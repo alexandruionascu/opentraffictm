@@ -1,0 +1,30 @@
+[
+  {
+    "id": "mobility-exports",
+    "name": "Mobility portal exports",
+    "format": ["CSV", "JSON"],
+    "description": "Public mobility indicators and corridor usage snapshots curated from Timișoara open data.",
+    "source": "https://data.primariatm.ro/group/mobilitate"
+  },
+  {
+    "id": "infrastructure-layers",
+    "name": "Infrastructure layers",
+    "format": ["GeoJSON"],
+    "description": "Road geometry, intersections, districts, and corridor overlays used by the visual benchmark.",
+    "source": "https://data.primariatm.ro/group/infrastructura"
+  },
+  {
+    "id": "monitoring-notes",
+    "name": "Traffic monitoring references",
+    "format": ["HTML", "PDF notes"],
+    "description": "Reference material for interpreting the city's traffic monitoring service and event constraints.",
+    "source": "https://www.primariatm.ro/siguranta-circulatiei/monitorizare-trafic"
+  },
+  {
+    "id": "osm-road-context",
+    "name": "OpenStreetMap road context",
+    "format": ["OSM", "Overpass"],
+    "description": "Road geometry and street context only. Not a traffic source.",
+    "source": "https://wiki.openstreetmap.org/wiki/Traffic_data"
+  }
+]

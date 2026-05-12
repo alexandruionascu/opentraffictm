@@ -1,0 +1,27 @@
+{
+  "name": "opentraffictm",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc && vite build",
+    "fetch:stpt-live": "node scripts/fetch-stpt-live.mjs",
+    "fetch:timisoara-open-data": "node scripts/fetch-timisoara-open-data.mjs",
+    "fetch:timisoara-road-closures": "node scripts/fetch-timisoara-road-closures.mjs",
+    "fetch:papers": "node scripts/fetch-timisoara-papers.mjs",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "maplibre-gl": "^5.24.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0"
+  }
+}

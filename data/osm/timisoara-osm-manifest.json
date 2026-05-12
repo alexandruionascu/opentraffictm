@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-05-12T09:40:04.826Z",
+  "source": "https://overpass-api.de/api/interpreter",
+  "bbox": {
+    "south": 45.68,
+    "west": 21.12,
+    "north": 45.82,
+    "east": 21.34
+  },
+  "query": "\n[out:json][timeout:180];\n(\n  way[\"highway\"](45.68,21.12,45.82,21.34);\n  node[\"highway\"=\"traffic_signals\"](45.68,21.12,45.82,21.34);\n  node[\"highway\"=\"crossing\"](45.68,21.12,45.82,21.34);\n);\nout tags geom;\n",
+  "roads": 22552,
+  "controls": 2981,
+  "outputFiles": [
+    "data/osm/timisoara-roads.geojson",
+    "data/osm/timisoara-controls.geojson"
+  ]
+}

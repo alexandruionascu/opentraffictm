@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-05-12T14:00:00.000Z",
+  "scope": "Official Timișoara source inventory for local traffic and mobility models",
+  "entries": [
+    {
+      "id": "timisoara-road-closures-notices",
+      "name": "Road closures and restrictions notices",
+      "organization": "Primăria Municipiului Timișoara",
+      "url": "https://www.primariatm.ro/dfmt/servicii-online",
+      "purpose": "Official notices about current and recent road closures, restrictions, and event-based blocks.",
+      "localFolder": "data/sources/timisoara-road-closures",
+      "note": "Used for the closure overlay and kept locally as mirrored notice text plus normalized JSON."
+    },
+    {
+      "id": "stpt-live-vehicles",
+      "name": "Live STPT vehicle feed",
+      "organization": "Societatea de Transport Public Timișoara",
+      "url": "https://live.stpt.ro/",
+      "purpose": "Live public-transport vehicle positions and route context for corridor delay and probe movement.",
+      "localFolder": "data/sources/stpt-live",
+      "note": "Local snapshots are refreshed from the public vehicle feed; useful as a transit probe layer."
+    },
+    {
+      "id": "timisoara-open-data-mobilitate",
+      "name": "Timișoara open mobility data",
+      "organization": "Municipiul Timișoara",
+      "url": "https://data.primariatm.ro/",
+      "purpose": "Public mobility and infrastructure datasets for city-level planning and validation.",
+      "localFolder": "data/sources/timisoara-open-data",
+      "note": "Annual and structured municipal mobility resources, stored locally in normalized form."
+    },
+    {
+      "id": "timisoara-rss-services",
+      "name": "Municipal RSS/XML service entry",
+      "organization": "Primăria Municipiului Timișoara",
+      "url": "https://www.primariatm.ro/dfmt/servicii-online",
+      "purpose": "Entry point for official XML/RSS notices and related public-service updates.",
+      "localFolder": null,
+      "note": "Useful for discovering other municipal feeds and notice endpoints without scraping map products."
+    }
+  ]
+}

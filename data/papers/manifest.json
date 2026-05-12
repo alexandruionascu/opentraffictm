@@ -1,0 +1,187 @@
+{
+  "generatedAt": "2026-05-12T13:41:34.410Z",
+  "scope": "Timisoara-first",
+  "counts": {
+    "total": 8,
+    "openAccess": 5,
+    "downloaded": 4,
+    "metadataOnly": 4
+  },
+  "papers": [
+    {
+      "id": "hybrid-kalman-fuzzy-car-following",
+      "title": "Hybrid Solution Combining Kalman Filtering with Takagi-Sugeno Fuzzy Inference System for Online Car-Following Model Calibration",
+      "year": 2020,
+      "authors": [
+        "Mădălin-Dorin Pop",
+        "Octavian Proștean",
+        "Tudor-Mihai David",
+        "Gabriela Proștean"
+      ],
+      "venue": "Sensors",
+      "doi": "10.3390/s20195539",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7582673/",
+      "pdfUrl": "https://pdfs.semanticscholar.org/f53b/68d85e22bc89fc1a2ec08e0788714e316610.pdf",
+      "access": "open",
+      "category": "calibration",
+      "relevance": "Timisoara traffic-monitoring data were used to calibrate car-following parameters in real time.",
+      "download": {
+        "status": "downloaded",
+        "filePath": "data/papers/files/hybrid-kalman-fuzzy-car-following.pdf",
+        "sourceUrl": "https://pdfs.semanticscholar.org/f53b/68d85e22bc89fc1a2ec08e0788714e316610.pdf",
+        "contentType": "application/pdf"
+      }
+    },
+    {
+      "id": "timisoara-traffic-light-control-sensors",
+      "title": "Ensemble based traffic light control for city zones using a reduced number of sensors",
+      "year": 2014,
+      "authors": [
+        "unknown"
+      ],
+      "venue": "Transportation Research Part C",
+      "doi": "10.1016/j.trc.2014.06.006",
+      "sourceUrl": "https://www.sciencedirect.com/science/article/pii/S0968090X14001855",
+      "pdfUrl": null,
+      "access": "restricted",
+      "category": "signal-control",
+      "relevance": "Timisoara central-area case study for adaptive signal control and reduced sensor placement.",
+      "download": {
+        "status": "unavailable"
+      }
+    },
+    {
+      "id": "timisoara-congestion-routes-information",
+      "title": "Urban traffic congestion prediction based on routes information",
+      "year": 2013,
+      "authors": [
+        "Pescaru Dan"
+      ],
+      "venue": "IEEE SACI 2013",
+      "doi": "10.1109/SACI.2013.6608951",
+      "sourceUrl": "https://ieeexplore.ieee.org/document/6608951",
+      "pdfUrl": null,
+      "access": "restricted",
+      "category": "prediction",
+      "relevance": "Timisoara case study using event-based routes and sensor-network inputs for congestion prediction.",
+      "download": {
+        "status": "unavailable"
+      }
+    },
+    {
+      "id": "timisoara-public-traffic-flow-dataset",
+      "title": "A dataset of urban traffic flow for 13 Romanian cities amid lockdown and after ease of COVID19 related restrictions",
+      "year": 2020,
+      "authors": [
+        "Alexandru Iovanovici",
+        "Dacian Avramoni",
+        "Lucian Prodan"
+      ],
+      "venue": "Data in Brief",
+      "doi": "10.1016/j.dib.2020.106318",
+      "sourceUrl": "https://www.sciencedirect.com/science/article/pii/S2352340920312129",
+      "pdfUrl": "https://www.sciencedirect.com/science/article/pii/S2352340920312129/pdfft?isDTMRedir=true&download=true",
+      "access": "open",
+      "category": "probe-data",
+      "relevance": "Public traffic-flow traces include Timisoara and provide a reusable short-term congestion benchmark.",
+      "download": {
+        "status": "unavailable"
+      }
+    },
+    {
+      "id": "timisoara-student-complex-road-infrastructure",
+      "title": "Analysis of the problems related to traffic and road infrastructure in the area of the Timisoara student complex",
+      "year": 2024,
+      "authors": [
+        "Madalina Ileana Zot",
+        "Ovidiu-Octavian Maran",
+        "Mihaela Popa",
+        "Francisc Popescu",
+        "Luisa Izabel Dungan"
+      ],
+      "venue": "Reciklaža i Održivi Razvoj",
+      "doi": "10.5937/ror2401057Z",
+      "sourceUrl": "https://www.rsd.tfbor.bg.ac.rs/index.php/home/article/view/101",
+      "pdfUrl": "https://scindeks-clanci.ceon.rs/data/pdf/1820-7480/2024/1820-74802401057Z.pdf",
+      "access": "open",
+      "category": "road-infrastructure",
+      "relevance": "District-level traffic and road-infrastructure analysis for the Timisoara student complex.",
+      "download": {
+        "status": "downloaded",
+        "filePath": "data/papers/files/timisoara-student-complex-road-infrastructure.pdf",
+        "sourceUrl": "https://scindeks-clanci.ceon.rs/data/pdf/1820-7480/2024/1820-74802401057Z.pdf",
+        "contentType": "application/pdf"
+      }
+    },
+    {
+      "id": "timisoara-city-monitoring-car-following",
+      "title": "Short term traffic congestion prediction using publically available traffic data: a case study on Timisoara",
+      "year": 2022,
+      "authors": [
+        "Dacian Avramoni",
+        "Alexandru Iovanovici",
+        "Anca Ilienescu",
+        "Lucian Prodan"
+      ],
+      "venue": "IEEE conference paper",
+      "doi": null,
+      "sourceUrl": "https://ieeexplore.ieee.org/document/9780813/",
+      "pdfUrl": null,
+      "access": "restricted",
+      "category": "prediction",
+      "relevance": "Short-term congestion prediction using publicly available traffic data for Timisoara.",
+      "download": {
+        "status": "unavailable"
+      }
+    },
+    {
+      "id": "timisoara-air-quality-traffic-intensity",
+      "title": "A Study on Particulate Matter from an Area with High Traffic Intensity",
+      "year": 2023,
+      "authors": [
+        "Dan-Marius Mustață",
+        "Ioana Ionel",
+        "Rareș-Mihăiță Popa",
+        "Ciprian Dughir",
+        "Daniel Bisorca"
+      ],
+      "venue": "Applied Sciences",
+      "doi": "10.3390/app13158824",
+      "sourceUrl": "https://www.mdpi.com/2076-3417/13/15/8824",
+      "pdfUrl": "https://www.mdpi.com/2076-3417/13/15/8824/pdf",
+      "access": "open",
+      "category": "impact",
+      "relevance": "Roadside traffic intensity evidence that can support demand and emissions assumptions around busy corridors.",
+      "download": {
+        "status": "downloaded",
+        "filePath": "data/papers/files/timisoara-air-quality-traffic-intensity.pdf",
+        "sourceUrl": "https://www.mdpi.com/2076-3417/13/15/8824/pdf",
+        "contentType": "application/pdf"
+      }
+    },
+    {
+      "id": "timisoara-tactics-adaptive-control",
+      "title": "TACTICS: Adaptive Framework for Reactive Control of Road Traffic Systems",
+      "year": 2015,
+      "authors": [
+        "Cristian Cosariu",
+        "Alexandru Iovanovici",
+        "Lucian Prodan",
+        "Mircea Vladutiu"
+      ],
+      "venue": "Scientific Bulletin of Politehnica University of Timisoara",
+      "doi": null,
+      "sourceUrl": "https://dspace.upt.ro/xmlui/handle/123456789/1155",
+      "pdfUrl": "https://dspace.upt.ro/xmlui/bitstream/handle/123456789/1155/BUPT_ART_Cosariu_f.pdf?isAllowed=y&sequence=3",
+      "access": "open",
+      "category": "signal-control",
+      "relevance": "Timisoara case study for adaptive reactive traffic control, queue reduction, and waiting-time improvement.",
+      "download": {
+        "status": "downloaded",
+        "filePath": "data/papers/files/timisoara-tactics-adaptive-control.pdf",
+        "sourceUrl": "https://dspace.upt.ro/xmlui/bitstream/handle/123456789/1155/BUPT_ART_Cosariu_f.pdf?isAllowed=y&sequence=3",
+        "contentType": "application/pdf"
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-05-12T14:30:00.000Z",
+  "scope": "Browser-native signal comparison contract",
+  "programs": [
+    {
+      "id": "signal-republicii",
+      "intersection": "Republicii / Core",
+      "cycleSeconds": 74,
+      "offsetSeconds": 0,
+      "states": [
+        { "state": "green", "durationSeconds": 38 },
+        { "state": "yellow", "durationSeconds": 4 },
+        { "state": "red", "durationSeconds": 32 }
+      ]
+    },
+    {
+      "id": "signal-aradului",
+      "intersection": "Calea Aradului / Ring",
+      "cycleSeconds": 76,
+      "offsetSeconds": 13,
+      "states": [
+        { "state": "green", "durationSeconds": 34 },
+        { "state": "yellow", "durationSeconds": 4 },
+        { "state": "red", "durationSeconds": 38 }
+      ]
+    },
+    {
+      "id": "signal-sagului",
+      "intersection": "Sagului / Core",
+      "cycleSeconds": 76,
+      "offsetSeconds": 22,
+      "states": [
+        { "state": "green", "durationSeconds": 32 },
+        { "state": "yellow", "durationSeconds": 4 },
+        { "state": "red", "durationSeconds": 40 }
+      ]
+    },
+    {
+      "id": "signal-take-ionescu",
+      "intersection": "Take Ionescu / Core",
+      "cycleSeconds": 74,
+      "offsetSeconds": 48,
+      "states": [
+        { "state": "green", "durationSeconds": 36 },
+        { "state": "yellow", "durationSeconds": 4 },
+        { "state": "red", "durationSeconds": 34 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-05-12T14:30:00.000Z",
+  "scope": "Hackathon scenario catalog",
+  "entries": [
+    {
+      "id": "TM-01",
+      "name": "Central corridor timing",
+      "district": "Central",
+      "corridor": "Bulevardul Republicii",
+      "task": "Estimate delay reduction after a signal timing change.",
+      "groundTruth": 11.2
+    },
+    {
+      "id": "TM-02",
+      "name": "North re-route ranking",
+      "district": "North",
+      "corridor": "Calea Aradului",
+      "task": "Rank the best re-route option for commuter traffic.",
+      "groundTruth": 8.7
+    },
+    {
+      "id": "TM-03",
+      "name": "Bus priority resilience",
+      "district": "South",
+      "corridor": "Calea Șagului",
+      "task": "Predict the resilience of bus priority at peak hour.",
+      "groundTruth": 13.4
+    },
+    {
+      "id": "TM-04",
+      "name": "Temporary closure impact",
+      "district": "East",
+      "corridor": "Bulevardul Circumvalațiunii",
+      "task": "Compare access impact for a temporary closure.",
+      "groundTruth": 9.6
+    }
+  ]
+}

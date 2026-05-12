@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2026-05-12T13:52:58.335Z",
+  "baseUrl": "https://www.primariatm.ro",
+  "seedFile": "data/sources/timisoara-road-closures/seed-urls.json",
+  "seedCount": 20,
+  "outputFile": "data/sources/timisoara-road-closures/latest.json",
+  "archiveDir": "data/sources/timisoara-road-closures/archive",
+  "pageDir": "data/sources/timisoara-road-closures/pages",
+  "sourceType": "official municipal closures notices",
+  "localOnly": true,
+  "caveat": "This mirrors official Timișoara notices about closures and restrictions. It is not Google Maps data and should be refreshed from the municipal source, not redistributed as live navigation data."
+}

@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-05-12T12:26:08.488Z",
+  "catalogUrl": "https://data.primariatm.ro/api/3/action/package_search?fq=groups:mobilitate&rows=20",
+  "license": "Creative Commons Attribution, per Timișoara open-data portal package metadata",
+  "fetched": [
+    {
+      "id": "transportul-public",
+      "file": "data/sources/timisoara-open-data/transportul-public.csv",
+      "sourceUrl": "https://data.primariatm.ro/dataset/8d8f9163-2b3a-41c4-9f2b-e939268a8c91/resource/cccf1959-4bb7-40cd-a817-91a885d06609/download/transportul-public.csv",
+      "bytes": 1587
+    },
+    {
+      "id": "transportul-public-normat",
+      "file": "data/sources/timisoara-open-data/transportul-public-normat.csv",
+      "sourceUrl": "https://data.primariatm.ro/dataset/8d8f9163-2b3a-41c4-9f2b-e939268a8c91/resource/380ff810-5d40-4196-aad8-74b3757fabcc/download/transportul-public.csv",
+      "bytes": 17105
+    },
+    {
+      "id": "sistemul-de-biciclete-trotinete-normat",
+      "file": "data/sources/timisoara-open-data/sistemul-de-biciclete-trotinete-normat.csv",
+      "sourceUrl": "https://data.primariatm.ro/dataset/0b9cba8f-82f2-4b52-9f66-d17cf61c720e/resource/7681392b-01cc-480e-b99c-4aeb6bcb2c08/download/sistemul-de-biciclete-trotinete.csv",
+      "bytes": 275
+    },
+    {
+      "id": "infrastructura-rutiera-normat",
+      "file": "data/sources/timisoara-open-data/infrastructura-rutiera-normat.csv",
+      "sourceUrl": "https://data.primariatm.ro/dataset/f99aeec0-e850-47cb-9bd9-6903369b479e/resource/94b66632-258b-4c5b-a92d-27758d1d7057/download/infrastructura-rutiera.csv",
+      "bytes": 2631
+    },
+    {
+      "id": "sistem-feroviar-transport-feroviar-normat",
+      "file": "data/sources/timisoara-open-data/sistem-feroviar-transport-feroviar-normat.csv",
+      "sourceUrl": "https://data.primariatm.ro/dataset/961814e6-3bd3-4508-98ff-cc67eb1137b6/resource/0df8b837-31e4-44d1-86b0-beaae0da1ad8/download/sistem-feroviar-transport-feroviar.csv",
+      "bytes": 583
+    }
+  ],
+  "caveat": "These are annual aggregate mobility and infrastructure indicators. They are not live road-traffic counts, speeds, signal phases, or probe traces."
+}

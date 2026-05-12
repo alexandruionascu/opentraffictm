@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-05-12T14:30:00.000Z",
+  "scope": "Hackathon leaderboard contract",
+  "tracks": [
+    {
+      "track": "Human",
+      "summary": "Human teams are ranked on calibration, coverage, and schema validity.",
+      "entries": [
+        {
+          "name": "Team North Loop",
+          "score": 96.3,
+          "scenarios": 12,
+          "schemaErrors": 0,
+          "summary": "Best corridor calibration; strong under congestion variance."
+        },
+        {
+          "name": "City Signals",
+          "score": 93.8,
+          "scenarios": 12,
+          "schemaErrors": 1,
+          "summary": "Balanced across districts with high calibration stability."
+        },
+        {
+          "name": "Route Atlas",
+          "score": 91.1,
+          "scenarios": 11,
+          "schemaErrors": 0,
+          "summary": "Excellent route accuracy; slightly weaker confidence calibration."
+        }
+      ]
+    },
+    {
+      "track": "Agent",
+      "summary": "Agent runs are compared on reproducibility and signal timing agreement.",
+      "entries": [
+        {
+          "name": "TransitLens",
+          "score": 97.4,
+          "scenarios": 12,
+          "schemaErrors": 0,
+          "summary": "Highest overall score with the tightest calibration curve."
+        },
+        {
+          "name": "CorridorMind",
+          "score": 95.6,
+          "scenarios": 12,
+          "schemaErrors": 0,
+          "summary": "Strong district-level agreement and robust schema compliance."
+        },
+        {
+          "name": "FlowPilot",
+          "score": 92.7,
+          "scenarios": 10,
+          "schemaErrors": 0,
+          "summary": "Fast and consistent, but narrower coverage on outlier corridors."
+        }
+      ]
+    }
+  ]
+}

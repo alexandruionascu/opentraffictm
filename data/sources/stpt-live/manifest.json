@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-05-12T12:31:51.306Z",
+  "baseUrl": "https://live.stpt.ro",
+  "routesDiscovered": 75,
+  "latestVehicleCount": 141,
+  "latestJson": "data/sources/stpt-live/latest-vehicles.json",
+  "latestGeoJson": "data/sources/stpt-live/latest-vehicles.geojson",
+  "archiveDir": "data/sources/stpt-live/archive",
+  "attribution": "Copyright © Romania, 2024, Tranzy AI SRL & Societatea de Transport Public Timișoara SA. All rights reserved.",
+  "caveat": "This is live public transport vehicle data, not private-car traffic. Use it as observed transit/probe movement and corridor-delay evidence."
+}
