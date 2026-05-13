@@ -32,6 +32,8 @@ export interface SignalProgram {
   primaryHeadingDeg?: number;
   phases: SignalPhase[];
   offsetSeconds: number;
+  osmId?: number;
+  sampleCount?: number;
 }
 
 interface SignalJsonPhase {
@@ -46,6 +48,8 @@ interface SignalJsonProgram {
   primaryHeadingDeg: number;
   offsetSeconds: number;
   phases: SignalJsonPhase[];
+  osmId?: number;
+  sampleCount?: number;
 }
 
 interface SignalsJson {
@@ -61,6 +65,8 @@ const importedSignalPrograms: SignalProgram[] = (signalsJson as SignalsJson).pro
   primaryHeadingDeg: program.primaryHeadingDeg,
   offsetSeconds: program.offsetSeconds,
   phases: program.phases,
+  osmId: program.osmId,
+  sampleCount: program.sampleCount,
 }));
 
 export interface Scenario {
