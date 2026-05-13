@@ -313,6 +313,10 @@ p {
   justify-items: end;
 }
 
+.signal-comparison-summary {
+  opacity: 0.72;
+}
+
 .mini-badge {
   background: rgba(3, 7, 13, 0.78);
   border: 1px solid var(--line);
@@ -325,6 +329,42 @@ p {
   padding: 8px 12px;
   position: absolute;
   z-index: 11;
+}
+
+.signal-inspector {
+  backdrop-filter: blur(18px);
+  background: rgba(3, 7, 13, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  bottom: 18px;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.26);
+  color: var(--text);
+  display: grid;
+  gap: 4px;
+  left: 50%;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 12px 14px;
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 12;
+}
+
+.signal-inspector strong {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.signal-inspector span {
+  color: #86efac;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.signal-inspector small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .btn {

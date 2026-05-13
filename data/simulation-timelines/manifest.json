@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-13T14:27:53.095Z",
+  "files": [
+    {
+      "scenarioId": "TM-CITY-01",
+      "scenarioName": "Whole-city signal pressure",
+      "file": "TM-CITY-01.json",
+      "frameStepSeconds": 1,
+      "frameCount": 521
+    }
+  ]
+}

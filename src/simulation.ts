@@ -25,6 +25,8 @@ export interface SignalFrame {
   secondsRemaining: number;
   cycleSeconds: number;
   phaseIndex: number;
+  osmId?: number;
+  sampleCount?: number;
 }
 
 export interface SignalComparisonFrame {
@@ -52,6 +54,11 @@ export interface SimulationFrame {
     queueLength: number;
     signalPressure: number;
   };
+}
+
+export interface SimulationTimeline {
+  frameStepSeconds: number;
+  frames: SimulationFrame[];
 }
 
 const metersPerDegreeLat = 111_320;
@@ -90,6 +97,17 @@ const laneAssignmentsCache = new WeakMap<
   Actor[],
   Map<string, { laneIndex: number; laneOffsetMeters: number; laneKey: string }>
 >();
+
+type ActorSimulationState = {
+  actor: Actor;
+  length: number;
+  distance: number;
+  speedMps: number;
+  waiting: boolean;
+  queueIndex: number;
+  congestion: number;
+  stoppedFor?: string;
+};
 
 function getRouteInfo(route: Coordinate[]) {
   const cached = routeInfoCache.get(route);
@@ -317,7 +335,7 @@ function distanceAlongRouteNear(route: Coordinate[], target: Coordinate) {
 
 function signalAt(program: SignalProgram, timeSeconds: number): SignalFrame {
   const cycle = program.phases.reduce((total, phase) => total + phase.durationSeconds, 0);
-  let phaseClock = (timeSeconds + program.offsetSeconds) % cycle;
+  let phaseClock = cycle > 0 ? ((timeSeconds - program.offsetSeconds) % cycle + cycle) % cycle : 0;
   let phaseIndex = 0;
 
   for (const [index, phase] of program.phases.entries()) {
@@ -331,6 +349,8 @@ function signalAt(program: SignalProgram, timeSeconds: number): SignalFrame {
         secondsRemaining: Math.ceil(phase.durationSeconds - phaseClock),
         cycleSeconds: cycle,
         phaseIndex: index,
+        osmId: program.osmId,
+        sampleCount: program.sampleCount,
       };
     }
     phaseClock -= phase.durationSeconds;
@@ -346,6 +366,8 @@ function signalAt(program: SignalProgram, timeSeconds: number): SignalFrame {
     secondsRemaining: 0,
     cycleSeconds: cycle,
     phaseIndex,
+    osmId: program.osmId,
+    sampleCount: program.sampleCount,
   };
 }
 
@@ -416,18 +438,13 @@ function nextBlockingSignal(
   return best;
 }
 
-export function simulateScenario(scenario: Scenario, timeSeconds: number): SimulationFrame {
-  const warmupSeconds = 18;
-  const simulationStart = Math.max(0, timeSeconds - warmupSeconds);
-  const signals = scenario.signals.map((program) => signalAt(program, timeSeconds));
-  const lanes = laneAssignments(scenario.actors);
-  const actorLookup = new Map(scenario.actors.map((actor) => [actor.id, actor] as const));
-  const states = scenario.actors.map((actor) => {
+function createInitialActorStates(scenario: Scenario, timeSeconds: number): ActorSimulationState[] {
+  return scenario.actors.map((actor) => {
     const length = routeLength(actor.route);
     const routeCycleLength = routeIsClosed(actor.route) ? length : length * 2;
     const phaseDistance =
       routeCycleLength > 0
-        ? (((actor.routeOffsetSeconds ?? 0) + simulationStart) * actor.speedMps) % routeCycleLength
+        ? (((actor.routeOffsetSeconds ?? 0) + timeSeconds) * actor.speedMps) % routeCycleLength
         : 0;
 
     return {
@@ -441,11 +458,20 @@ export function simulateScenario(scenario: Scenario, timeSeconds: number): Simul
       stoppedFor: undefined as string | undefined,
     };
   });
+}
+
+function advanceActorStates(
+  scenario: Scenario,
+  states: ActorSimulationState[],
+  fromSeconds: number,
+  toSeconds: number,
+) {
+  const lanes = laneAssignments(scenario.actors);
   const stateById = new Map(states.map((state) => [state.actor.id, state] as const));
   const stepSeconds = 0.5;
 
-  for (let simTime = simulationStart; simTime < timeSeconds; simTime += stepSeconds) {
-    const step = Math.min(stepSeconds, timeSeconds - simTime);
+  for (let simTime = fromSeconds; simTime < toSeconds; simTime += stepSeconds) {
+    const step = Math.min(stepSeconds, toSeconds - simTime);
     const stepSignals = scenario.signals.map((program) => signalAt(program, simTime + step));
     const candidates = states.map((state) => {
       const { actor, length } = state;
@@ -583,7 +609,16 @@ export function simulateScenario(scenario: Scenario, timeSeconds: number): Simul
       state.stoppedFor = candidate.stoppedFor;
     }
   }
+}
 
+function frameFromActorStates(
+  scenario: Scenario,
+  timeSeconds: number,
+  states: ActorSimulationState[],
+): SimulationFrame {
+  const lanes = laneAssignments(scenario.actors);
+  const actorLookup = new Map(scenario.actors.map((actor) => [actor.id, actor] as const));
+  const signals = scenario.signals.map((program) => signalAt(program, timeSeconds));
   const actors = states.map((state) => {
     const lane = lanes.get(state.actor.id) ?? { laneIndex: 0, laneOffsetMeters: 0 };
     const point = pointOnTravelRoute(state.actor.route, state.distance, state.length);
@@ -609,8 +644,19 @@ export function simulateScenario(scenario: Scenario, timeSeconds: number): Simul
     };
   });
 
+  const blockedActorsBySignal = new Map<string, ActorFrame[]>();
+  for (const actor of actors) {
+    if (!actor.stoppedFor) continue;
+    const blockedActors = blockedActorsBySignal.get(actor.stoppedFor);
+    if (blockedActors) {
+      blockedActors.push(actor);
+    } else {
+      blockedActorsBySignal.set(actor.stoppedFor, [actor]);
+    }
+  }
+
   const signalComparisons = signals.map((signal) => {
-    const blockedActors = actors.filter((actor) => actor.stoppedFor === signal.name || actor.stoppedFor === signal.id);
+    const blockedActors = blockedActorsBySignal.get(signal.name) ?? blockedActorsBySignal.get(signal.id) ?? [];
     const queueMeters = blockedActors.reduce((total, actor) => {
       const original = actorLookup.get(actor.id);
       return total + Math.max(original?.lengthMeters ?? 4.8, 4.8) + 2.8;
@@ -655,4 +701,27 @@ export function simulateScenario(scenario: Scenario, timeSeconds: number): Simul
     },
     signalComparisons,
   };
+}
+
+export function simulateScenario(scenario: Scenario, timeSeconds: number): SimulationFrame {
+  const warmupSeconds = 18;
+  const simulationStart = Math.max(0, timeSeconds - warmupSeconds);
+  const states = createInitialActorStates(scenario, simulationStart);
+  advanceActorStates(scenario, states, simulationStart, timeSeconds);
+  return frameFromActorStates(scenario, timeSeconds, states);
+}
+
+export function buildScenarioTimeline(scenario: Scenario, frameStepSeconds = 0.5): SimulationTimeline {
+  const states = createInitialActorStates(scenario, 0);
+  const frames: SimulationFrame[] = [frameFromActorStates(scenario, 0, states)];
+  let previousTime = 0;
+
+  for (let time = frameStepSeconds; time <= scenario.durationSeconds; time += frameStepSeconds) {
+    const frameTime = Math.min(time, scenario.durationSeconds);
+    advanceActorStates(scenario, states, previousTime, frameTime);
+    frames.push(frameFromActorStates(scenario, frameTime, states));
+    previousTime = frameTime;
+  }
+
+  return { frameStepSeconds, frames };
 }

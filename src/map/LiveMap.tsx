@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import type { FeatureCollection, LineString, Point } from "geojson";
 import type { GeoJSONSource, Map as MapLibreMap, StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { type Scenario, type ActorType } from "../data";
+import { type Scenario, type ActorType, type SignalState } from "../data";
 import {
   buildClosureOverlay,
   closureWindowLabel,
@@ -11,13 +11,63 @@ import {
   type ClosureManifest,
   type ClosureOverlaySummary,
 } from "../closures";
-import { simulateScenario, type SimulationFrame } from "../simulation";
+import { buildScenarioTimeline, type ActorFrame, type SignalFrame, type SimulationFrame, type SimulationTimeline } from "../simulation";
 import { downloadJson } from "../contracts";
 
 type LineCollection = FeatureCollection<LineString>;
 type PointCollection = FeatureCollection<Point>;
 type LaneCollection = FeatureCollection<LineString>;
 type MapStyleMode = "midnight" | "daylight" | "aerial";
+type SelectedSignalDetails = {
+  id: string;
+  name: string;
+  state?: string;
+  secondsRemaining?: number;
+  cycleSeconds?: number;
+  phaseIndex?: number;
+  phaseCount?: number;
+  osmId?: number;
+  sampleCount?: number;
+  hasProvidedData: boolean;
+};
+
+type CompactActorFrame = [
+  lng: number,
+  lat: number,
+  headingDeg: number,
+  progress: number,
+  waiting: 0 | 1,
+  speedMps: number,
+  queueIndex: number,
+  laneIndex: number,
+  laneOffsetMeters: number,
+  congestion: number,
+  stoppedFor: string,
+];
+type CompactMetricsFrame = [
+  activeActors: number,
+  averageProgress: number,
+  waitingActors: number,
+  throughput: number,
+  averageSpeedKmh: number,
+  queueLength: number,
+  signalPressure: number,
+];
+type CompactTimelineFrame = {
+  t: number;
+  a: CompactActorFrame[];
+  m: CompactMetricsFrame;
+};
+type CompactTimelineArtifact = {
+  version: 2;
+  scenarioId: string;
+  durationSeconds: number;
+  frameStepSeconds: number;
+  frames: CompactTimelineFrame[];
+};
+type PlaybackTimeline =
+  | { kind: "full"; frameStepSeconds: number; frames: SimulationFrame[] }
+  | { kind: "compact"; frameStepSeconds: number; frames: CompactTimelineFrame[] };
 
 interface LocalOsmBundle {
   roads: LineCollection;
@@ -159,6 +209,13 @@ function parseLaneCount(value: unknown, rank: number) {
   return rank >= 7 ? 2 : 1;
 }
 
+function roadRenderGeoJson(roads: LineCollection): LineCollection {
+  return {
+    type: "FeatureCollection",
+    features: roads.features.filter((feature) => (feature.properties?.rank ?? 0) >= 3),
+  };
+}
+
 function laneOverlayGeoJson(roads: LineCollection): LaneCollection {
   const features = roads.features.flatMap((feature) => {
     const lanes = parseLaneCount(feature.properties?.lanes, feature.properties?.rank ?? 0);
@@ -276,6 +333,161 @@ function actorHeadingGeoJson(frame: SimulationFrame): FeatureCollection<LineStri
   };
 }
 
+function emptySimulationFrame(scenario: Scenario): SimulationFrame {
+  const signals = signalAtTime(scenario, 0);
+
+  return {
+    timeSeconds: 0,
+    actors: [],
+    signals,
+    signalComparisons: signals.map((signal) => ({
+      id: signal.id,
+      name: signal.name,
+      state: signal.state,
+      secondsRemaining: signal.secondsRemaining,
+      cycleSeconds: signal.cycleSeconds,
+      blockedActors: 0,
+      queueMeters: 0,
+      estimatedDelaySeconds: 0,
+    })),
+    metrics: {
+      activeActors: 0,
+      averageProgress: 0,
+      waitingActors: 0,
+      throughput: 0,
+      averageSpeedKmh: 0,
+      queueLength: 0,
+      signalPressure: 0,
+    },
+  };
+}
+
+function emptySimulationTimeline(scenario: Scenario): SimulationTimeline {
+  return { frameStepSeconds: 1, frames: [emptySimulationFrame(scenario)] };
+}
+
+function emptyPlaybackTimeline(scenario: Scenario): PlaybackTimeline {
+  const timeline = emptySimulationTimeline(scenario);
+  return { kind: "full", frameStepSeconds: timeline.frameStepSeconds, frames: timeline.frames };
+}
+
+function signalAtTime(scenario: Scenario, timeSeconds: number): SignalFrame[] {
+  return scenario.signals.map((program) => {
+    const cycleSeconds = program.phases.reduce((total, phase) => total + phase.durationSeconds, 0);
+    let phaseClock =
+      cycleSeconds > 0 ? ((timeSeconds - program.offsetSeconds) % cycleSeconds + cycleSeconds) % cycleSeconds : 0;
+
+    for (const [phaseIndex, phase] of program.phases.entries()) {
+      if (phaseClock < phase.durationSeconds) {
+        return {
+          id: program.id,
+          name: program.name,
+          position: program.position,
+          state: phase.state,
+          primaryHeadingDeg: program.primaryHeadingDeg,
+          secondsRemaining: Math.ceil(phase.durationSeconds - phaseClock),
+          cycleSeconds,
+          phaseIndex,
+          osmId: program.osmId,
+          sampleCount: program.sampleCount,
+        };
+      }
+      phaseClock -= phase.durationSeconds;
+    }
+
+    return {
+      id: program.id,
+      name: program.name,
+      position: program.position,
+      state: "red" as SignalState,
+      primaryHeadingDeg: program.primaryHeadingDeg,
+      secondsRemaining: 0,
+      cycleSeconds,
+      phaseIndex: Math.max(0, program.phases.length - 1),
+      osmId: program.osmId,
+      sampleCount: program.sampleCount,
+    };
+  });
+}
+
+function signalComparisonsForFrame(scenario: Scenario, actors: ActorFrame[], signals: SignalFrame[]) {
+  const actorLookup = new Map(scenario.actors.map((actor) => [actor.id, actor] as const));
+  const blockedActorsBySignal = new Map<string, ActorFrame[]>();
+
+  for (const actor of actors) {
+    if (!actor.stoppedFor) continue;
+    const blockedActors = blockedActorsBySignal.get(actor.stoppedFor);
+    if (blockedActors) {
+      blockedActors.push(actor);
+    } else {
+      blockedActorsBySignal.set(actor.stoppedFor, [actor]);
+    }
+  }
+
+  return signals.map((signal) => {
+    const blockedActors = blockedActorsBySignal.get(signal.name) ?? blockedActorsBySignal.get(signal.id) ?? [];
+    const queueMeters = blockedActors.reduce((total, actor) => {
+      const original = actorLookup.get(actor.id);
+      return total + Math.max(original?.lengthMeters ?? 4.8, 4.8) + 2.8;
+    }, 0);
+    const estimatedDelaySeconds = blockedActors.reduce((total, actor) => {
+      const original = actorLookup.get(actor.id);
+      const delayFactor = original?.type === "bus" ? 1.8 : original?.type === "pedestrian" ? 0.8 : 1.2;
+      return total + delayFactor * (signal.state === "red" ? 6.5 : signal.state === "yellow" ? 3.5 : 1.1);
+    }, 0);
+
+    return {
+      id: signal.id,
+      name: signal.name,
+      state: signal.state,
+      secondsRemaining: signal.secondsRemaining,
+      cycleSeconds: signal.cycleSeconds,
+      blockedActors: blockedActors.length,
+      queueMeters,
+      estimatedDelaySeconds,
+    };
+  });
+}
+
+function compactFrameToSimulationFrame(scenario: Scenario, compact: CompactTimelineFrame): SimulationFrame {
+  const actors = compact.a.map((actor, index): ActorFrame => {
+    const source = scenario.actors[index];
+
+    return {
+      id: source?.id ?? `actor-${index}`,
+      type: source?.type ?? "car",
+      label: source?.label ?? `Actor ${index + 1}`,
+      position: { lng: actor[0], lat: actor[1] },
+      headingDeg: actor[2],
+      progress: actor[3],
+      waiting: actor[4] === 1,
+      speedMps: actor[5],
+      queueIndex: actor[6],
+      laneIndex: actor[7],
+      laneOffsetMeters: actor[8],
+      congestion: actor[9],
+      stoppedFor: actor[10] || undefined,
+    };
+  });
+  const signals = signalAtTime(scenario, compact.t);
+
+  return {
+    timeSeconds: compact.t,
+    actors,
+    signals,
+    signalComparisons: signalComparisonsForFrame(scenario, actors, signals),
+    metrics: {
+      activeActors: compact.m[0],
+      averageProgress: compact.m[1],
+      waitingActors: compact.m[2],
+      throughput: compact.m[3],
+      averageSpeedKmh: compact.m[4],
+      queueLength: compact.m[5],
+      signalPressure: compact.m[6],
+    },
+  };
+}
+
 function coordinateAtBearing(origin: { lng: number; lat: number }, headingDeg: number, distanceMeters: number) {
   const headingRad = (headingDeg * Math.PI) / 180;
   const latScale = 111_320;
@@ -287,10 +499,10 @@ function coordinateAtBearing(origin: { lng: number; lat: number }, headingDeg: n
   };
 }
 
-function signalPhaseGeoJson(frame: SimulationFrame): FeatureCollection<LineString> {
+function signalPhaseFramesGeoJson(signals: SignalFrame[]): FeatureCollection<LineString> {
   return {
     type: "FeatureCollection",
-    features: frame.signals
+    features: signals
       .filter((signal) => signal.primaryHeadingDeg !== undefined)
       .map((signal) => {
         const activeHeading =
@@ -313,15 +525,26 @@ function signalPhaseGeoJson(frame: SimulationFrame): FeatureCollection<LineStrin
   };
 }
 
-function signalGeoJson(frame: SimulationFrame): FeatureCollection<Point> {
+function signalPhaseGeoJson(frame: SimulationFrame): FeatureCollection<LineString> {
+  return signalPhaseFramesGeoJson(frame.signals);
+}
+
+function signalFramesGeoJson(signals: SignalFrame[]): FeatureCollection<Point> {
   return {
     type: "FeatureCollection",
-    features: frame.signals.map((signal) => ({
+    features: signals.map((signal) => ({
       type: "Feature",
       properties: {
         id: signal.id,
+        name: signal.name,
         state: signal.state,
         primaryHeadingDeg: signal.primaryHeadingDeg ?? 0,
+        secondsRemaining: signal.secondsRemaining,
+        cycleSeconds: signal.cycleSeconds,
+        phaseIndex: signal.phaseIndex,
+        osmId: signal.osmId ?? null,
+        sampleCount: signal.sampleCount ?? null,
+        hasProvidedData: true,
       },
       geometry: {
         type: "Point",
@@ -329,6 +552,18 @@ function signalGeoJson(frame: SimulationFrame): FeatureCollection<Point> {
       },
     })),
   };
+}
+
+function signalGeoJson(frame: SimulationFrame): FeatureCollection<Point> {
+  return signalFramesGeoJson(frame.signals);
+}
+
+function scenarioSignalGeoJson(scenario: Scenario, timeSeconds: number): FeatureCollection<Point> {
+  return signalFramesGeoJson(signalAtTime(scenario, timeSeconds));
+}
+
+function scenarioSignalPhaseGeoJson(scenario: Scenario, timeSeconds: number): FeatureCollection<LineString> {
+  return signalPhaseFramesGeoJson(signalAtTime(scenario, timeSeconds));
 }
 
 function buildMapStyle(mode: MapStyleMode, localOsm: LocalOsmBundle | null): StyleSpecification {
@@ -502,11 +737,11 @@ function buildMapStyle(mode: MapStyleMode, localOsm: LocalOsmBundle | null): Sty
         source: "local-osm-controls",
         filter: ["==", ["get", "kind"], "traffic_signal"],
         paint: {
-          "circle-radius": isAerial ? ["interpolate", ["linear"], ["zoom"], 11, 1.5, 16, 4] : ["interpolate", ["linear"], ["zoom"], 11, 2, 16, 5],
+          "circle-radius": isAerial ? ["interpolate", ["linear"], ["zoom"], 10, 2.5, 16, 7] : ["interpolate", ["linear"], ["zoom"], 10, 3, 16, 8],
           "circle-color": isAerial ? "#ff5c7a" : theme.signal,
           "circle-stroke-color": theme.signalStroke,
-          "circle-stroke-width": 0.8,
-          "circle-opacity": 0.86,
+          "circle-stroke-width": 1.2,
+          "circle-opacity": 0.92,
         },
       },
     ],
@@ -530,7 +765,7 @@ function attachDynamicMapLayers(
   map.addSource("actors", { type: "geojson", data: actorGeoJson(frame) });
   map.addSource("actor-headings", { type: "geojson", data: actorHeadingGeoJson(frame) });
   map.addSource("scenario-routes", { type: "geojson", data: routeGeoJson(scenario) });
-  map.addSource("signal-phases", { type: "geojson", data: signalPhaseGeoJson(frame) });
+  map.addSource("signal-phases", { type: "geojson", data: scenarioSignalPhaseGeoJson(scenario, frame.timeSeconds) });
   map.addSource("validation-probes", { type: "geojson", data: probePoints });
   if (probeSource === "tomtom") {
     map.addSource("validation-flow-lines", { type: "geojson", data: probeLines });
@@ -630,7 +865,7 @@ function attachDynamicMapLayers(
     id: "validation-probe-halo",
     type: "circle",
     source: "validation-probes",
-    filter: probeSource === "tomtom" ? ["==", ["get", "kind"], "flow"] : undefined,
+    ...(probeSource === "tomtom" ? { filter: ["==", ["get", "kind"], "flow"] as const } : {}),
     paint: {
       "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 7, 15, 14],
       "circle-color": probeSource === "tomtom" ? "#38bdf8" : "#22c55e",
@@ -642,7 +877,7 @@ function attachDynamicMapLayers(
     id: "validation-probes",
     type: "circle",
     source: "validation-probes",
-    filter: probeSource === "tomtom" ? ["==", ["get", "kind"], "flow"] : undefined,
+    ...(probeSource === "tomtom" ? { filter: ["==", ["get", "kind"], "flow"] as const } : {}),
     paint: {
       "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 3.5, 15, 7],
       "circle-color": probeSource === "tomtom" ? "#38bdf8" : ["case", [">", ["get", "speed"], 0], "#22c55e", "#a3e635"],
@@ -786,7 +1021,7 @@ function attachDynamicMapLayers(
     type: "symbol",
     source: "validation-probes",
     minzoom: 13.6,
-    filter: probeSource === "tomtom" ? ["==", ["get", "kind"], "flow"] : undefined,
+    ...(probeSource === "tomtom" ? { filter: ["==", ["get", "kind"], "flow"] as const } : {}),
     layout: {
       "text-field": ["concat", probeLabel, " ", ["to-string", ["get", "route"]]],
       "text-size": 10,
@@ -811,16 +1046,37 @@ function attachDynamicMapLayers(
       paint: { "text-color": "#ffe4e6", "text-halo-color": "#4c0519", "text-halo-width": 1.4 },
     });
   }
-  map.addSource("signals", { type: "geojson", data: signalGeoJson(frame) });
+  map.addSource("signals", { type: "geojson", data: scenarioSignalGeoJson(scenario, frame.timeSeconds) });
+  map.addLayer({
+    id: "signals-halo",
+    type: "circle",
+    source: "signals",
+    paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 9, 15, 20],
+      "circle-color": ["match", ["get", "state"], "green", "#86efac", "yellow", "#fbbf24", "#fb7185"],
+      "circle-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.2, 15, 0.12],
+      "circle-blur": 0.45,
+    },
+  });
   map.addLayer({
     id: "signals",
     type: "circle",
     source: "signals",
     paint: {
-      "circle-radius": 8,
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 6, 15, 11],
       "circle-color": ["match", ["get", "state"], "green", "#86efac", "yellow", "#fbbf24", "#fb7185"],
       "circle-stroke-color": "#ffffff",
-      "circle-stroke-width": 1.5,
+      "circle-stroke-width": 2,
+    },
+  });
+  map.addLayer({
+    id: "signals-hitbox",
+    type: "circle",
+    source: "signals",
+    paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 13, 15, 24],
+      "circle-color": "#ffffff",
+      "circle-opacity": 0.01,
     },
   });
 
@@ -857,7 +1113,10 @@ export function LiveMap({
   );
   const [running, setRunning] = useState(true);
   const [speed, setSpeed] = useState(1.5);
-  const [time, setTime] = useState(0);
+  const [timeline, setTimeline] = useState<PlaybackTimeline>(() => emptyPlaybackTimeline(scenario));
+  const [timelineStatus, setTimelineStatus] = useState<"loading" | "static" | "computed">("loading");
+  const [frameIndex, setFrameIndex] = useState(0);
+  const frameIndexRef = useRef(0);
   const [demoMode, setDemoMode] = useState(true);
   const [stptVehicles, setStptVehicles] = useState<PointCollection>(emptyPointCollection);
   const [tomtomFlowLines, setTomtomFlowLines] = useState<LineCollection>(emptyTomTomLines);
@@ -868,22 +1127,72 @@ export function LiveMap({
     speed?: number;
     severity?: number;
   } | null>(null);
+  const [selectedSignal, setSelectedSignal] = useState<SelectedSignalDetails | null>(null);
   const lastFrameAt = useRef(0);
 
-  const frame = useMemo(() => simulateScenario(scenario, time), [scenario, time]);
+  const frame = useMemo(() => {
+    const currentFrame = timeline.frames[frameIndex] ?? timeline.frames[0];
+    if (timeline.kind === "compact") {
+      return compactFrameToSimulationFrame(scenario, currentFrame as CompactTimelineFrame);
+    }
+    return currentFrame as SimulationFrame;
+  }, [frameIndex, scenario, timeline]);
+
+  useEffect(() => {
+    frameIndexRef.current = frameIndex;
+  }, [frameIndex]);
 
   useEffect(() => {
     if (!demoMode) return;
     setSelectedScenarioId(scenarios[0]?.id ?? "");
-    setTime(0);
+    setFrameIndex(0);
     setRunning(true);
     setSpeed(1.5);
   }, [demoMode, scenarios]);
 
   useEffect(() => {
-    setTime(0);
+    let disposed = false;
+
+    setTimeline(emptyPlaybackTimeline(scenario));
+    setFrameIndex(0);
+    setTimelineStatus("loading");
     lastFrameAt.current = 0;
-  }, [scenario.id]);
+
+    async function loadTimeline() {
+      try {
+        const response = await fetch(`/data/simulation-timelines/${scenario.id}.json`);
+        if (!response.ok) throw new Error("timeline artifact missing");
+        const artifact = (await response.json()) as CompactTimelineArtifact;
+        if (
+          artifact.version !== 2 ||
+          artifact.scenarioId !== scenario.id ||
+          artifact.durationSeconds !== scenario.durationSeconds ||
+          !Array.isArray(artifact.frames) ||
+          artifact.frames.length === 0
+        ) {
+          throw new Error("timeline artifact is stale");
+        }
+        if (!disposed) {
+          setTimeline({ kind: "compact", frameStepSeconds: artifact.frameStepSeconds, frames: artifact.frames });
+          setFrameIndex(0);
+          setTimelineStatus("static");
+        }
+      } catch {
+        const computedTimeline = buildScenarioTimeline(scenario, 1);
+        if (!disposed) {
+          setTimeline({ kind: "full", frameStepSeconds: computedTimeline.frameStepSeconds, frames: computedTimeline.frames });
+          setFrameIndex(0);
+          setTimelineStatus("computed");
+        }
+      }
+    }
+
+    void loadTimeline();
+
+    return () => {
+      disposed = true;
+    };
+  }, [scenario]);
 
   useEffect(() => {
     let disposed = false;
@@ -1051,13 +1360,20 @@ export function LiveMap({
     if (!running) return undefined;
 
     const startedAt = performance.now();
-    const initialTime = time;
+    const initialTime =
+      timeline.kind === "compact"
+        ? (timeline.frames[frameIndexRef.current] ?? timeline.frames[0])?.t ?? 0
+        : (timeline.frames[frameIndexRef.current] ?? timeline.frames[0])?.timeSeconds ?? 0;
     let raf = 0;
 
     const tick = (now: number) => {
-      if (now - lastFrameAt.current >= 50) {
-        const elapsed = ((now - startedAt) / 1000) * speed;
-        setTime((initialTime + elapsed) % scenario.durationSeconds);
+      if (now - lastFrameAt.current >= 100) {
+        const elapsedTime = (initialTime + ((now - startedAt) / 1000) * speed) % scenario.durationSeconds;
+        const nextIndex = Math.min(
+          timeline.frames.length - 1,
+          Math.max(0, Math.round(elapsedTime / timeline.frameStepSeconds)),
+        );
+        setFrameIndex((currentIndex) => (currentIndex === nextIndex ? currentIndex : nextIndex));
         lastFrameAt.current = now;
       }
       raf = requestAnimationFrame(tick);
@@ -1065,7 +1381,7 @@ export function LiveMap({
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [running, scenario.durationSeconds, speed]);
+  }, [running, scenario.durationSeconds, speed, timeline]);
 
   const mapNode = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -1100,6 +1416,41 @@ export function LiveMap({
   }, [closures]);
 
   useEffect(() => {
+    setSelectedSignal((current) => {
+      if (!current?.hasProvidedData) return current;
+      const signalFrame =
+        frame.signals.find((signal) => signal.id === current.id) ??
+        (current.osmId !== undefined ? frame.signals.find((signal) => signal.osmId === current.osmId) : undefined);
+      if (!signalFrame) return current;
+
+      const program =
+        scenario.signals.find((signal) => signal.id === signalFrame.id) ??
+        (signalFrame.osmId !== undefined
+          ? scenario.signals.find((signal) => signal.osmId === signalFrame.osmId)
+          : undefined);
+      const next: SelectedSignalDetails = {
+        ...current,
+        id: signalFrame.id,
+        name: signalFrame.name,
+        state: signalFrame.state,
+        secondsRemaining: signalFrame.secondsRemaining,
+        cycleSeconds: signalFrame.cycleSeconds,
+        phaseIndex: signalFrame.phaseIndex,
+        phaseCount: program?.phases.length ?? current.phaseCount,
+        osmId: signalFrame.osmId,
+        sampleCount: signalFrame.sampleCount,
+      };
+
+      return current.state === next.state &&
+        current.secondsRemaining === next.secondsRemaining &&
+        current.phaseIndex === next.phaseIndex &&
+        current.cycleSeconds === next.cycleSeconds
+        ? current
+        : next;
+    });
+  }, [frame.signals, scenario.signals]);
+
+  useEffect(() => {
     let disposed = false;
     let osmLoadPromise: Promise<LocalOsmBundle> | null = null;
 
@@ -1115,9 +1466,10 @@ export function LiveMap({
 
       const roads = (await roadsResponse.json()) as LineCollection;
       const controls = (await controlsResponse.json()) as FeatureCollection<Point>;
-      const laneBands = laneOverlayGeoJson(roads);
+      const renderRoads = roadRenderGeoJson(roads);
+      const laneBands = laneOverlayGeoJson(renderRoads);
       roadsRef.current = roads;
-      return { roads, controls, laneBands };
+      return { roads: renderRoads, controls, laneBands };
     }
 
     async function attachLocalOsm(map: MapLibreMap) {
@@ -1182,8 +1534,12 @@ export function LiveMap({
 
         (map.getSource("actors") as GeoJSONSource | undefined)?.setData(actorGeoJson(frameRef.current));
         (map.getSource("actor-headings") as GeoJSONSource | undefined)?.setData(actorHeadingGeoJson(frameRef.current));
-        (map.getSource("signals") as GeoJSONSource | undefined)?.setData(signalGeoJson(frameRef.current));
-        (map.getSource("signal-phases") as GeoJSONSource | undefined)?.setData(signalPhaseGeoJson(frameRef.current));
+        (map.getSource("signals") as GeoJSONSource | undefined)?.setData(
+          scenarioSignalGeoJson(scenarioRef.current, frameRef.current.timeSeconds),
+        );
+        (map.getSource("signal-phases") as GeoJSONSource | undefined)?.setData(
+          scenarioSignalPhaseGeoJson(scenarioRef.current, frameRef.current.timeSeconds),
+        );
         (map.getSource("validation-probes") as GeoJSONSource | undefined)?.setData(stptVehiclesRef.current);
         (map.getSource("validation-flow-lines") as GeoJSONSource | undefined)?.setData(tomtomFlowLinesRef.current);
         updateClosureOverlay(map, roadsRef.current ?? emptyLineCollection, closuresRef.current);
@@ -1196,6 +1552,51 @@ export function LiveMap({
           route: String(props.route ?? "Unknown"),
           speed: typeof props.speed === "number" ? props.speed : undefined,
           severity: typeof props.severity === "number" ? props.severity : undefined,
+        });
+      };
+      const selectProvidedSignal = (feature: any) => {
+        const props = feature?.properties ?? {};
+        const program = scenarioRef.current.signals.find((signal) => signal.id === props.id);
+        setSelectedSignal({
+          id: String(props.id ?? program?.id ?? "signal"),
+          name: String(props.name ?? program?.name ?? "Traffic signal"),
+          state: props.state ? String(props.state) : undefined,
+          secondsRemaining: typeof props.secondsRemaining === "number" ? props.secondsRemaining : undefined,
+          cycleSeconds: typeof props.cycleSeconds === "number" ? props.cycleSeconds : program?.phases.reduce((total, phase) => total + phase.durationSeconds, 0),
+          phaseIndex: typeof props.phaseIndex === "number" ? props.phaseIndex : undefined,
+          phaseCount: program?.phases.length,
+          osmId: typeof props.osmId === "number" ? props.osmId : program?.osmId,
+          sampleCount: typeof props.sampleCount === "number" ? props.sampleCount : program?.sampleCount,
+          hasProvidedData: true,
+        });
+      };
+      const selectLocalSignal = (feature: any) => {
+        const props = feature?.properties ?? {};
+        const osmId = typeof props.osmId === "number" ? props.osmId : Number(props.osmId);
+        const program = Number.isFinite(osmId)
+          ? scenarioRef.current.signals.find((signal) => signal.osmId === osmId)
+          : undefined;
+        if (program) {
+          const signalFrame = frameRef.current.signals.find((signal) => signal.id === program.id);
+          setSelectedSignal({
+            id: program.id,
+            name: program.name,
+            state: signalFrame?.state,
+            secondsRemaining: signalFrame?.secondsRemaining,
+            cycleSeconds: signalFrame?.cycleSeconds ?? program.phases.reduce((total, phase) => total + phase.durationSeconds, 0),
+            phaseIndex: signalFrame?.phaseIndex,
+            phaseCount: program.phases.length,
+            osmId: program.osmId,
+            sampleCount: program.sampleCount,
+            hasProvidedData: true,
+          });
+          return;
+        }
+        setSelectedSignal({
+          id: Number.isFinite(osmId) ? `osm:${osmId}` : "osm:traffic-signal",
+          name: props.name ? String(props.name) : "OSM traffic signal",
+          osmId: Number.isFinite(osmId) ? osmId : undefined,
+          hasProvidedData: false,
         });
       };
 
@@ -1211,6 +1612,18 @@ export function LiveMap({
         const feature = event.features?.[0];
         if (feature) handleProbeClick(feature);
       });
+      map.on("click", "signals-hitbox", (event) => {
+        const feature = event.features?.[0];
+        if (feature) selectProvidedSignal(feature);
+      });
+      map.on("click", "signals", (event) => {
+        const feature = event.features?.[0];
+        if (feature) selectProvidedSignal(feature);
+      });
+      map.on("click", "local-traffic-signals", (event) => {
+        const feature = event.features?.[0];
+        if (feature) selectLocalSignal(feature);
+      });
       map.on("mouseenter", "validation-probes", () => {
         map.getCanvas().style.cursor = "pointer";
       });
@@ -1223,6 +1636,14 @@ export function LiveMap({
       map.on("mouseleave", "validation-incidents", () => {
         map.getCanvas().style.cursor = "";
       });
+      for (const layerId of ["signals-hitbox", "signals", "local-traffic-signals"]) {
+        map.on("mouseenter", layerId, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", layerId, () => {
+          map.getCanvas().style.cursor = "";
+        });
+      }
 
       osmLoadPromise ??= loadLocalOsm();
       map.once("load", () => {
@@ -1260,9 +1681,13 @@ export function LiveMap({
   useEffect(() => {
     (mapRef.current?.getSource("actors") as GeoJSONSource | undefined)?.setData(actorGeoJson(frame));
     (mapRef.current?.getSource("actor-headings") as GeoJSONSource | undefined)?.setData(actorHeadingGeoJson(frame));
-    (mapRef.current?.getSource("signals") as GeoJSONSource | undefined)?.setData(signalGeoJson(frame));
-    (mapRef.current?.getSource("signal-phases") as GeoJSONSource | undefined)?.setData(signalPhaseGeoJson(frame));
-  }, [frame]);
+    (mapRef.current?.getSource("signals") as GeoJSONSource | undefined)?.setData(
+      scenarioSignalGeoJson(scenario, frame.timeSeconds),
+    );
+    (mapRef.current?.getSource("signal-phases") as GeoJSONSource | undefined)?.setData(
+      scenarioSignalPhaseGeoJson(scenario, frame.timeSeconds),
+    );
+  }, [frame, scenario]);
 
   useEffect(() => {
     (mapRef.current?.getSource("validation-probes") as GeoJSONSource | undefined)?.setData(stptVehicles);
@@ -1360,6 +1785,17 @@ export function LiveMap({
       payload: scenario,
     });
   };
+  const visibleSignalComparisons = useMemo(
+    () =>
+      [...frame.signalComparisons]
+        .sort((a, b) => {
+          const pressureDelta = b.blockedActors - a.blockedActors;
+          if (pressureDelta !== 0) return pressureDelta;
+          return b.estimatedDelaySeconds - a.estimatedDelaySeconds;
+        })
+        .slice(0, 12),
+    [frame.signalComparisons],
+  );
 
   return (
     <main className={validationOnly ? "page" : "map-page"}>
@@ -1375,6 +1811,7 @@ export function LiveMap({
         setMapMode={setMapMode}
         mapReady={mapReady}
         mapError={mapError}
+        selectedSignal={selectedSignal}
       />
       {!validationOnly ? (
         <>
@@ -1390,7 +1827,7 @@ export function LiveMap({
                 className="btn secondary"
                 onClick={() => {
                   setRunning(false);
-                  setTime(0);
+                  setFrameIndex(0);
                 }}
                 type="button"
               >
@@ -1433,12 +1870,12 @@ export function LiveMap({
               <Metric value={String(frame.metrics.activeActors)} label="active actors" />
               <Metric value={String(frame.metrics.queueLength)} label="queued at signals" />
               <Metric value={frame.metrics.averageSpeedKmh.toFixed(1)} label="avg km/h" />
-              <Metric value={`${Math.round(time)}s`} label="simulation clock" />
+              <Metric value={`${Math.round(frame.timeSeconds)}s`} label="simulation clock" />
               <Metric value={String(frame.metrics.signalPressure)} label="signal pressure" />
               <Metric value={String(closures?.recordCount ?? 0)} label="closure notices" />
             </div>
             <div className="signal-comparison">
-              {frame.signalComparisons.map((signal) => (
+              {visibleSignalComparisons.map((signal) => (
                 <article className="signal-comparison-card" key={signal.id}>
                   <div>
                     <strong>{signal.name}</strong>
@@ -1451,14 +1888,22 @@ export function LiveMap({
                   </div>
                 </article>
               ))}
+              {frame.signalComparisons.length > visibleSignalComparisons.length ? (
+                <article className="signal-comparison-card signal-comparison-summary">
+                  <div>
+                    <strong>{frame.signalComparisons.length - visibleSignalComparisons.length} more signals</strong>
+                    <small>Map points remain clickable</small>
+                  </div>
+                </article>
+              ) : null}
             </div>
             {closures?.records.length ? <ClosureSidebar closures={closures} /> : null}
           </aside>
           <div className="timeline">
             <span>Browser-native deterministic model</span>
             <div>
-              <b>SUMO adapter</b>
-              <span> planned</span>
+              <b>Timeline cache</b>
+              <span> {timelineStatus}</span>
             </div>
             <div>
               <b>Satellite mode</b>
@@ -1496,6 +1941,7 @@ export function LiveMapViewport({
   mapReady,
   mapError,
   selectedProbeKey,
+  selectedSignal,
 }: {
   scenario: Scenario;
   frame: SimulationFrame;
@@ -1508,6 +1954,7 @@ export function LiveMapViewport({
   mapReady: boolean;
   mapError: string | null;
   selectedProbeKey?: string | null;
+  selectedSignal?: SelectedSignalDetails | null;
 }) {
   const probeCount = stptVehicles?.features?.length ?? 0;
   return (
@@ -1543,6 +1990,33 @@ export function LiveMapViewport({
           Selected: {selectedProbeKey}
         </div>
       ) : null}
+      {selectedSignal ? <SignalInspector signal={selectedSignal} /> : null}
+    </div>
+  );
+}
+
+function SignalInspector({ signal }: { signal: SelectedSignalDetails }) {
+  const phaseLabel =
+    signal.phaseIndex !== undefined && signal.phaseCount !== undefined
+      ? ` · phase ${signal.phaseIndex + 1}/${signal.phaseCount}`
+      : "";
+
+  return (
+    <div className="signal-inspector">
+      <strong>{signal.name}</strong>
+      <span>{signal.hasProvidedData ? "Provided interval data" : "No provided interval data"}</span>
+      {signal.hasProvidedData ? (
+        <small>
+          {signal.state ? signal.state.toUpperCase() : "UNKNOWN"}
+          {signal.secondsRemaining !== undefined ? ` · ${signal.secondsRemaining}s left` : ""}
+          {signal.cycleSeconds !== undefined ? ` · ${signal.cycleSeconds}s cycle` : ""}
+          {phaseLabel}
+        </small>
+      ) : null}
+      <small>
+        {signal.osmId !== undefined ? `OSM ${signal.osmId}` : signal.id}
+        {signal.sampleCount !== undefined ? ` · ${signal.sampleCount} samples` : ""}
+      </small>
     </div>
   );
 }

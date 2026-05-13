@@ -10,7 +10,6 @@ import {
   type LeaderboardEntry,
   type Scenario,
 } from "./data";
-import { simulateScenario } from "./simulation";
 import { downloadJson, type LeaderboardManifest, type ScenarioCatalogManifest } from "./contracts";
 import {
   createMockSnapshot,

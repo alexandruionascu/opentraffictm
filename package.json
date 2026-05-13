@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc && vite build",
+    "build": "npm run build:timelines && tsc && vite build",
+    "build:timelines": "node scripts/build-simulation-timelines.mjs",
     "fetch:stpt-live": "node scripts/fetch-stpt-live.mjs",
     "fetch:timisoara-open-data": "node scripts/fetch-timisoara-open-data.mjs",
     "fetch:timisoara-road-closures": "node scripts/fetch-timisoara-road-closures.mjs",
