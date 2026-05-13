@@ -1742,3 +1742,624 @@ p {
     display: none;
   }
 }
+
+.traffic-light-page {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(460px, 0.9fr);
+  min-height: 100vh;
+  padding: 92px 22px 20px;
+}
+
+.traffic-light-map-shell {
+  min-height: calc(100vh - 138px);
+  overflow: hidden;
+  position: relative;
+}
+
+.traffic-light-map,
+.traffic-light-map-canvas {
+  height: 100%;
+  min-height: calc(100vh - 138px);
+  width: 100%;
+}
+
+.traffic-light-map {
+  background: #07131f;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+.traffic-light-map-legend {
+  background: rgba(3, 7, 13, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  bottom: 18px;
+  display: grid;
+  gap: 2px;
+  left: 18px;
+  max-width: 320px;
+  padding: 12px 14px;
+  position: absolute;
+  z-index: 500;
+}
+
+.traffic-light-map-legend strong {
+  font-size: 13px;
+}
+
+.traffic-light-map-legend span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.traffic-light-marker-shell {
+  background: transparent;
+  border: 0;
+}
+
+.traffic-light-marker {
+  align-items: center;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgba(3, 7, 13, 0.92),
+    0 0 18px color-mix(in srgb, var(--traffic-marker-color) 64%, transparent);
+  display: grid;
+  height: 20px;
+  justify-items: center;
+  position: relative;
+  width: 20px;
+}
+
+.traffic-light-marker::before {
+  background: color-mix(in srgb, var(--traffic-marker-color) 22%, transparent);
+  border-radius: 50%;
+  content: "";
+  inset: -7px;
+  opacity: 0.75;
+  position: absolute;
+}
+
+.traffic-light-marker.selected {
+  transform: scale(1.18);
+}
+
+.traffic-light-marker-core {
+  background: var(--traffic-marker-color);
+  border-radius: 50%;
+  height: 8px;
+  position: relative;
+  width: 8px;
+  z-index: 1;
+}
+
+.traffic-light-panel {
+  background: linear-gradient(180deg, rgba(5, 12, 21, 0.95), rgba(4, 9, 16, 0.98));
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 16px;
+  max-height: calc(100vh - 138px);
+  overflow: auto;
+  padding: 22px;
+}
+
+.traffic-light-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.traffic-light-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+.traffic-light-panel-head h1 {
+  font-size: 30px;
+  line-height: 0.98;
+  margin-bottom: 12px;
+}
+
+.traffic-light-summary-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.traffic-light-rank-card,
+.traffic-light-visual-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.traffic-light-rank-list,
+.traffic-light-visual-stepper {
+  display: grid;
+  gap: 8px;
+}
+
+.traffic-light-rank-row {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  padding: 11px 12px;
+  text-align: left;
+}
+
+.traffic-light-rank-row.active {
+  background: rgba(101, 214, 255, 0.12);
+  border-color: rgba(101, 214, 255, 0.28);
+}
+
+.traffic-light-rank-index {
+  align-items: center;
+  background: rgba(101, 214, 255, 0.16);
+  border-radius: 12px;
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.traffic-light-rank-body {
+  display: grid;
+  gap: 4px;
+}
+
+.traffic-light-rank-body span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.traffic-light-rank-state {
+  align-self: center;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 7px 10px;
+  text-transform: uppercase;
+}
+
+.traffic-light-rank-state.state-green {
+  background: rgba(46, 204, 113, 0.14);
+  color: #a7f3d0;
+}
+
+.traffic-light-rank-state.state-red {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fecaca;
+}
+
+.traffic-light-rank-state.state-unknown {
+  background: rgba(148, 163, 184, 0.14);
+  color: #dbeafe;
+}
+
+.traffic-light-summary-card,
+.traffic-light-detail-card,
+.traffic-light-list-card {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.traffic-light-summary-card span,
+.traffic-light-detail-head p,
+.traffic-light-section-head span,
+.traffic-light-list-row span,
+.traffic-light-explanation {
+  color: var(--muted);
+}
+
+.traffic-light-summary-card span {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+}
+
+.traffic-light-summary-card strong {
+  display: block;
+  font-size: 20px;
+}
+
+.traffic-light-detail-card {
+  display: grid;
+  gap: 12px;
+}
+
+.traffic-light-detail-head {
+  align-items: start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.traffic-light-detail-head h2,
+.traffic-light-section-head h2 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.traffic-light-state-badge {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.traffic-light-state-badge.state-green {
+  background: rgba(46, 204, 113, 0.16);
+  color: #a7f3d0;
+}
+
+.traffic-light-state-badge.state-red {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fecaca;
+}
+
+.traffic-light-state-badge.state-unknown {
+  background: rgba(148, 163, 184, 0.16);
+  color: #dbeafe;
+}
+
+.traffic-light-detail-metrics {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.traffic-light-detail-metrics div {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.traffic-light-detail-metrics span {
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.traffic-light-detail-metrics strong {
+  font-size: 18px;
+}
+
+.traffic-light-explanation {
+  line-height: 1.55;
+  margin: 0;
+}
+
+.traffic-light-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.traffic-light-evidence span {
+  background: rgba(101, 214, 255, 0.1);
+  border: 1px solid rgba(101, 214, 255, 0.18);
+  border-radius: 999px;
+  color: #d8f3ff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 10px;
+}
+
+.traffic-light-method-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.traffic-light-method-grid div {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.traffic-light-method-grid span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.traffic-light-method-grid strong {
+  font-size: 17px;
+}
+
+.traffic-light-visual-step {
+  align-items: start;
+  background: rgba(255, 255, 255, 0.032);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  padding: 10px 12px;
+}
+
+.traffic-light-visual-step.done {
+  border-color: rgba(124, 255, 178, 0.2);
+}
+
+.traffic-light-visual-step.pending {
+  opacity: 0.76;
+}
+
+.traffic-light-visual-step-index {
+  align-items: center;
+  background: rgba(124, 255, 178, 0.14);
+  border-radius: 10px;
+  color: #d7ffe7;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  height: 30px;
+  justify-content: center;
+}
+
+.traffic-light-visual-step-body strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+
+.traffic-light-visual-step-body p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.42;
+  margin: 0;
+}
+
+.traffic-light-hourly-card {
+  display: grid;
+  gap: 10px;
+}
+
+.traffic-light-hourly-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.traffic-light-hourly-cell {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+}
+
+.traffic-light-hourly-cell.active {
+  border-color: rgba(101, 214, 255, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(101, 214, 255, 0.14);
+}
+
+.traffic-light-hourly-cell span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.traffic-light-hourly-bar {
+  align-items: center;
+  border-radius: 999px;
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+}
+
+.traffic-light-hourly-bar i {
+  background: rgba(255, 255, 255, 0.34);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.traffic-light-hourly-cell small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.traffic-light-step-list {
+  display: grid;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.traffic-light-section-head {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.traffic-light-step {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.traffic-light-step.done {
+  border-color: rgba(124, 255, 178, 0.24);
+}
+
+.traffic-light-step.pending {
+  opacity: 0.74;
+}
+
+.traffic-light-step strong {
+  font-size: 14px;
+}
+
+.traffic-light-step p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.traffic-light-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.traffic-light-list-row {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.traffic-light-list-row.active {
+  background: rgba(101, 214, 255, 0.12);
+  border-color: rgba(101, 214, 255, 0.28);
+}
+
+.traffic-light-list-row strong {
+  font-size: 14px;
+}
+
+.traffic-light-loading {
+  align-items: center;
+  background: rgba(5, 12, 21, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  bottom: 20px;
+  display: grid;
+  gap: 4px;
+  left: 20px;
+  padding: 16px 18px;
+  position: absolute;
+  z-index: 500;
+}
+
+.traffic-light-loading span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.traffic-light-footer {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.traffic-light-footer-item {
+  background: rgba(255, 255, 255, 0.038);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.traffic-light-footer-item span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.traffic-light-footer-item strong {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+@media (max-width: 1180px) {
+  .traffic-light-page {
+    grid-template-columns: 1fr;
+  }
+
+  .traffic-light-map-shell,
+  .traffic-light-map,
+  .traffic-light-map-canvas,
+  .traffic-light-panel {
+    min-height: 540px;
+  }
+
+  .traffic-light-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .traffic-light-page {
+    padding: 88px 14px 14px;
+  }
+
+  .traffic-light-summary-grid,
+  .traffic-light-detail-metrics,
+  .traffic-light-footer {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .traffic-light-summary-grid,
+  .traffic-light-detail-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .traffic-light-detail-head,
+  .traffic-light-section-head {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .traffic-light-hourly-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .traffic-light-map-legend {
+    left: 14px;
+    max-width: calc(100% - 28px);
+    right: 14px;
+  }
+}
