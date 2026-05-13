@@ -1,3 +1,5 @@
+import signalsJson from "../data/traffic-lights/signals.json";
+
 export type ActorType = "car" | "bus" | "pedestrian";
 export type SignalState = "green" | "yellow" | "red";
 export type ModelBackend = "browser-native" | "sumo-import" | "sota-adapter";
@@ -31,6 +33,35 @@ export interface SignalProgram {
   phases: SignalPhase[];
   offsetSeconds: number;
 }
+
+interface SignalJsonPhase {
+  state: SignalState;
+  durationSeconds: number;
+}
+
+interface SignalJsonProgram {
+  id: string;
+  name: string;
+  position: Coordinate;
+  primaryHeadingDeg: number;
+  offsetSeconds: number;
+  phases: SignalJsonPhase[];
+}
+
+interface SignalsJson {
+  generatedAt: string;
+  scope: string;
+  programs: SignalJsonProgram[];
+}
+
+const importedSignalPrograms: SignalProgram[] = (signalsJson as SignalsJson).programs.map((program) => ({
+  id: program.id,
+  name: program.name,
+  position: program.position,
+  primaryHeadingDeg: program.primaryHeadingDeg,
+  offsetSeconds: program.offsetSeconds,
+  phases: program.phases,
+}));
 
 export interface Scenario {
   id: string;
@@ -506,68 +537,7 @@ export const scenarios: Scenario[] = [
     zoom: 13.15,
     durationSeconds: 520,
     actors: [...createCars(54), ...createBuses(), ...createPedestrians(18)],
-    signals: [
-      {
-        id: "signal-republicii",
-        name: "Republicii / Core",
-        position: { lng: 21.2101, lat: 45.7502 },
-        primaryHeadingDeg: 116,
-        offsetSeconds: 0,
-        phases: [
-          { state: "green", durationSeconds: 38 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 32 },
-        ],
-      },
-      {
-        id: "signal-aradului",
-        name: "Calea Aradului / Ring",
-        position: { lng: 21.2139, lat: 45.7581 },
-        primaryHeadingDeg: 166,
-        offsetSeconds: 13,
-        phases: [
-          { state: "green", durationSeconds: 34 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 38 },
-        ],
-      },
-      {
-        id: "signal-sagului",
-        name: "Sagului / Core",
-        position: { lng: 21.2113, lat: 45.7466 },
-        primaryHeadingDeg: 15,
-        offsetSeconds: 22,
-        phases: [
-          { state: "green", durationSeconds: 32 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 40 },
-        ],
-      },
-      {
-        id: "signal-take-ionescu",
-        name: "Take Ionescu / Core",
-        position: { lng: 21.2161, lat: 45.7522 },
-        primaryHeadingDeg: 42,
-        offsetSeconds: 48,
-        phases: [
-          { state: "green", durationSeconds: 36 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 34 },
-        ],
-      },
-      {
-        id: "signal-rebreanu",
-        name: "Rebreanu / South Gate",
-        position: { lng: 21.2219, lat: 45.7424 },
-        primaryHeadingDeg: 300,
-        offsetSeconds: 7,
-        phases: [
-          { state: "green", durationSeconds: 30 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 42 },
-        ],
-      },
-    ],
+    signals: importedSignalPrograms,
   },
 ];
 

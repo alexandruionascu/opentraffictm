@@ -1184,7 +1184,7 @@ export function LiveMap({
         (map.getSource("actor-headings") as GeoJSONSource | undefined)?.setData(actorHeadingGeoJson(frameRef.current));
         (map.getSource("signals") as GeoJSONSource | undefined)?.setData(signalGeoJson(frameRef.current));
         (map.getSource("signal-phases") as GeoJSONSource | undefined)?.setData(signalPhaseGeoJson(frameRef.current));
-        (map.getSource("stpt-vehicles") as GeoJSONSource | undefined)?.setData(stptVehiclesRef.current);
+        (map.getSource("validation-probes") as GeoJSONSource | undefined)?.setData(stptVehiclesRef.current);
         (map.getSource("validation-flow-lines") as GeoJSONSource | undefined)?.setData(tomtomFlowLinesRef.current);
         updateClosureOverlay(map, roadsRef.current ?? emptyLineCollection, closuresRef.current);
       };
@@ -1265,7 +1265,7 @@ export function LiveMap({
   }, [frame]);
 
   useEffect(() => {
-    (mapRef.current?.getSource("stpt-vehicles") as GeoJSONSource | undefined)?.setData(stptVehicles);
+    (mapRef.current?.getSource("validation-probes") as GeoJSONSource | undefined)?.setData(stptVehicles);
   }, [stptVehicles]);
 
   useEffect(() => {
