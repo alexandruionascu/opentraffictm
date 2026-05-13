@@ -38,6 +38,19 @@ function bboxCenter() {
   };
 }
 
+function buildSamplePoints() {
+  const lngStep = (maxLng - minLng) / 3;
+  const latStep = (maxLat - minLat) / 3;
+  return [
+    [minLat + latStep, minLng + lngStep],
+    [minLat + latStep, minLng + 2 * lngStep],
+    [minLat + 2 * latStep, minLng + lngStep],
+    [minLat + 2 * latStep, minLng + 2 * lngStep],
+    [minLat + latStep / 2, minLng + 1.5 * lngStep],
+    [minLat + 2.5 * latStep, minLng + 1.5 * lngStep],
+  ];
+}
+
 async function fetchJson(url, headers = {}) {
   const response = await fetch(url, {
     headers: {
@@ -129,16 +142,19 @@ function normalizeHereFlow(items) {
   }));
 }
 
-function normalizeTomTomFlow(response) {
+function normalizeTomTomFlow(response, label) {
   const flow = response?.flowSegmentData ?? response?.flowSegmentData?.currentFlow ?? response;
   const current = flow?.currentFlow ?? {};
   const freeFlow = flow?.freeFlowSpeed ?? current?.freeFlowSpeed;
   const currentSpeed = current?.speed ?? flow?.currentSpeed;
   return [
     {
-      segmentId: flow?.location?.description ?? "tomtom-flow-0",
+      segmentId: flow?.location?.description ?? label ?? "tomtom-flow-0",
       roadName: flow?.roadName ?? flow?.location?.description ?? undefined,
-      geometry: [[minLng, minLat], [maxLng, maxLat]],
+      geometry: [
+        [flow?.coordinates?.longitude ?? minLng, flow?.coordinates?.latitude ?? minLat],
+        [flow?.coordinates?.longitude ?? maxLng, flow?.coordinates?.latitude ?? maxLat],
+      ],
       speedKph: currentSpeed,
       travelTimeSeconds: flow?.currentTravelTime ?? undefined,
       delaySeconds:
@@ -205,12 +221,7 @@ async function runTomTom() {
   if (!apiKey) throw new Error("TOMTOM_API_KEY is required");
 
   const center = bboxCenter();
-  const flowUrl = new URL("https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json");
-  flowUrl.searchParams.set("key", apiKey);
-  flowUrl.searchParams.set("point", `${center.lat},${center.lng}`);
-  flowUrl.searchParams.set("unit", "KMPH");
-  flowUrl.searchParams.set("thickness", "10");
-  flowUrl.searchParams.set("openLr", "false");
+  const samplePoints = buildSamplePoints();
 
   const incidentsUrl = new URL("https://api.tomtom.com/traffic/services/5/incidentDetails");
   incidentsUrl.searchParams.set("key", apiKey);
@@ -219,9 +230,20 @@ async function runTomTom() {
   incidentsUrl.searchParams.set("language", "en-GB");
   incidentsUrl.searchParams.set("timeValidityFilter", "present");
 
-  const [flow, incidents] = await Promise.all([fetchJson(flowUrl), fetchJson(incidentsUrl)]);
+  const flowItems = [];
+  for (const [index, [lat, lng]] of samplePoints.entries()) {
+    const flowUrl = new URL("https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json");
+    flowUrl.searchParams.set("key", apiKey);
+    flowUrl.searchParams.set("point", `${lat},${lng}`);
+    flowUrl.searchParams.set("unit", "KMPH");
+    flowUrl.searchParams.set("thickness", "10");
+    flowUrl.searchParams.set("openLr", "false");
+    const flow = await fetchJson(flowUrl);
+    flowItems.push(...normalizeTomTomFlow(flow, `sample-${index + 1}`));
+  }
+
+  const incidents = await fetchJson(incidentsUrl);
   const incidentsItems = incidents?.incidents ?? incidents?.results ?? [];
-  const flowItems = normalizeTomTomFlow(flow);
 
   return {
     provider: "tomtom",
@@ -241,8 +263,8 @@ async function runTomTom() {
       geometry: item?.geometry?.coordinates ? item.geometry.coordinates : undefined,
     })),
     rawStored: true,
-    raw: { flow, incidents },
-    transactionCount: 2,
+    raw: { incidents },
+    transactionCount: samplePoints.length + 1,
   };
 }
 

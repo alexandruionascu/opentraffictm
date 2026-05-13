@@ -1,0 +1,15 @@
+{
+  "provider": "tomtom",
+  "requestId": "tomtom-2026-05-13T06-03-56-527Z",
+  "collectedAt": "2026-05-13T06:03:56.527Z",
+  "bbox": [
+    21.19,
+    45.73,
+    21.24,
+    45.77
+  ],
+  "transactionCount": 2,
+  "segmentCount": 6,
+  "incidentCount": 37,
+  "notes": "Derived validation summary from private traffic API data."
+}

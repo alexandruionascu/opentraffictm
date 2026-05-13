@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   datasets,
   leaderboards,
@@ -10,6 +10,7 @@ import {
   type LeaderboardEntry,
   type Scenario,
 } from "./data";
+import { simulateScenario } from "./simulation";
 import { downloadJson, type LeaderboardManifest, type ScenarioCatalogManifest } from "./contracts";
 import {
   createMockSnapshot,
@@ -29,6 +30,7 @@ const navItems = [
   { path: "/datasets", label: "Data" },
   { path: "/sources", label: "Sources" },
   { path: "/validation", label: "Validation" },
+  { path: "/tomtom", label: "TomTom Traffic" },
   { path: "/sheet", label: "Sheet" },
   { path: "/scenarios", label: "Scenarios" },
   { path: "/leaderboards", label: "Leaderboards" },
@@ -100,16 +102,30 @@ export function App() {
       {path === "/datasets" ? <DatasetsPage /> : null}
       {path === "/sources" ? <SourcesPage /> : null}
       {path === "/validation" ? <ValidationPage /> : null}
+      {path === "/tomtom" ? <TomTomTrafficPage /> : null}
       {path === "/sheet" ? <SpreadsheetPage /> : null}
       {path === "/scenarios" ? <ScenariosPage /> : null}
       {path === "/leaderboards" ? <LeaderboardsPage /> : null}
       {path === "/papers" ? <PapersPage /> : null}
-      {!["/map", "/datasets", "/sources", "/validation", "/sheet", "/scenarios", "/leaderboards", "/papers"].includes(path) ? (
+      {!["/map", "/datasets", "/sources", "/validation", "/tomtom", "/sheet", "/scenarios", "/leaderboards", "/papers"].includes(path) ? (
         <HomePage />
       ) : null}
     </Shell>
   );
 }
+
+const emptyScenario = {
+  id: "tomtom-validation",
+  name: "TomTom validation corridor",
+  district: "Timișoara",
+  description: "TomTom live traffic validation snapshot rendered in the shared map shell.",
+  boundsLabel: "Timișoara bbox",
+  center: { lng: 21.2087, lat: 45.7489 },
+  zoom: 12.8,
+  durationSeconds: 60,
+  actors: [],
+  signals: [],
+} satisfies Scenario;
 
 function ValidationPage() {
   const adapters = useMemo<Record<TrafficProvider, TrafficProviderAdapter>>(
@@ -257,6 +273,88 @@ function ValidationPage() {
           <li>Persist `ValidationResult` and derived metrics.</li>
         </ol>
       </section>
+    </main>
+  );
+}
+
+function TomTomTrafficPage() {
+  const [snapshot, setSnapshot] = useState<{
+    collectedAt?: string;
+    bbox?: [number, number, number, number];
+    segments?: Array<{ segmentId?: string; roadName?: string; speedKph?: number; delaySeconds?: number; congestionLevel?: string }>;
+    incidents?: Array<{ incidentId?: string; kind?: string; description?: string; severity?: number }>;
+  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/data/traffic-validation/providers/tomtom/latest.json")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("TomTom snapshot unavailable");
+        return response.json();
+      })
+      .then((json) => {
+        if (!cancelled) setSnapshot(json);
+      })
+      .catch((fetchError) => {
+        if (!cancelled) setError(fetchError instanceof Error ? fetchError.message : "TomTom snapshot unavailable");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <main className="map-page">
+      <aside className="sim-panel">
+        <p className="eyebrow">TomTom</p>
+        <h2>Traffic snapshot</h2>
+        <p>Click a row to highlight the matching TomTom flow segment or incident on the map.</p>
+        <div className="toolbar">
+          <a className="btn secondary" href="/validation">
+            Back
+          </a>
+          <span className="toolbar-note">
+            {error
+              ? error
+              : `${snapshot?.segments?.length ?? 0} flow, ${snapshot?.incidents?.length ?? 0} incidents, ${(snapshot?.segments?.length ?? 0) + (snapshot?.incidents?.length ?? 0)} total`}
+          </span>
+        </div>
+        <div className="scenario-picker">
+          {(snapshot?.segments ?? []).map((segment, index) => {
+            const key = `flow:${segment.segmentId ?? index}`;
+            return (
+              <button
+                key={key}
+                className={selectedKey === key ? "scenario-chip active" : "scenario-chip"}
+                onClick={() => setSelectedKey(key)}
+                type="button"
+              >
+                <strong>{segment.roadName ?? `Flow segment ${index + 1}`}</strong>
+                <span>{segment.speedKph ?? 0} km/h</span>
+              </button>
+            );
+          })}
+          {(snapshot?.incidents ?? []).map((incident, index) => {
+            const key = `incident:${incident.incidentId ?? index}`;
+            return (
+              <button
+                key={key}
+                className={selectedKey === key ? "scenario-chip active" : "scenario-chip"}
+                onClick={() => setSelectedKey(key)}
+                type="button"
+              >
+                <strong>{incident.kind ?? `Incident ${index + 1}`}</strong>
+                <span>{incident.severity !== undefined ? `severity ${incident.severity}` : "incident"}</span>
+              </button>
+            );
+          })}
+        </div>
+      </aside>
+      <Suspense fallback={<MapLoading />}>
+        <LiveMap scenarios={[emptyScenario]} probeSource="tomtom" validationOnly selectedProbeKey={selectedKey} />
+      </Suspense>
     </main>
   );
 }

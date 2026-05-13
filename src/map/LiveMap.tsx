@@ -25,12 +25,22 @@ interface LocalOsmBundle {
   laneBands: LaneCollection;
 }
 
+export interface ProbePointCollection {
+  label: string;
+  features: PointCollection;
+}
+
 const emptyLineCollection: LineCollection = {
   type: "FeatureCollection",
   features: [],
 };
 
 const emptyPointCollection: PointCollection = {
+  type: "FeatureCollection",
+  features: [],
+};
+
+const emptyTomTomLines: LineCollection = {
   type: "FeatureCollection",
   features: [],
 };
@@ -507,9 +517,13 @@ function attachDynamicMapLayers(
   map: MapLibreMap,
   scenario: Scenario,
   frame: SimulationFrame,
-  stptVehicles: PointCollection,
+  probePoints: PointCollection,
+  probeLines: LineCollection,
   closures: ClosureManifest | null,
   roads: LineCollection,
+  probeLabel = "probe",
+  probeSource: ProbeSource = "stpt",
+  selectedProbeKey: string | null = null,
 ) {
   if (map.getSource("actors")) return;
 
@@ -517,7 +531,10 @@ function attachDynamicMapLayers(
   map.addSource("actor-headings", { type: "geojson", data: actorHeadingGeoJson(frame) });
   map.addSource("scenario-routes", { type: "geojson", data: routeGeoJson(scenario) });
   map.addSource("signal-phases", { type: "geojson", data: signalPhaseGeoJson(frame) });
-  map.addSource("stpt-vehicles", { type: "geojson", data: stptVehicles });
+  map.addSource("validation-probes", { type: "geojson", data: probePoints });
+  if (probeSource === "tomtom") {
+    map.addSource("validation-flow-lines", { type: "geojson", data: probeLines });
+  }
 
   map.addLayer({
     id: "scenario-routes",
@@ -610,40 +627,190 @@ function attachDynamicMapLayers(
     paint: { "text-color": "#edf7ff", "text-halo-color": "#031018", "text-halo-width": 1.5 },
   });
   map.addLayer({
-    id: "stpt-vehicle-halo",
+    id: "validation-probe-halo",
     type: "circle",
-    source: "stpt-vehicles",
+    source: "validation-probes",
+    filter: probeSource === "tomtom" ? ["==", ["get", "kind"], "flow"] : undefined,
     paint: {
       "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 7, 15, 14],
-      "circle-color": "#22c55e",
+      "circle-color": probeSource === "tomtom" ? "#38bdf8" : "#22c55e",
       "circle-opacity": 0.18,
       "circle-blur": 0.35,
     },
   });
   map.addLayer({
-    id: "stpt-vehicles",
+    id: "validation-probes",
     type: "circle",
-    source: "stpt-vehicles",
+    source: "validation-probes",
+    filter: probeSource === "tomtom" ? ["==", ["get", "kind"], "flow"] : undefined,
     paint: {
       "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 3.5, 15, 7],
-      "circle-color": ["case", [">", ["get", "speed"], 0], "#22c55e", "#a3e635"],
+      "circle-color": probeSource === "tomtom" ? "#38bdf8" : ["case", [">", ["get", "speed"], 0], "#22c55e", "#a3e635"],
       "circle-stroke-color": "#052e16",
       "circle-stroke-width": 1.5,
     },
   });
+  if (probeSource === "tomtom") {
+    map.addLayer({
+      id: "validation-flow-lines-halo",
+      type: "line",
+      source: "validation-flow-lines",
+      paint: {
+        "line-color": "#0f172a",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 4.5, 15, 10],
+        "line-opacity": 0.7,
+        "line-blur": 1.2,
+      },
+    });
+    map.addLayer({
+      id: "validation-flow-lines",
+      type: "line",
+      source: "validation-flow-lines",
+      paint: {
+        "line-color": [
+          "match",
+          ["get", "congestionLevel"],
+          "low",
+          "#22c55e",
+          "moderate",
+          "#fbbf24",
+          "heavy",
+          "#fb923c",
+          "severe",
+          "#ef4444",
+          "#38bdf8",
+        ],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 2.2, 15, 5.4],
+        "line-opacity": 0.6,
+      },
+    });
+    const selectedFilter = ["==", ["get", "probeKey"], selectedProbeKey ?? "__none__"] as any;
+    map.addLayer({
+      id: "validation-incidents-halo",
+      type: "circle",
+      source: "validation-probes",
+      filter: ["==", ["get", "kind"], "incident"],
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 9, 15, 18],
+        "circle-color": "#fb7185",
+        "circle-opacity": 0.2,
+        "circle-blur": 0.4,
+      },
+    });
+    map.addLayer({
+      id: "validation-incidents",
+      type: "circle",
+      source: "validation-probes",
+      filter: ["==", ["get", "kind"], "incident"],
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 5, 15, 10],
+        "circle-color": "#fb7185",
+        "circle-stroke-color": "#fff1f2",
+        "circle-stroke-width": 1.2,
+      },
+    });
+    map.addLayer({
+      id: "validation-selected-road-pulse",
+      type: "line",
+      source: "validation-flow-lines",
+      filter: selectedFilter,
+      paint: {
+        "line-color": "#fff1a8",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 7, 15, 16],
+        "line-opacity": 0.16,
+        "line-blur": 1.3,
+      },
+    });
+    map.addLayer({
+      id: "validation-selected-road-glow",
+      type: "line",
+      source: "validation-flow-lines",
+      filter: selectedFilter,
+      paint: {
+        "line-color": "#fef3c7",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 4, 15, 9],
+        "line-opacity": 0.92,
+        "line-blur": 0.8,
+      },
+    });
+    map.addLayer({
+      id: "validation-selected-road",
+      type: "line",
+      source: "validation-flow-lines",
+      filter: selectedFilter,
+      paint: {
+        "line-color": "#fef08a",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 3.4, 15, 7.4],
+        "line-opacity": 1,
+      },
+    });
+    map.addLayer({
+      id: "validation-selected-halo",
+      type: "circle",
+      source: "validation-probes",
+      filter: selectedFilter,
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 18, 15, 34],
+        "circle-color": "#fde68a",
+        "circle-opacity": ["interpolate", ["linear"], ["zoom"], 11, 0.34, 15, 0.18],
+        "circle-blur": 0.65,
+      },
+    });
+    map.addLayer({
+      id: "validation-selected",
+      type: "circle",
+      source: "validation-probes",
+      filter: selectedFilter,
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 10, 15, 18],
+        "circle-color": "#fde68a",
+        "circle-stroke-color": "#fff7ed",
+        "circle-stroke-width": 3,
+      },
+    });
+    map.addLayer({
+      id: "validation-selected-pulse",
+      type: "circle",
+      source: "validation-probes",
+      filter: selectedFilter,
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 24, 15, 42],
+        "circle-color": "#fff1a8",
+        "circle-opacity": 0.08,
+        "circle-blur": 0.85,
+      },
+    });
+  }
   map.addLayer({
-    id: "stpt-vehicle-labels",
+    id: "validation-probe-labels",
     type: "symbol",
-    source: "stpt-vehicles",
+    source: "validation-probes",
     minzoom: 13.6,
+    filter: probeSource === "tomtom" ? ["==", ["get", "kind"], "flow"] : undefined,
     layout: {
-      "text-field": ["concat", "STPT ", ["to-string", ["get", "route"]]],
+      "text-field": ["concat", probeLabel, " ", ["to-string", ["get", "route"]]],
       "text-size": 10,
       "text-offset": [0, 1.2],
       "text-anchor": "top",
     },
     paint: { "text-color": "#edf7ff", "text-halo-color": "#052e16", "text-halo-width": 1.4 },
   });
+  if (probeSource === "tomtom") {
+    map.addLayer({
+      id: "validation-incident-labels",
+      type: "symbol",
+      source: "validation-probes",
+      minzoom: 13.6,
+      filter: ["==", ["get", "kind"], "incident"],
+      layout: {
+        "text-field": ["concat", "INC ", ["to-string", ["get", "route"]]],
+        "text-size": 9,
+        "text-offset": [0, 1.15],
+        "text-anchor": "top",
+      },
+      paint: { "text-color": "#ffe4e6", "text-halo-color": "#4c0519", "text-halo-width": 1.4 },
+    });
+  }
   map.addSource("signals", { type: "geojson", data: signalGeoJson(frame) });
   map.addLayer({
     id: "signals",
@@ -670,7 +837,19 @@ function updateClosureOverlay(map: MapLibreMap, roads: LineCollection, closures:
   );
 }
 
-export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
+type ProbeSource = "stpt" | "tomtom";
+
+export function LiveMap({
+  scenarios,
+  probeSource = "stpt",
+  validationOnly = false,
+  selectedProbeKey = null,
+}: {
+  scenarios: Scenario[];
+  probeSource?: ProbeSource;
+  validationOnly?: boolean;
+  selectedProbeKey?: string | null;
+}) {
   const [selectedScenarioId, setSelectedScenarioId] = useState(scenarios[0]?.id ?? "");
   const scenario = useMemo(
     () => scenarios.find((entry) => entry.id === selectedScenarioId) ?? scenarios[0],
@@ -681,7 +860,14 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
   const [time, setTime] = useState(0);
   const [demoMode, setDemoMode] = useState(true);
   const [stptVehicles, setStptVehicles] = useState<PointCollection>(emptyPointCollection);
+  const [tomtomFlowLines, setTomtomFlowLines] = useState<LineCollection>(emptyTomTomLines);
   const [closures, setClosures] = useState<ClosureManifest | null>(null);
+  const [selectedProbe, setSelectedProbe] = useState<{
+    kind: string;
+    route: string;
+    speed?: number;
+    severity?: number;
+  } | null>(null);
   const lastFrameAt = useRef(0);
 
   const frame = useMemo(() => simulateScenario(scenario, time), [scenario, time]);
@@ -703,25 +889,98 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
     let disposed = false;
 
     async function loadStptVehicles() {
-      const fetchGeoJson = async () => {
-        const response = await fetch(`/data/sources/stpt-live/latest-vehicles.geojson?t=${Date.now()}`);
-        if (!response.ok) throw new Error("geojson unavailable");
-        return (await response.json()) as PointCollection;
-      };
+      try {
+        const url =
+          probeSource === "tomtom"
+            ? `/data/traffic-validation/providers/tomtom/latest.json?t=${Date.now()}`
+            : `/data/sources/stpt-live/latest-vehicles.json?t=${Date.now()}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("traffic snapshot unavailable");
+        const json = await response.json();
 
-      const fetchJson = async () => {
-        const response = await fetch(`/data/sources/stpt-live/latest-vehicles.json?t=${Date.now()}`);
-        if (!response.ok) throw new Error("json unavailable");
-        const json = (await response.json()) as {
+        if (probeSource === "tomtom") {
+          const snapshot = json as {
+            segments?: Array<{
+              segmentId?: string;
+              roadName?: string;
+              speedKph?: number;
+              delaySeconds?: number;
+              congestionLevel?: string;
+              geometry?: [number, number][];
+            }>;
+            incidents?: Array<{ incidentId?: string; kind?: string; geometry?: [number, number][] }>;
+          };
+          const lines: LineCollection["features"] = [];
+          const features: PointCollection["features"] = [
+            ...(snapshot.segments ?? []).map((segment, index) => {
+              const coords = (segment.geometry ?? []).filter(
+                (coord): coord is [number, number] => Array.isArray(coord) && coord.length === 2,
+              );
+              if (coords.length >= 2) {
+                lines.push({
+                  type: "Feature" as const,
+                  properties: {
+                    kind: "flow",
+                    probeKey: `flow:${segment.segmentId ?? index}`,
+                    route: segment.roadName ?? segment.segmentId ?? `segment-${index}`,
+                    speed: segment.speedKph ?? 0,
+                    delaySeconds: segment.delaySeconds ?? 0,
+                    congestionLevel: segment.congestionLevel ?? "unknown",
+                  },
+                  geometry: {
+                    type: "LineString" as const,
+                    coordinates: coords,
+                  },
+                });
+              }
+              const pointCoord = coords[Math.floor((coords.length - 1) / 2)] ?? [scenario.center.lng, scenario.center.lat];
+              return {
+                type: "Feature" as const,
+                properties: {
+                  kind: "flow",
+                  probeKey: `flow:${segment.segmentId ?? index}`,
+                  route: segment.roadName ?? segment.segmentId ?? `segment-${index}`,
+                  speed: segment.speedKph ?? 0,
+                },
+                geometry: {
+                  type: "Point" as const,
+                  coordinates: pointCoord,
+                },
+              };
+            }),
+            ...(snapshot.incidents ?? []).map((incident, index) => ({
+              type: "Feature" as const,
+              properties: {
+                kind: "incident",
+                probeKey: `incident:${incident.incidentId ?? index}`,
+                route: incident.kind ?? incident.incidentId ?? `incident-${index}`,
+                speed: 0,
+              },
+              geometry: {
+                type: "Point" as const,
+                coordinates:
+                  incident.geometry?.[0] ?? incident.geometry?.[1] ?? [scenario.center.lng, scenario.center.lat],
+              },
+            })),
+          ];
+          if (!disposed) {
+            setStptVehicles({ type: "FeatureCollection", features });
+            setTomtomFlowLines({ type: "FeatureCollection", features: lines });
+          }
+          return;
+        }
+
+        const legacy = json as {
           features?: Array<{ geometry?: { coordinates?: [number, number] }; properties?: { speed?: number; route?: string | number } }>;
         };
-        return {
+        const geojson: PointCollection = {
           type: "FeatureCollection",
           features:
-            json.features?.map((feature, index) => ({
+            legacy.features?.map((feature, index) => ({
               type: "Feature" as const,
               properties: {
                 route: feature.properties?.route ?? index + 1,
+                probeKey: `stpt:${feature.properties?.route ?? index + 1}`,
                 speed: feature.properties?.speed ?? 0,
               },
               geometry: {
@@ -729,14 +988,16 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
                 coordinates: feature.geometry?.coordinates ?? [scenario.center.lng, scenario.center.lat],
               },
             })) ?? [],
-        } as PointCollection;
-      };
-
-      try {
-        const geojson = await fetchGeoJson().catch(fetchJson);
-        if (!disposed) setStptVehicles(geojson);
+        };
+        if (!disposed) {
+          setStptVehicles(geojson);
+          setTomtomFlowLines(emptyTomTomLines);
+        }
       } catch {
-        if (!disposed) setStptVehicles(emptyPointCollection);
+        if (!disposed) {
+          setStptVehicles(emptyPointCollection);
+          setTomtomFlowLines(emptyTomTomLines);
+        }
       }
     }
 
@@ -747,9 +1008,10 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
       disposed = true;
       window.clearInterval(interval);
     };
-  }, [scenario.center.lat, scenario.center.lng]);
+  }, [probeSource, scenario.center.lat, scenario.center.lng, validationOnly]);
 
   useEffect(() => {
+    if (validationOnly) return undefined;
     let disposed = false;
 
     async function loadClosures() {
@@ -770,7 +1032,20 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
       disposed = true;
       window.clearInterval(interval);
     };
-  }, []);
+  }, [validationOnly]);
+
+  useEffect(() => {
+    if (probeSource !== "tomtom") return;
+    if (selectedProbe) return;
+    const flow = stptVehicles.features.find((feature) => feature.properties?.kind === "flow");
+    const fallback = flow ?? stptVehicles.features[0];
+    if (!fallback) return;
+    setSelectedProbe({
+      kind: String(fallback.properties?.kind ?? "flow"),
+      route: String(fallback.properties?.route ?? "Unknown"),
+      speed: typeof fallback.properties?.speed === "number" ? fallback.properties.speed : undefined,
+    });
+  }, [probeSource, selectedProbe, stptVehicles.features]);
 
   useEffect(() => {
     if (!running) return undefined;
@@ -796,6 +1071,7 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
   const mapRef = useRef<MapLibreMap | null>(null);
   const roadsRef = useRef<LineCollection | null>(null);
   const stptVehiclesRef = useRef(stptVehicles);
+  const tomtomFlowLinesRef = useRef(tomtomFlowLines);
   const frameRef = useRef(frame);
   const scenarioRef = useRef(scenario);
   const closuresRef = useRef(closures);
@@ -805,10 +1081,14 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
   const [mapError, setMapError] = useState<string | null>(null);
   const [mapMode, setMapMode] = useState<MapStyleMode>("midnight");
   const [localOsm, setLocalOsm] = useState<LocalOsmBundle | null>(null);
+  const probeCount = stptVehicles.features.length;
 
   useEffect(() => {
     stptVehiclesRef.current = stptVehicles;
   }, [stptVehicles]);
+  useEffect(() => {
+    tomtomFlowLinesRef.current = tomtomFlowLines;
+  }, [tomtomFlowLines]);
   useEffect(() => {
     frameRef.current = frame;
   }, [frame]);
@@ -889,8 +1169,12 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
             scenarioRef.current,
             frameRef.current,
             stptVehiclesRef.current,
+            tomtomFlowLinesRef.current,
             closuresRef.current,
             roadsRef.current ?? emptyLineCollection,
+            probeSource === "tomtom" ? "TomTom" : "STPT",
+            probeSource,
+            selectedProbeKey,
           );
           setMapReady(true);
           return;
@@ -901,12 +1185,43 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
         (map.getSource("signals") as GeoJSONSource | undefined)?.setData(signalGeoJson(frameRef.current));
         (map.getSource("signal-phases") as GeoJSONSource | undefined)?.setData(signalPhaseGeoJson(frameRef.current));
         (map.getSource("stpt-vehicles") as GeoJSONSource | undefined)?.setData(stptVehiclesRef.current);
+        (map.getSource("validation-flow-lines") as GeoJSONSource | undefined)?.setData(tomtomFlowLinesRef.current);
         updateClosureOverlay(map, roadsRef.current ?? emptyLineCollection, closuresRef.current);
+      };
+
+      const handleProbeClick = (feature: any) => {
+        const props = feature?.properties ?? {};
+        setSelectedProbe({
+          kind: String(props.kind ?? "flow"),
+          route: String(props.route ?? "Unknown"),
+          speed: typeof props.speed === "number" ? props.speed : undefined,
+          severity: typeof props.severity === "number" ? props.severity : undefined,
+        });
       };
 
       map.on("style.load", () => {
         if (!styleReloadsEnabledRef.current) return;
         syncDynamicLayers();
+      });
+      map.on("click", "validation-probes", (event) => {
+        const feature = event.features?.[0];
+        if (feature) handleProbeClick(feature);
+      });
+      map.on("click", "validation-incidents", (event) => {
+        const feature = event.features?.[0];
+        if (feature) handleProbeClick(feature);
+      });
+      map.on("mouseenter", "validation-probes", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "validation-probes", () => {
+        map.getCanvas().style.cursor = "";
+      });
+      map.on("mouseenter", "validation-incidents", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "validation-incidents", () => {
+        map.getCanvas().style.cursor = "";
       });
 
       osmLoadPromise ??= loadLocalOsm();
@@ -954,6 +1269,66 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
   }, [stptVehicles]);
 
   useEffect(() => {
+    if (probeSource !== "tomtom") return;
+    (mapRef.current?.getSource("validation-flow-lines") as GeoJSONSource | undefined)?.setData(tomtomFlowLines);
+  }, [probeSource, tomtomFlowLines]);
+
+  useEffect(() => {
+    if (probeSource !== "tomtom") return;
+    const map = mapRef.current;
+    if (!map) return;
+    if (map.getLayer("validation-selected-road")) {
+      map.setFilter("validation-selected-road-pulse", ["==", ["get", "probeKey"], selectedProbeKey ?? "__none__"]);
+      map.setFilter("validation-selected-road-glow", ["==", ["get", "probeKey"], selectedProbeKey ?? "__none__"]);
+      map.setFilter("validation-selected-road", ["==", ["get", "probeKey"], selectedProbeKey ?? "__none__"]);
+      map.setFilter("validation-selected-halo", ["==", ["get", "probeKey"], selectedProbeKey ?? "__none__"]);
+      map.setFilter("validation-selected", ["==", ["get", "probeKey"], selectedProbeKey ?? "__none__"]);
+    }
+  }, [probeSource, selectedProbeKey]);
+
+  useEffect(() => {
+    if (probeSource !== "tomtom" || !selectedProbeKey) return;
+    const map = mapRef.current;
+    if (!map) return;
+    const lineFeature = tomtomFlowLines.features.find((entry) => entry.properties?.probeKey === selectedProbeKey);
+    if (lineFeature?.geometry?.coordinates?.length) {
+      const coords = lineFeature.geometry.coordinates;
+      const [firstLng, firstLat] = coords[0] as [number, number];
+      const [minLng, minLat, maxLng, maxLat] = coords.slice(1).reduce(
+        (acc, coord) => [
+          Math.min(acc[0], coord[0]),
+          Math.min(acc[1], coord[1]),
+          Math.max(acc[2], coord[0]),
+          Math.max(acc[3], coord[1]),
+        ],
+        [firstLng, firstLat, firstLng, firstLat] as [number, number, number, number],
+      );
+      map.fitBounds(
+        [
+          [minLng, minLat],
+          [maxLng, maxLat],
+        ],
+        {
+          padding: { top: 110, bottom: 110, left: 120, right: 120 },
+          duration: 1300,
+          essential: true,
+          maxZoom: 16.5,
+        },
+      );
+      return;
+    }
+    const pointFeature = stptVehicles.features.find((entry) => entry.properties?.probeKey === selectedProbeKey);
+    const coords = pointFeature?.geometry?.coordinates;
+    if (!coords || coords.length !== 2) return;
+    map.easeTo({
+      center: [coords[0], coords[1]],
+      zoom: 15.8,
+      duration: 1100,
+      essential: true,
+    });
+  }, [probeSource, selectedProbeKey, stptVehicles, tomtomFlowLines]);
+
+  useEffect(() => {
     const map = mapRef.current;
     const roads = roadsRef.current;
     if (!map || !roads) return;
@@ -987,11 +1362,13 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
   };
 
   return (
-    <main className="map-page">
+    <main className={validationOnly ? "page" : "map-page"}>
       <LiveMapViewport
         scenario={scenario}
         frame={frame}
         stptVehicles={stptVehicles}
+        probeLabel={probeSource === "tomtom" ? "TomTom" : "STPT"}
+        selectedProbeKey={selectedProbeKey}
         closures={closures}
         mapNode={mapNode}
         mapMode={mapMode}
@@ -999,118 +1376,140 @@ export function LiveMap({ scenarios }: { scenarios: Scenario[] }) {
         mapReady={mapReady}
         mapError={mapError}
       />
-      <aside className="sim-panel">
-        <p className="eyebrow">Live environment</p>
-        <h2>{scenario.name}</h2>
-        <p>{scenario.description}</p>
-        <div className="toolbar">
-          <button className="btn primary" onClick={() => setRunning((value) => !value)} type="button">
-            {running ? "Pause" : "Play"}
-          </button>
-          <button
-            className="btn secondary"
-            onClick={() => {
-              setRunning(false);
-              setTime(0);
-            }}
-            type="button"
-          >
-            Reset
-          </button>
-          <button className="btn secondary" onClick={exportTrace} type="button">
-            Export trace
-          </button>
-          <button className="btn secondary" onClick={exportScenario} type="button">
-            Export scenario
-          </button>
+      {!validationOnly ? (
+        <>
+          <aside className="sim-panel">
+            <p className="eyebrow">Live environment</p>
+            <h2>{scenario.name}</h2>
+            <p>{scenario.description}</p>
+            <div className="toolbar">
+              <button className="btn primary" onClick={() => setRunning((value) => !value)} type="button">
+                {running ? "Pause" : "Play"}
+              </button>
+              <button
+                className="btn secondary"
+                onClick={() => {
+                  setRunning(false);
+                  setTime(0);
+                }}
+                type="button"
+              >
+                Reset
+              </button>
+              <button className="btn secondary" onClick={exportTrace} type="button">
+                Export trace
+              </button>
+              <button className="btn secondary" onClick={exportScenario} type="button">
+                Export scenario
+              </button>
+            </div>
+            <div className="toolbar">
+              <label className="switch">
+                <input checked={demoMode} onChange={(event) => setDemoMode(event.target.checked)} type="checkbox" />
+                <span>Demo mode</span>
+              </label>
+              <select onChange={(event) => setSpeed(Number(event.target.value))} value={speed}>
+                <option value={0.5}>0.5x</option>
+                <option value={1}>1x</option>
+                <option value={1.5}>1.5x</option>
+                <option value={2}>2x</option>
+                <option value={4}>4x</option>
+              </select>
+            </div>
+            <div className="scenario-picker">
+              {scenarios.map((entry) => (
+                <button
+                  className={entry.id === scenario.id ? "scenario-chip active" : "scenario-chip"}
+                  key={entry.id}
+                  onClick={() => setSelectedScenarioId(entry.id)}
+                  type="button"
+                >
+                  <strong>{entry.name}</strong>
+                  <span>{entry.district}</span>
+                </button>
+              ))}
+            </div>
+            <div className="metrics-grid">
+              <Metric value={String(frame.metrics.activeActors)} label="active actors" />
+              <Metric value={String(frame.metrics.queueLength)} label="queued at signals" />
+              <Metric value={frame.metrics.averageSpeedKmh.toFixed(1)} label="avg km/h" />
+              <Metric value={`${Math.round(time)}s`} label="simulation clock" />
+              <Metric value={String(frame.metrics.signalPressure)} label="signal pressure" />
+              <Metric value={String(closures?.recordCount ?? 0)} label="closure notices" />
+            </div>
+            <div className="signal-comparison">
+              {frame.signalComparisons.map((signal) => (
+                <article className="signal-comparison-card" key={signal.id}>
+                  <div>
+                    <strong>{signal.name}</strong>
+                    <small>{signal.state.toUpperCase()} · {signal.secondsRemaining}s left</small>
+                  </div>
+                  <div>
+                    <span>{signal.blockedActors} blocked</span>
+                    <span>{signal.queueMeters.toFixed(0)}m queue</span>
+                    <span>{signal.estimatedDelaySeconds.toFixed(1)}s delay</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {closures?.records.length ? <ClosureSidebar closures={closures} /> : null}
+          </aside>
+          <div className="timeline">
+            <span>Browser-native deterministic model</span>
+            <div>
+              <b>SUMO adapter</b>
+              <span> planned</span>
+            </div>
+            <div>
+              <b>Satellite mode</b>
+              <span> optional imagery</span>
+            </div>
+          </div>
+        </>
+      ) : (
+        <section className="panel" style={{ marginTop: 16 }}>
+          <p className="eyebrow">TomTom validation only</p>
+          <h2>{scenario.name}</h2>
+          <p>Only the locally gathered TomTom snapshot is rendered here.</p>
+        </section>
+      )}
+      {validationOnly && probeSource === "tomtom" ? (
+        <div className="mini-badge" style={{ left: 16, right: "auto", bottom: 16, maxWidth: 320 }}>
+          {selectedProbe
+            ? `${selectedProbe.kind.toUpperCase()} · ${selectedProbe.route}${selectedProbe.speed !== undefined ? ` · ${selectedProbe.speed} km/h` : ""}${selectedProbe.severity !== undefined ? ` · severity ${selectedProbe.severity}` : ""}`
+            : "Click a point to inspect it"}
         </div>
-        <div className="toolbar">
-          <label className="switch">
-            <input checked={demoMode} onChange={(event) => setDemoMode(event.target.checked)} type="checkbox" />
-            <span>Demo mode</span>
-          </label>
-          <select onChange={(event) => setSpeed(Number(event.target.value))} value={speed}>
-            <option value={0.5}>0.5x</option>
-            <option value={1}>1x</option>
-            <option value={1.5}>1.5x</option>
-            <option value={2}>2x</option>
-            <option value={4}>4x</option>
-          </select>
-        </div>
-        <div className="scenario-picker">
-          {scenarios.map((entry) => (
-            <button
-              className={entry.id === scenario.id ? "scenario-chip active" : "scenario-chip"}
-              key={entry.id}
-              onClick={() => setSelectedScenarioId(entry.id)}
-              type="button"
-            >
-              <strong>{entry.name}</strong>
-              <span>{entry.district}</span>
-            </button>
-          ))}
-        </div>
-        <div className="metrics-grid">
-          <Metric value={String(frame.metrics.activeActors)} label="active actors" />
-          <Metric value={String(frame.metrics.queueLength)} label="queued at signals" />
-          <Metric value={frame.metrics.averageSpeedKmh.toFixed(1)} label="avg km/h" />
-          <Metric value={`${Math.round(time)}s`} label="simulation clock" />
-          <Metric value={String(frame.metrics.signalPressure)} label="signal pressure" />
-          <Metric value={String(closures?.recordCount ?? 0)} label="closure notices" />
-        </div>
-        <div className="signal-comparison">
-          {frame.signalComparisons.map((signal) => (
-            <article className="signal-comparison-card" key={signal.id}>
-              <div>
-                <strong>{signal.name}</strong>
-                <small>{signal.state.toUpperCase()} · {signal.secondsRemaining}s left</small>
-              </div>
-              <div>
-                <span>{signal.blockedActors} blocked</span>
-                <span>{signal.queueMeters.toFixed(0)}m queue</span>
-                <span>{signal.estimatedDelaySeconds.toFixed(1)}s delay</span>
-              </div>
-            </article>
-          ))}
-        </div>
-        {closures?.records.length ? <ClosureSidebar closures={closures} /> : null}
-      </aside>
-      <div className="timeline">
-        <span>Browser-native deterministic model</span>
-        <div>
-          <b>SUMO adapter</b>
-          <span> planned</span>
-        </div>
-        <div>
-          <b>Satellite mode</b>
-          <span> optional imagery</span>
-        </div>
-      </div>
+      ) : null}
     </main>
   );
 }
 
-function LiveMapViewport({
+export function LiveMapViewport({
   scenario,
   frame,
   stptVehicles,
+  probeLabel,
   closures,
   mapNode,
   mapMode,
   setMapMode,
   mapReady,
   mapError,
+  selectedProbeKey,
 }: {
   scenario: Scenario;
   frame: SimulationFrame;
   stptVehicles: PointCollection;
+  probeLabel: string;
   closures: ClosureManifest | null;
   mapNode: RefObject<HTMLDivElement | null>;
   mapMode: MapStyleMode;
   setMapMode: (mode: MapStyleMode) => void;
   mapReady: boolean;
   mapError: string | null;
+  selectedProbeKey?: string | null;
 }) {
+  const probeCount = stptVehicles?.features?.length ?? 0;
   return (
     <div className={`map-canvas map-mode-${mapMode}`}>
       <div className="maplibre-node" ref={mapNode} />
@@ -1132,8 +1531,18 @@ function LiveMapViewport({
       {!mapReady ? <FallbackMap scenario={scenario} frame={frame} /> : null}
       {mapError ? <div className="map-error">{mapError}</div> : null}
       <div className="map-vignette" />
-      <ActorLegend frame={frame} stptVehicleCount={stptVehicles.features.length} />
+      <ActorLegend frame={frame} probeCount={probeCount} probeLabel={probeLabel} />
       {closures?.records.length ? <MiniClosureBadge closures={closures} /> : null}
+      {probeLabel === "TomTom" ? (
+        <div className="mini-badge" style={{ left: 16, right: "auto", bottom: 72 }}>
+          {probeCount} TomTom points
+        </div>
+      ) : null}
+      {probeLabel === "TomTom" && selectedProbeKey ? (
+        <div className="mini-badge" style={{ left: 16, right: "auto", bottom: 120, maxWidth: 320 }}>
+          Selected: {selectedProbeKey}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1177,10 +1586,12 @@ function FallbackMap({ scenario, frame }: { scenario: Scenario; frame: Simulatio
 
 function ActorLegend({
   frame,
-  stptVehicleCount,
+  probeCount,
+  probeLabel,
 }: {
   frame: SimulationFrame;
-  stptVehicleCount: number;
+  probeCount: number;
+  probeLabel: string;
 }) {
   const counts = frame.actors.reduce<Record<ActorType, number>>(
     (total, actor) => {
@@ -1210,7 +1621,7 @@ function ActorLegend({
       </span>
       <span>
         <i className="legend-dot stpt-dot" />
-        {stptVehicleCount} real STPT
+        {probeCount} {probeLabel}
       </span>
       <span>
         <i className="legend-dot lane-dot" />
