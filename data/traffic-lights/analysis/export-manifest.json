@@ -1,0 +1,920 @@
+{
+  "generatedAt": "2026-05-13T14:38:14.178Z",
+  "source": "/Users/alexandruionascu/Workspace/opentraffictm/data/stpt.db",
+  "window": {
+    "start": "2026-05-12",
+    "end": "2026-05-13"
+  },
+  "partitionRowLimit": 18000,
+  "files": [
+    {
+      "file": "raw/2026-05-12__4-00.csv",
+      "day": "2026-05-12",
+      "route": "4",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1640,
+      "bytes": 260439
+    },
+    {
+      "file": "raw/2026-05-12__1-00.csv",
+      "day": "2026-05-12",
+      "route": "1",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1436,
+      "bytes": 203162
+    },
+    {
+      "file": "raw/2026-05-12__14-00.csv",
+      "day": "2026-05-12",
+      "route": "14",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1389,
+      "bytes": 214891
+    },
+    {
+      "file": "raw/2026-05-12__9-00.csv",
+      "day": "2026-05-12",
+      "route": "9",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1356,
+      "bytes": 207720
+    },
+    {
+      "file": "raw/2026-05-12__2-00.csv",
+      "day": "2026-05-12",
+      "route": "2",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1263,
+      "bytes": 180997
+    },
+    {
+      "file": "raw/2026-05-12__8-00.csv",
+      "day": "2026-05-12",
+      "route": "8",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1184,
+      "bytes": 171289
+    },
+    {
+      "file": "raw/2026-05-12__e2-00.csv",
+      "day": "2026-05-12",
+      "route": "E2",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1122,
+      "bytes": 167470
+    },
+    {
+      "file": "raw/2026-05-12__5-00.csv",
+      "day": "2026-05-12",
+      "route": "5",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1023,
+      "bytes": 137291
+    },
+    {
+      "file": "raw/2026-05-12__17-00.csv",
+      "day": "2026-05-12",
+      "route": "17",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 875,
+      "bytes": 151961
+    },
+    {
+      "file": "raw/2026-05-12__7-00.csv",
+      "day": "2026-05-12",
+      "route": "7",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 873,
+      "bytes": 137884
+    },
+    {
+      "file": "raw/2026-05-12__33-00.csv",
+      "day": "2026-05-12",
+      "route": "33",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 861,
+      "bytes": 143880
+    },
+    {
+      "file": "raw/2026-05-12__18-00.csv",
+      "day": "2026-05-12",
+      "route": "18",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 821,
+      "bytes": 132074
+    },
+    {
+      "file": "raw/2026-05-12__m14-00.csv",
+      "day": "2026-05-12",
+      "route": "M14",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 769,
+      "bytes": 124796
+    },
+    {
+      "file": "raw/2026-05-12__e8-00.csv",
+      "day": "2026-05-12",
+      "route": "E8",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 662,
+      "bytes": 102784
+    },
+    {
+      "file": "raw/2026-05-12__16-00.csv",
+      "day": "2026-05-12",
+      "route": "16",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 641,
+      "bytes": 101589
+    },
+    {
+      "file": "raw/2026-05-12__e7-00.csv",
+      "day": "2026-05-12",
+      "route": "E7",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 602,
+      "bytes": 92398
+    },
+    {
+      "file": "raw/2026-05-12__e1-00.csv",
+      "day": "2026-05-12",
+      "route": "E1",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 551,
+      "bytes": 87107
+    },
+    {
+      "file": "raw/2026-05-12__11-00.csv",
+      "day": "2026-05-12",
+      "route": "11",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 528,
+      "bytes": 84550
+    },
+    {
+      "file": "raw/2026-05-12__40-00.csv",
+      "day": "2026-05-12",
+      "route": "40",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 441,
+      "bytes": 67491
+    },
+    {
+      "file": "raw/2026-05-12__e3-00.csv",
+      "day": "2026-05-12",
+      "route": "E3",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 400,
+      "bytes": 56904
+    },
+    {
+      "file": "raw/2026-05-12__m35-00.csv",
+      "day": "2026-05-12",
+      "route": "M35",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 393,
+      "bytes": 61035
+    },
+    {
+      "file": "raw/2026-05-12__m51-00.csv",
+      "day": "2026-05-12",
+      "route": "M51",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 387,
+      "bytes": 59996
+    },
+    {
+      "file": "raw/2026-05-12__m36-00.csv",
+      "day": "2026-05-12",
+      "route": "M36",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 356,
+      "bytes": 56828
+    },
+    {
+      "file": "raw/2026-05-12__e4b-00.csv",
+      "day": "2026-05-12",
+      "route": "E4b",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 338,
+      "bytes": 49698
+    },
+    {
+      "file": "raw/2026-05-12__46-00.csv",
+      "day": "2026-05-12",
+      "route": "46",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 310,
+      "bytes": 43464
+    },
+    {
+      "file": "raw/2026-05-12__m41-00.csv",
+      "day": "2026-05-12",
+      "route": "M41",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 306,
+      "bytes": 45815
+    },
+    {
+      "file": "raw/2026-05-12__5b-00.csv",
+      "day": "2026-05-12",
+      "route": "5b",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 287,
+      "bytes": 39067
+    },
+    {
+      "file": "raw/2026-05-12__m37-00.csv",
+      "day": "2026-05-12",
+      "route": "M37",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 276,
+      "bytes": 40661
+    },
+    {
+      "file": "raw/2026-05-12__m49-00.csv",
+      "day": "2026-05-12",
+      "route": "M49",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 273,
+      "bytes": 40317
+    },
+    {
+      "file": "raw/2026-05-12__m11-00.csv",
+      "day": "2026-05-12",
+      "route": "M11",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 267,
+      "bytes": 41354
+    },
+    {
+      "file": "raw/2026-05-12__13-00.csv",
+      "day": "2026-05-12",
+      "route": "13",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 249,
+      "bytes": 42282
+    },
+    {
+      "file": "raw/2026-05-12__e4-00.csv",
+      "day": "2026-05-12",
+      "route": "E4",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 242,
+      "bytes": 35118
+    },
+    {
+      "file": "raw/2026-05-12__m46-00.csv",
+      "day": "2026-05-12",
+      "route": "M46",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 198,
+      "bytes": 29985
+    },
+    {
+      "file": "raw/2026-05-12__e6-00.csv",
+      "day": "2026-05-12",
+      "route": "E6",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 196,
+      "bytes": 27055
+    },
+    {
+      "file": "raw/2026-05-12__23-00.csv",
+      "day": "2026-05-12",
+      "route": "23",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 186,
+      "bytes": 28189
+    },
+    {
+      "file": "raw/2026-05-12__m22-00.csv",
+      "day": "2026-05-12",
+      "route": "M22",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 173,
+      "bytes": 28496
+    },
+    {
+      "file": "raw/2026-05-12__33b-00.csv",
+      "day": "2026-05-12",
+      "route": "33b",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 165,
+      "bytes": 26257
+    },
+    {
+      "file": "raw/2026-05-12__m24-00.csv",
+      "day": "2026-05-12",
+      "route": "M24",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 163,
+      "bytes": 25007
+    },
+    {
+      "file": "raw/2026-05-12__15-00.csv",
+      "day": "2026-05-12",
+      "route": "15",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 152,
+      "bytes": 24084
+    },
+    {
+      "file": "raw/2026-05-12__m23-00.csv",
+      "day": "2026-05-12",
+      "route": "M23",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 148,
+      "bytes": 21897
+    },
+    {
+      "file": "raw/2026-05-12__m45-00.csv",
+      "day": "2026-05-12",
+      "route": "M45",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 145,
+      "bytes": 22690
+    },
+    {
+      "file": "raw/2026-05-12__21-00.csv",
+      "day": "2026-05-12",
+      "route": "21",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 138,
+      "bytes": 21019
+    },
+    {
+      "file": "raw/2026-05-12__28-00.csv",
+      "day": "2026-05-12",
+      "route": "28",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 125,
+      "bytes": 17415
+    },
+    {
+      "file": "raw/2026-05-12__32-00.csv",
+      "day": "2026-05-12",
+      "route": "32",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 31,
+      "bytes": 5221
+    },
+    {
+      "file": "raw/2026-05-13__7-00.csv",
+      "day": "2026-05-13",
+      "route": "7",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 9166,
+      "bytes": 1461617
+    },
+    {
+      "file": "raw/2026-05-13__2-00.csv",
+      "day": "2026-05-13",
+      "route": "2",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 9095,
+      "bytes": 1296110
+    },
+    {
+      "file": "raw/2026-05-13__1-00.csv",
+      "day": "2026-05-13",
+      "route": "1",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 7774,
+      "bytes": 1102962
+    },
+    {
+      "file": "raw/2026-05-13__e2-00.csv",
+      "day": "2026-05-13",
+      "route": "E2",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 7309,
+      "bytes": 1058879
+    },
+    {
+      "file": "raw/2026-05-13__9-00.csv",
+      "day": "2026-05-13",
+      "route": "9",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 7238,
+      "bytes": 1120921
+    },
+    {
+      "file": "raw/2026-05-13__14-00.csv",
+      "day": "2026-05-13",
+      "route": "14",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 6770,
+      "bytes": 1049543
+    },
+    {
+      "file": "raw/2026-05-13__4-00.csv",
+      "day": "2026-05-13",
+      "route": "4",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 6190,
+      "bytes": 978491
+    },
+    {
+      "file": "raw/2026-05-13__8-00.csv",
+      "day": "2026-05-13",
+      "route": "8",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 6179,
+      "bytes": 907673
+    },
+    {
+      "file": "raw/2026-05-13__e8-00.csv",
+      "day": "2026-05-13",
+      "route": "E8",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 6001,
+      "bytes": 930432
+    },
+    {
+      "file": "raw/2026-05-13__16-00.csv",
+      "day": "2026-05-13",
+      "route": "16",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 5880,
+      "bytes": 953200
+    },
+    {
+      "file": "raw/2026-05-13__40-00.csv",
+      "day": "2026-05-13",
+      "route": "40",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 5622,
+      "bytes": 880444
+    },
+    {
+      "file": "raw/2026-05-13__33-00.csv",
+      "day": "2026-05-13",
+      "route": "33",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 5607,
+      "bytes": 932988
+    },
+    {
+      "file": "raw/2026-05-13__e1-00.csv",
+      "day": "2026-05-13",
+      "route": "E1",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 5587,
+      "bytes": 880442
+    },
+    {
+      "file": "raw/2026-05-13__e7-00.csv",
+      "day": "2026-05-13",
+      "route": "E7",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 5293,
+      "bytes": 824448
+    },
+    {
+      "file": "raw/2026-05-13__15-00.csv",
+      "day": "2026-05-13",
+      "route": "15",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 5137,
+      "bytes": 825585
+    },
+    {
+      "file": "raw/2026-05-13__17-00.csv",
+      "day": "2026-05-13",
+      "route": "17",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 5059,
+      "bytes": 873085
+    },
+    {
+      "file": "raw/2026-05-13__5-00.csv",
+      "day": "2026-05-13",
+      "route": "5",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 4953,
+      "bytes": 674031
+    },
+    {
+      "file": "raw/2026-05-13__11-00.csv",
+      "day": "2026-05-13",
+      "route": "11",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 4935,
+      "bytes": 798023
+    },
+    {
+      "file": "raw/2026-05-13__m14-00.csv",
+      "day": "2026-05-13",
+      "route": "M14",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 4298,
+      "bytes": 696827
+    },
+    {
+      "file": "raw/2026-05-13__18-00.csv",
+      "day": "2026-05-13",
+      "route": "18",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 4006,
+      "bytes": 651505
+    },
+    {
+      "file": "raw/2026-05-13__23-00.csv",
+      "day": "2026-05-13",
+      "route": "23",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 3886,
+      "bytes": 588710
+    },
+    {
+      "file": "raw/2026-05-13__e3-00.csv",
+      "day": "2026-05-13",
+      "route": "E3",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 3837,
+      "bytes": 562467
+    },
+    {
+      "file": "raw/2026-05-13__m11-00.csv",
+      "day": "2026-05-13",
+      "route": "M11",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 3763,
+      "bytes": 582731
+    },
+    {
+      "file": "raw/2026-05-13__33b-00.csv",
+      "day": "2026-05-13",
+      "route": "33b",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 3043,
+      "bytes": 462331
+    },
+    {
+      "file": "raw/2026-05-13__e4-00.csv",
+      "day": "2026-05-13",
+      "route": "E4",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 2555,
+      "bytes": 367939
+    },
+    {
+      "file": "raw/2026-05-13__13-00.csv",
+      "day": "2026-05-13",
+      "route": "13",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 2527,
+      "bytes": 423998
+    },
+    {
+      "file": "raw/2026-05-13__21-00.csv",
+      "day": "2026-05-13",
+      "route": "21",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 2371,
+      "bytes": 363054
+    },
+    {
+      "file": "raw/2026-05-13__24-00.csv",
+      "day": "2026-05-13",
+      "route": "24",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 2302,
+      "bytes": 352638
+    },
+    {
+      "file": "raw/2026-05-13__m49-00.csv",
+      "day": "2026-05-13",
+      "route": "M49",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1727,
+      "bytes": 256773
+    },
+    {
+      "file": "raw/2026-05-13__m37-00.csv",
+      "day": "2026-05-13",
+      "route": "M37",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1693,
+      "bytes": 255092
+    },
+    {
+      "file": "raw/2026-05-13__v1-00.csv",
+      "day": "2026-05-13",
+      "route": "V1",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1680,
+      "bytes": 243761
+    },
+    {
+      "file": "raw/2026-05-13__m35-00.csv",
+      "day": "2026-05-13",
+      "route": "M35",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1566,
+      "bytes": 239932
+    },
+    {
+      "file": "raw/2026-05-13__m36-00.csv",
+      "day": "2026-05-13",
+      "route": "M36",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1550,
+      "bytes": 249731
+    },
+    {
+      "file": "raw/2026-05-13__m43-00.csv",
+      "day": "2026-05-13",
+      "route": "M43",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1545,
+      "bytes": 239536
+    },
+    {
+      "file": "raw/2026-05-13__m24-00.csv",
+      "day": "2026-05-13",
+      "route": "M24",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1475,
+      "bytes": 222617
+    },
+    {
+      "file": "raw/2026-05-13__m22-00.csv",
+      "day": "2026-05-13",
+      "route": "M22",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1461,
+      "bytes": 231592
+    },
+    {
+      "file": "raw/2026-05-13__46-00.csv",
+      "day": "2026-05-13",
+      "route": "46",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1438,
+      "bytes": 206036
+    },
+    {
+      "file": "raw/2026-05-13__28-00.csv",
+      "day": "2026-05-13",
+      "route": "28",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1414,
+      "bytes": 197425
+    },
+    {
+      "file": "raw/2026-05-13__m29-00.csv",
+      "day": "2026-05-13",
+      "route": "M29",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1392,
+      "bytes": 210548
+    },
+    {
+      "file": "raw/2026-05-13__m46-00.csv",
+      "day": "2026-05-13",
+      "route": "M46",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1371,
+      "bytes": 205096
+    },
+    {
+      "file": "raw/2026-05-13__32-00.csv",
+      "day": "2026-05-13",
+      "route": "32",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1369,
+      "bytes": 207498
+    },
+    {
+      "file": "raw/2026-05-13__5b-00.csv",
+      "day": "2026-05-13",
+      "route": "5b",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1349,
+      "bytes": 181581
+    },
+    {
+      "file": "raw/2026-05-13__m23-00.csv",
+      "day": "2026-05-13",
+      "route": "M23",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1277,
+      "bytes": 184146
+    },
+    {
+      "file": "raw/2026-05-13__e4b-00.csv",
+      "day": "2026-05-13",
+      "route": "E4b",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1274,
+      "bytes": 188347
+    },
+    {
+      "file": "raw/2026-05-13__e6-00.csv",
+      "day": "2026-05-13",
+      "route": "E6",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1207,
+      "bytes": 167496
+    },
+    {
+      "file": "raw/2026-05-13__m50-00.csv",
+      "day": "2026-05-13",
+      "route": "M50",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1115,
+      "bytes": 171981
+    },
+    {
+      "file": "raw/2026-05-13__m45-00.csv",
+      "day": "2026-05-13",
+      "route": "M45",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1096,
+      "bytes": 171243
+    },
+    {
+      "file": "raw/2026-05-13__m30-00.csv",
+      "day": "2026-05-13",
+      "route": "M30",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1079,
+      "bytes": 167856
+    },
+    {
+      "file": "raw/2026-05-13__m51-00.csv",
+      "day": "2026-05-13",
+      "route": "M51",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1067,
+      "bytes": 163742
+    },
+    {
+      "file": "raw/2026-05-13__m44-00.csv",
+      "day": "2026-05-13",
+      "route": "M44",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 1008,
+      "bytes": 161507
+    },
+    {
+      "file": "raw/2026-05-13__m41-00.csv",
+      "day": "2026-05-13",
+      "route": "M41",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 968,
+      "bytes": 146256
+    },
+    {
+      "file": "raw/2026-05-13__m27-00.csv",
+      "day": "2026-05-13",
+      "route": "M27",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 744,
+      "bytes": 116924
+    },
+    {
+      "file": "raw/2026-05-13__m47-00.csv",
+      "day": "2026-05-13",
+      "route": "M47",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 732,
+      "bytes": 113453
+    },
+    {
+      "file": "raw/2026-05-13__m38-00.csv",
+      "day": "2026-05-13",
+      "route": "M38",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 517,
+      "bytes": 75929
+    },
+    {
+      "file": "raw/2026-05-13__m48-00.csv",
+      "day": "2026-05-13",
+      "route": "M48",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 511,
+      "bytes": 80495
+    },
+    {
+      "file": "raw/2026-05-13__m42-00.csv",
+      "day": "2026-05-13",
+      "route": "M42",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 460,
+      "bytes": 67807
+    },
+    {
+      "file": "raw/2026-05-13__m39-00.csv",
+      "day": "2026-05-13",
+      "route": "M39",
+      "partition": 1,
+      "partitionCount": 1,
+      "rows": 388,
+      "bytes": 55433
+    }
+  ]
+}

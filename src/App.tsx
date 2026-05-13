@@ -20,8 +20,21 @@ import {
   type TrafficProviderAdapter,
   type ValidationResult,
 } from "./traffic-validation";
+import type {
+  TrafficLightIntersectionAnalysis,
+  TrafficLightProbeExportManifest,
+} from "./contracts";
+import { TrafficLightConfidenceMap, type TrafficHistoricalPlace, type TrafficProbeTrack } from "./map/TrafficLightConfidenceMap";
 
 const LiveMap = lazy(() => import("./map/LiveMap").then((module) => ({ default: module.LiveMap })));
+
+const eBusExamples = [
+  { route: "E2", label: "E2", places: "Mărăști, Continental, Județean" },
+  { route: "E1", label: "E1", places: "Shopping City, Calea Șagului" },
+  { route: "E7", label: "E7", places: "east-west express corridor" },
+  { route: "E8", label: "E8", places: "south corridor overlaps" },
+  { route: "E4b", label: "E4b", places: "mixed express branch" },
+];
 
 const navItems = [
   { path: "/", label: "Home" },
@@ -29,6 +42,7 @@ const navItems = [
   { path: "/datasets", label: "Data" },
   { path: "/sources", label: "Sources" },
   { path: "/validation", label: "Validation" },
+  { path: "/traffic-lights", label: "Traffic Lights" },
   { path: "/tomtom", label: "TomTom Traffic" },
   { path: "/sheet", label: "Sheet" },
   { path: "/scenarios", label: "Scenarios" },
@@ -62,7 +76,7 @@ function Shell({
   path: string;
   navigate: (nextPath: string) => void;
 }) {
-  const isMap = path === "/map";
+  const isMap = path === "/map" || path === "/traffic-lights";
 
   return (
     <div className={isMap ? "app app-map" : "app"}>
@@ -101,12 +115,13 @@ export function App() {
       {path === "/datasets" ? <DatasetsPage /> : null}
       {path === "/sources" ? <SourcesPage /> : null}
       {path === "/validation" ? <ValidationPage /> : null}
+      {path === "/traffic-lights" ? <TrafficLightIntersectionPage /> : null}
       {path === "/tomtom" ? <TomTomTrafficPage /> : null}
       {path === "/sheet" ? <SpreadsheetPage /> : null}
       {path === "/scenarios" ? <ScenariosPage /> : null}
       {path === "/leaderboards" ? <LeaderboardsPage /> : null}
       {path === "/papers" ? <PapersPage /> : null}
-      {!["/map", "/datasets", "/sources", "/validation", "/tomtom", "/sheet", "/scenarios", "/leaderboards", "/papers"].includes(path) ? (
+      {!["/map", "/datasets", "/sources", "/validation", "/traffic-lights", "/tomtom", "/sheet", "/scenarios", "/leaderboards", "/papers"].includes(path) ? (
         <HomePage />
       ) : null}
     </Shell>
@@ -273,6 +288,383 @@ function ValidationPage() {
         </ol>
       </section>
     </main>
+  );
+}
+
+function parseCsvLine(line: string) {
+  const cells: string[] = [];
+  let value = "";
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (char === '"' && line[index + 1] === '"') {
+      value += '"';
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      cells.push(value);
+      value = "";
+    } else {
+      value += char;
+    }
+  }
+  cells.push(value);
+  return cells;
+}
+
+function routeMatchesCandidate(candidate: TrafficLightIntersectionAnalysis["candidates"][number], route: string) {
+  return candidate.route
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .includes(route.toLowerCase());
+}
+
+function historicalPlacesFor(tracks: TrafficProbeTrack[]): TrafficHistoricalPlace[] {
+  const groups = new Map<string, Array<{ lng: number; lat: number; waiting: boolean }>>();
+  for (const point of tracks.flatMap((track) => track.points)) {
+    const stop = point.stop.trim();
+    if (!stop || stop.length < 3) continue;
+    const bucket = groups.get(stop) ?? [];
+    bucket.push({ lng: point.lng, lat: point.lat, waiting: point.speed <= 2.2 });
+    groups.set(stop, bucket);
+  }
+
+  return [...groups.entries()]
+    .map(([name, points]) => ({
+      name,
+      lng: points.reduce((total, point) => total + point.lng, 0) / points.length,
+      lat: points.reduce((total, point) => total + point.lat, 0) / points.length,
+      samples: points.length,
+      waitingSamples: points.filter((point) => point.waiting).length,
+    }))
+    .filter((place) => place.samples >= 3)
+    .sort((a, b) => b.waitingSamples - a.waitingSamples || b.samples - a.samples)
+    .slice(0, 8);
+}
+
+function TrafficLightIntersectionPage() {
+  const [manifest, setManifest] = useState<TrafficLightProbeExportManifest | null>(null);
+  const [analysis, setAnalysis] = useState<TrafficLightIntersectionAnalysis | null>(null);
+  const [step, setStep] = useState(0);
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState("E2");
+  const [tracks, setTracks] = useState<TrafficProbeTrack[]>([]);
+
+  useEffect(() => {
+    fetch("/data/traffic-lights/analysis/export-manifest.json")
+      .then((response) => response.json())
+      .then(setManifest)
+      .catch(() => setManifest(null));
+    fetch("/data/traffic-lights/analysis/intersection-analysis.json")
+      .then((response) => response.json())
+      .then(setAnalysis)
+      .catch(() => setAnalysis(null));
+  }, []);
+
+  useEffect(() => {
+    if (!manifest) return;
+    let cancelled = false;
+    const load = async () => {
+      const routeFiles = manifest.files.filter((file) => file.route.toLowerCase() === selectedRoute.toLowerCase());
+      const slices = await Promise.all(
+        routeFiles.slice(0, 4).map(async (file) => {
+          const csv = await fetch(`/data/traffic-lights/analysis/${file.file}`).then((r) => r.text());
+          return csv
+            .trim()
+            .split("\n")
+            .slice(1)
+            .map((line) => {
+              const parts = parseCsvLine(line);
+              return {
+                vehicleId: parts[0],
+                route: parts[1],
+                direction: parts[2],
+                lng: Number(parts[6]),
+                lat: Number(parts[5]),
+                speed: Number(parts[8]),
+                t: Number(parts[4]),
+                stop: parts[10] ?? "",
+              };
+            })
+            .filter((row) => Number.isFinite(row.lng) && Number.isFinite(row.lat));
+        }),
+      );
+      const grouped = new Map<string, Array<{ lng: number; lat: number; t: number; speed: number; stop: string }>>();
+      for (const row of slices.flat()) {
+        const key = `${row.route}:${row.vehicleId}:${row.direction}`;
+        const bucket = grouped.get(key) ?? [];
+        bucket.push(row);
+        grouped.set(key, bucket);
+      }
+      const nextTracks = [...grouped.entries()]
+        .map(([key, points]) => ({
+          id: key,
+          route: key.split(":")[0],
+          vehicleId: key.split(":")[1],
+          points: points
+            .sort((a, b) => a.t - b.t)
+            .filter((point, index) => index % Math.max(1, Math.floor(points.length / 80)) === 0)
+            .map(({ lng, lat, t, speed, stop }) => ({ lng, lat, t, speed, stop })),
+        }))
+        .filter((item) => item.points.length > 8)
+        .sort((a, b) => b.points.length - a.points.length)
+        .slice(0, 24);
+      if (!cancelled) setTracks(nextTracks);
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [manifest, selectedRoute]);
+
+  const best = analysis?.candidates[0];
+  const routeCandidates = analysis?.candidates.filter((candidate) => routeMatchesCandidate(candidate, selectedRoute)) ?? [];
+  const topCandidates = routeCandidates.length ? routeCandidates : analysis?.candidates.slice(0, 6) ?? [];
+  const activeCandidate = analysis?.candidates.find((candidate) => candidate.id === selectedCandidateId) ?? best;
+  const activeRouteCandidate = selectedCandidateId
+    ? analysis?.candidates.find((candidate) => candidate.id === selectedCandidateId)
+    : topCandidates[0];
+  const selectedCandidate = activeRouteCandidate ?? activeCandidate;
+  const historicalPlaces = useMemo(() => historicalPlacesFor(tracks), [tracks]);
+
+  return (
+    <main className="traffic-confidence-page map-page">
+      <TrafficLightConfidenceMap tracks={tracks} candidate={selectedCandidate} places={historicalPlaces} step={step} />
+      <div className="traffic-map-scrim" />
+      <aside className="traffic-wizard traffic-wizard-floating panel">
+        <div className="wizard-top">
+          <p className="eyebrow">E-bus traffic-light confidence</p>
+          <h1>{selectedRoute} historical places to signal confidence</h1>
+          <p className="lede">
+            Choose an E route, then click each pipeline step. The map does not advance on its own:
+            every layer appears only when you ask for it.
+          </p>
+        </div>
+
+        <div className="route-example-list" aria-label="E bus examples">
+          {eBusExamples.map((example) => (
+            <button
+              className={example.route === selectedRoute ? "route-example active" : "route-example"}
+              key={example.route}
+              onClick={() => {
+                setSelectedRoute(example.route);
+                setSelectedCandidateId(null);
+                setStep(0);
+              }}
+              type="button"
+            >
+              <strong>{example.label}</strong>
+              <span>{example.places}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="wizard-steps">
+          {[
+            "Show historical places",
+            "Add waiting evidence",
+            "Add moving evidence",
+            "Overlap confidence",
+          ].map((label, index) => (
+            <button
+              className={index === step ? "wizard-step active" : "wizard-step"}
+              key={label}
+              onClick={() => setStep(index)}
+              type="button"
+            >
+              <span>0{index + 1}</span>
+              <strong>{label}</strong>
+            </button>
+          ))}
+        </div>
+
+        <div className="wizard-content">
+          {step === 0 ? (
+            <WizardPanel
+              title={`Historical places on ${selectedRoute}`}
+              text="The first layer shows only historical route paths and repeated named stops. This lets people see the line geography before any confidence claim is made."
+              meta={manifest ? `${manifest.window.start} to ${manifest.window.end} · ${tracks.length} vehicle histories` : "loading"}
+            />
+          ) : null}
+          {step === 1 ? (
+            <WizardPanel
+              title="Waiting evidence"
+              text={selectedCandidate ? `Low-speed samples are now visible around ${selectedCandidate.candidate.lat.toFixed(5)}, ${selectedCandidate.candidate.lng.toFixed(5)}. These are possible red-light or stop-line waits, not yet a final signal.` : "loading"}
+              meta={selectedCandidate ? `${selectedCandidate.stopResumeMarkers.stopCount} low-speed markers` : "loading"}
+            />
+          ) : null}
+          {step === 2 ? (
+            <WizardPanel
+              title="Moving evidence"
+              text="Moving samples are added after the waits. If the same route resumes from the same corridor, the candidate becomes easier to explain."
+              meta={selectedCandidate ? `${selectedCandidate.stopResumeMarkers.resumeCount} movement markers` : "loading"}
+            />
+          ) : null}
+          {step === 3 ? (
+            <WizardPanel
+              title="Confidence overlap"
+              text="Only now do the waiting and moving layers become a confidence halo. The score means repeated observations line up in the same place with low residual error."
+              meta={selectedCandidate ? `${Math.round(selectedCandidate.finalConfidence * 100)}% final confidence` : "loading"}
+            />
+          ) : null}
+        </div>
+
+        <div className="historical-place-list">
+          <h2>Historical places</h2>
+          {historicalPlaces.slice(0, 5).map((place) => (
+            <div className="historical-place-row" key={place.name}>
+              <strong>{place.name}</strong>
+              <span>{place.waitingSamples} waiting of {place.samples} samples</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="wizard-footer">
+          <div className="wizard-kpi">
+            <span>Candidate</span>
+            <strong>{selectedCandidate ? selectedCandidate.id : "loading"}</strong>
+          </div>
+          <div className="wizard-kpi">
+            <span>Routes</span>
+            <strong>{selectedCandidate ? selectedCandidate.routeCount : "loading"}</strong>
+          </div>
+          <div className="wizard-kpi">
+            <span>Confidence</span>
+            <strong>{selectedCandidate ? `${Math.round(selectedCandidate.finalConfidence * 100)}%` : "loading"}</strong>
+          </div>
+        </div>
+
+        <section className="traffic-bottom traffic-bottom-floating">
+          <article className="panel traffic-convergence">
+            <div className="panel-heading">
+              <div>
+                <h2>Confidence rising in real time</h2>
+                <p className="paper-meta">Residual error and confidence history for the selected candidate.</p>
+              </div>
+              <div className="big-score">{selectedCandidate ? `${Math.round(selectedCandidate.finalConfidence * 100)}%` : "loading"}</div>
+            </div>
+            <AnalysisChart candidate={selectedCandidate ?? best} />
+          </article>
+          <article className="panel traffic-evidence">
+            <h2>Ranked candidates</h2>
+            <div className="candidate-list">
+              {topCandidates.map((candidate, index) => (
+                <button
+                  className={candidate.id === selectedCandidate?.id ? "candidate-row active" : "candidate-row"}
+                  key={candidate.id}
+                  onClick={() => setSelectedCandidateId(candidate.id)}
+                  type="button"
+                >
+                  <div className="candidate-rank">{index + 1}</div>
+                  <div className="candidate-body">
+                    <strong>{candidate.route || "mixed routes"}</strong>
+                    <span>
+                      {candidate.candidate.lat.toFixed(5)}, {candidate.candidate.lng.toFixed(5)}
+                    </span>
+                  </div>
+                  <div className="candidate-score">{Math.round(candidate.finalConfidence * 100)}%</div>
+                </button>
+              ))}
+            </div>
+          </article>
+        </section>
+      </aside>
+    </main>
+  );
+}
+
+function WizardPanel({ title, text, meta }: { title: string; text: string; meta: string }) {
+  return (
+    <div className="wizard-panel-body">
+      <h2>{title}</h2>
+      <p>{text}</p>
+      <span>{meta}</span>
+    </div>
+  );
+}
+
+function AnalysisMap({ best }: { best?: TrafficLightIntersectionAnalysis["candidates"][number] }) {
+  const target = best?.candidate ?? { lng: 21.2087, lat: 45.7489 };
+  return (
+    <div className="analysis-map-shell">
+      <div className="analysis-map-header">
+        <h3>Overlap field</h3>
+        <p>{best ? `Candidate ${best.id} at ${best.approachHeadingDeg.toFixed(1)}°` : "Waiting for analysis output"}</p>
+      </div>
+      <svg viewBox="0 0 800 520" className="analysis-map-svg" role="img" aria-label="Overlap map">
+        <defs>
+          <linearGradient id="trackFade" x1="0" x2="1">
+            <stop offset="0%" stopColor="rgba(124,255,178,0.15)" />
+            <stop offset="100%" stopColor="rgba(101,214,255,0.9)" />
+          </linearGradient>
+        </defs>
+        <rect width="800" height="520" rx="28" fill="rgba(2,6,12,0.65)" />
+        <g opacity="0.35">
+          {[120, 220, 320, 420].map((y) => (
+            <line key={y} x1="80" y1={y} x2="720" y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+          ))}
+          {[120, 220, 320, 420].map((x) => (
+            <line key={x} x1={x} y1="80" x2={x} y2="440" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+          ))}
+        </g>
+        {[0, 1, 2, 3].map((i) => (
+          <path
+            key={i}
+            d={`M ${120 + i * 18} ${120 + i * 30} C ${210 + i * 16} ${160 + i * 15}, ${520 - i * 8} ${330 - i * 14}, ${690 - i * 18} ${430 - i * 36}`}
+            stroke="url(#trackFade)"
+            strokeWidth={5 - i}
+            opacity={0.7 - i * 0.12}
+            fill="none"
+          />
+        ))}
+        <circle cx="410" cy="255" r="44" fill="rgba(255,209,102,0.12)" />
+        <circle cx="410" cy="255" r="15" fill="#ffd166" />
+        <circle cx="410" cy="255" r="7" fill="#03070d" />
+        <path d="M392 162 L428 162 L410 124 Z" fill="#7cffb2" opacity="0.95" />
+        <text x="40" y="52" fill="#edf7ff" fontSize="18">Candidate center</text>
+        <text x="40" y="80" fill="#92a9ba" fontSize="14">
+          {target.lat.toFixed(5)}, {target.lng.toFixed(5)}
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+function AnalysisChart({ candidate }: { candidate?: TrafficLightIntersectionAnalysis["candidates"][number] }) {
+  const points = candidate?.errorHistory ?? [];
+  const width = 720;
+  const height = 260;
+  const maxError = Math.max(80, ...points.map((point) => point.errorMeters));
+  const maxIndex = Math.max(1, points.length - 1);
+  const line = points
+    .map((point, index) => {
+      const x = 20 + (index / maxIndex) * (width - 40);
+      const y = height - 28 - (point.errorMeters / maxError) * (height - 56);
+      return `${index === 0 ? "M" : "L"} ${x} ${y}`;
+    })
+    .join(" ");
+  return (
+    <div className="analysis-chart">
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Confidence convergence chart">
+        <rect x="0" y="0" width={width} height={height} rx="20" fill="rgba(2,6,12,0.45)" />
+        <path d={line} fill="none" stroke="#65d6ff" strokeWidth="4" />
+        <path
+          d={`${line} L ${20 + (points.length > 0 ? (points.length - 1) / maxIndex : 0) * (width - 40)} ${height - 28} L 20 ${height - 28} Z`}
+          fill="rgba(101,214,255,0.12)"
+          stroke="none"
+        />
+        {points.map((point, index) => {
+          const x = 20 + (index / maxIndex) * (width - 40);
+          const y = height - 28 - (point.errorMeters / maxError) * (height - 56);
+          return <circle key={`${point.t}-${index}`} cx={x} cy={y} r="5" fill="#7cffb2" />;
+        })}
+      </svg>
+      <div className="analysis-chart-legend">
+        <span>Residual error</span>
+        <span>{candidate ? `Final confidence ${Math.round(candidate.finalConfidence * 100)}%` : "No candidate yet"}</span>
+      </div>
+    </div>
   );
 }
 

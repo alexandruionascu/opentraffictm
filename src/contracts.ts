@@ -38,6 +38,48 @@ export interface ExportEnvelope<T> {
   payload: T;
 }
 
+export interface TrafficLightProbeExportManifest {
+  generatedAt: string;
+  source: string;
+  window: { start: string; end: string };
+  partitionRowLimit: number;
+  files: Array<{
+    file: string;
+    route: string;
+    partition: number;
+    partitionCount: number;
+    rows: number;
+    bytes: number;
+  }>;
+}
+
+export interface TrafficLightIntersectionCandidate {
+  id: string;
+  route: string;
+  candidate: { lng: number; lat: number };
+  approachHeadingDeg: number;
+  sampleCount: number;
+  routeCount: number;
+  stopResumeMarkers: {
+    stopCount: number;
+    resumeCount: number;
+    firstStopAt: string | null;
+    lastStopAt: string | null;
+  };
+  errorHistory: Array<{ t: number; errorMeters: number; confidence: number }>;
+  finalConfidence: number;
+}
+
+export interface TrafficLightIntersectionAnalysis {
+  generatedAt: string;
+  window: { start: string; end: string };
+  sourceManifest: string;
+  sampleCount: number;
+  lowSpeedSampleCount: number;
+  candidateCount: number;
+  candidates: TrafficLightIntersectionCandidate[];
+}
+
 export function downloadJson(filename: string, value: unknown) {
   const blob = new Blob([JSON.stringify(value, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -48,4 +90,3 @@ export function downloadJson(filename: string, value: unknown) {
   anchor.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
 }
-
