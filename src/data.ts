@@ -612,6 +612,14 @@ export const datasets: DatasetEntry[] = [
     source: "OpenTrafficTM",
     folder: "data/scenarios",
   },
+  {
+    id: "traffic-validation",
+    name: "Traffic validation assets",
+    format: ["JSON"],
+    description: "Licensed validation snapshots, derived metrics, and run manifests for private API traffic sources.",
+    source: "OpenTrafficTM",
+    folder: "data/traffic-validation",
+  },
 ];
 
 export const officialSources: OfficialSourceEntry[] = [

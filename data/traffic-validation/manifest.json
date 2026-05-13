@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-05-13T00:00:00.000Z",
+  "scope": "Local traffic validation contract",
+  "providers": [
+    {
+      "id": "google",
+      "name": "Google Maps Platform",
+      "status": "license-gated",
+      "notes": "Use only if the agreement explicitly allows the exact caching and validation workflow."
+    },
+    {
+      "id": "here",
+      "name": "HERE",
+      "status": "adapter-ready",
+      "notes": "API-backed traffic source for private validation and derived metrics."
+    },
+    {
+      "id": "tomtom",
+      "name": "TomTom",
+      "status": "adapter-ready",
+      "notes": "API-backed traffic source for private validation and derived metrics."
+    }
+  ],
+  "snapshots": [],
+  "runs": []
+}

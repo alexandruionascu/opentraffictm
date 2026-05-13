@@ -11,6 +11,15 @@ import {
   type Scenario,
 } from "./data";
 import { downloadJson, type LeaderboardManifest, type ScenarioCatalogManifest } from "./contracts";
+import {
+  createMockSnapshot,
+  createTimisoaraClosuresAdapter,
+  createTimisoaraStptAdapter,
+  trafficValidationFolderContract,
+  type TrafficProvider,
+  type TrafficProviderAdapter,
+  type ValidationResult,
+} from "./traffic-validation";
 
 const LiveMap = lazy(() => import("./map/LiveMap").then((module) => ({ default: module.LiveMap })));
 
@@ -19,6 +28,7 @@ const navItems = [
   { path: "/map", label: "Live Map" },
   { path: "/datasets", label: "Data" },
   { path: "/sources", label: "Sources" },
+  { path: "/validation", label: "Validation" },
   { path: "/sheet", label: "Sheet" },
   { path: "/scenarios", label: "Scenarios" },
   { path: "/leaderboards", label: "Leaderboards" },
@@ -89,14 +99,165 @@ export function App() {
       ) : null}
       {path === "/datasets" ? <DatasetsPage /> : null}
       {path === "/sources" ? <SourcesPage /> : null}
+      {path === "/validation" ? <ValidationPage /> : null}
       {path === "/sheet" ? <SpreadsheetPage /> : null}
       {path === "/scenarios" ? <ScenariosPage /> : null}
       {path === "/leaderboards" ? <LeaderboardsPage /> : null}
       {path === "/papers" ? <PapersPage /> : null}
-      {!["/map", "/datasets", "/sources", "/sheet", "/scenarios", "/leaderboards", "/papers"].includes(path) ? (
+      {!["/map", "/datasets", "/sources", "/validation", "/sheet", "/scenarios", "/leaderboards", "/papers"].includes(path) ? (
         <HomePage />
       ) : null}
     </Shell>
+  );
+}
+
+function ValidationPage() {
+  const adapters = useMemo<Record<TrafficProvider, TrafficProviderAdapter>>(
+    () => ({
+      google: {
+        provider: "google",
+        supportsRawCaching: false,
+        async fetchSnapshot(request) {
+          return createMockSnapshot("google");
+        },
+      },
+      here: {
+        provider: "here",
+        supportsRawCaching: true,
+        async fetchSnapshot(request) {
+          return createMockSnapshot("here");
+        },
+      },
+      tomtom: {
+        provider: "tomtom",
+        supportsRawCaching: true,
+        async fetchSnapshot(request) {
+          return createMockSnapshot("tomtom");
+        },
+      },
+      "timisoara-stpt": createTimisoaraStptAdapter(),
+      "timisoara-closures": createTimisoaraClosuresAdapter(),
+    }),
+    [],
+  );
+  const [provider, setProvider] = useState<TrafficProvider>("timisoara-stpt");
+  const snapshot = useMemo(
+    () =>
+      adapters[provider].fetchSnapshot({
+        provider,
+        requestId: `${provider}-local-validation`,
+        requestedAt: new Date().toISOString(),
+        windowStart: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+        windowEnd: new Date().toISOString(),
+        bbox: [21.19, 45.73, 21.24, 45.77],
+        corridor: provider === "timisoara-closures" ? "municipal closure overlap" : "city-center corridor",
+        mode: provider === "timisoara-stpt" ? "transit-probe" : "traffic",
+      }),
+    [adapters, provider],
+  );
+  const [resolvedSnapshot, setResolvedSnapshot] = useState(createMockSnapshot("timisoara-stpt"));
+  const [ledgerText, setLedgerText] = useState<string>("Loading quota ledger...");
+
+  useEffect(() => {
+    let cancelled = false;
+    snapshot.then((nextSnapshot) => {
+      if (!cancelled) setResolvedSnapshot(nextSnapshot);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [snapshot]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/data/traffic-validation/usage-ledger-${provider}.json`)
+      .then((response) => (response.ok ? response.text() : Promise.resolve("No quota ledger yet.")))
+      .then((text) => {
+        if (!cancelled) setLedgerText(text);
+      })
+      .catch(() => {
+        if (!cancelled) setLedgerText("No quota ledger yet.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [provider]);
+
+  const validation = useMemo<ValidationResult>(
+    () =>
+      ({
+        snapshotId: resolvedSnapshot.requestId,
+        modelRunId: "browser-native-baseline",
+        scenarioId: "city-center-peak",
+        provider: resolvedSnapshot.provider,
+        requestedAt: resolvedSnapshot.requestedAt,
+        accepted: true,
+        metrics: [
+          {
+            name: "speedKph",
+            expected: 30,
+            observed: resolvedSnapshot.segments[0]?.speedKph ?? 0,
+            delta: (resolvedSnapshot.segments[0]?.speedKph ?? 0) / 30 - 1,
+          },
+          {
+            name: "delaySeconds",
+            expected: 30,
+            observed: resolvedSnapshot.segments[0]?.delaySeconds ?? 0,
+            delta: ((resolvedSnapshot.segments[0]?.delaySeconds ?? 0) - 30) / 30,
+          },
+        ],
+        notes: "Local scaffold only. Replace the mock adapter with actual provider fetch logic if needed.",
+      }) satisfies ValidationResult,
+    [resolvedSnapshot],
+  );
+
+  return (
+    <main className="page">
+      <PageIntro
+        eyebrow="Validation"
+        title="Private traffic validation stays local."
+        text="Use a provider API as a confirmation layer, normalize snapshots locally, and keep only derived results in the app."
+      />
+      <section className="section-grid">
+        <FeatureCard title="Folder contract" text={trafficValidationFolderContract.join("  ")} />
+        <FeatureCard title="Google" text="License-gated. Use only if your contract allows the exact caching and validation workflow." />
+        <FeatureCard title="HERE / TomTom" text="Adapter-ready for internal validation and local comparison." />
+      </section>
+      <div className="toolbar">
+        <label className="search-input" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          Provider
+          <select aria-label="Provider" value={provider} onChange={(event) => setProvider(event.target.value as TrafficProvider)}>
+            <option value="here">HERE</option>
+            <option value="tomtom">TomTom</option>
+            <option value="google">Google</option>
+          </select>
+        </label>
+        <a className="btn secondary" href="/datasets">
+          View data folders
+        </a>
+      </div>
+      <section className="card-grid">
+        <FeatureCard
+          title="Snapshot shape"
+          text={`${resolvedSnapshot.provider} snapshot with ${resolvedSnapshot.segments.length} segment(s) and ${resolvedSnapshot.incidents.length} incident(s). Raw stored: ${String(resolvedSnapshot.rawStored)}.`}
+        />
+        <FeatureCard
+          title="Validation output"
+          text={`${validation.accepted ? "accepted" : "rejected"} for ${validation.scenarioId} via ${validation.modelRunId}. Metrics: ${validation.metrics.map((metric) => `${metric.name}=${metric.delta}`).join(", ")}.`}
+        />
+        <FeatureCard title="Quota ledger" text={ledgerText.slice(0, 260)} />
+      </section>
+      <section className="panel">
+        <p className="eyebrow">Implementation contract</p>
+        <ol className="clean-list">
+          <li>Fetch provider traffic for a bbox or corridor.</li>
+          <li>Normalize to `TrafficSnapshot`.</li>
+          <li>Store locally only if the license allows it.</li>
+          <li>Compare against the current model run.</li>
+          <li>Persist `ValidationResult` and derived metrics.</li>
+        </ol>
+      </section>
+    </main>
   );
 }
 

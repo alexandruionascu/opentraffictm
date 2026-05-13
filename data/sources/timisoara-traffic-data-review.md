@@ -56,9 +56,22 @@ Action needed:
 - Treat signal phases and car counts as unavailable unless the city provides a feed or export.
 - Submit a formal data request for anonymized detector counts, signal plans, phase timings, and intersection queue/delay aggregates.
 
-## What We Should Not Scrape
+## What We Should Not Treat As Open Data
 
 Google Maps traffic is not a freely reusable traffic dataset. We should not scrape tiles, congestion overlays, directions durations at scale, or live traffic layers for model training/calibration unless we have a licensed Google Maps Platform agreement that explicitly permits that use.
+
+That does not mean Google can never be used for validation. It means the safe default is:
+
+- treat Google traffic as a licensed, restricted input source,
+- do not store raw provider content beyond what the license allows,
+- and do not expose it publicly as a dataset.
+
+For internal validation, the same basic rule applies to HERE and TomTom:
+
+- use the API under the plan terms,
+- store only the minimum local snapshot needed for comparison,
+- derive validation metrics from that snapshot,
+- and keep the raw payloads private.
 
 ## Recommended Data Plan
 
@@ -69,6 +82,17 @@ Google Maps traffic is not a freely reusable traffic dataset. We should not scra
 5. Build a Timisoara-first paper corpus focused on calibration, congestion prediction, signal control, and local road-infrastructure studies.
 6. Request city traffic-management exports for actual car counts, detector speeds, queues, lane counts, and traffic-light programs.
 7. Only after that, calibrate the browser simulation against real observed movement.
+
+## Validation-Only Provider Workflow
+
+If we need external confirmation rather than a public data source, the provider workflow should look like this:
+
+1. Query a provider API for a bounded region and time window.
+2. Normalize the response into a local `TrafficSnapshot`.
+3. Persist the snapshot in `data/traffic-validation/` with provider, timestamp, bounding box, and request metadata.
+4. Run a comparison job against the current model output.
+5. Store only derived `ValidationResult` records for scoring, thresholds, and regression checks.
+6. Keep the provider payload private unless the contract explicitly allows broader reuse.
 
 ## Public-Facing Models
 - Corridor congestion viewer built from live STPT probes and open traffic traces.

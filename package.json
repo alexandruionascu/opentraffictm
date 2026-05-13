@@ -9,6 +9,10 @@
     "fetch:stpt-live": "node scripts/fetch-stpt-live.mjs",
     "fetch:timisoara-open-data": "node scripts/fetch-timisoara-open-data.mjs",
     "fetch:timisoara-road-closures": "node scripts/fetch-timisoara-road-closures.mjs",
+    "fetch:traffic:here": "node scripts/fetch-traffic-validation.mjs here",
+    "fetch:traffic:here:dry": "node scripts/fetch-traffic-validation.mjs here --dry-run",
+    "fetch:traffic:tomtom": "node scripts/fetch-traffic-validation.mjs tomtom",
+    "fetch:traffic:tomtom:dry": "node scripts/fetch-traffic-validation.mjs tomtom --dry-run",
     "fetch:papers": "node scripts/fetch-timisoara-papers.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },
