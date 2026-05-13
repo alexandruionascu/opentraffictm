@@ -32,6 +32,37 @@ export interface SignalProgram {
   offsetSeconds: number;
 }
 
+interface SignalJsonPhase {
+  state: "green" | "yellow" | "red";
+  durationSeconds: number;
+}
+
+interface SignalJsonProgram {
+  id: string;
+  name: string;
+  position: { lng: number; lat: number };
+  primaryHeadingDeg: number;
+  offsetSeconds: number;
+  phases: SignalJsonPhase[];
+}
+
+interface SignalsJson {
+  generatedAt: string;
+  scope: string;
+  programs: SignalJsonProgram[];
+}
+
+import signalsJson from "../data/traffic-lights/signals.json";
+
+const importedSignalPrograms: SignalProgram[] = (signalsJson as SignalsJson).programs.map((p) => ({
+  id: p.id,
+  name: p.name,
+  position: p.position,
+  primaryHeadingDeg: p.primaryHeadingDeg,
+  offsetSeconds: p.offsetSeconds,
+  phases: p.phases,
+}));
+
 export interface Scenario {
   id: string;
   name: string;
@@ -426,10 +457,18 @@ const vehicleRoutes = [
   rebreanuReverse,
 ];
 
-const mapMatchedVehicleRoutes = [...osmLoopVehicleRoutes, ...osmMatchedVehicleRoutes];
-const activeVehicleRoutes = mapMatchedVehicleRoutes.length > 0 ? mapMatchedVehicleRoutes : vehicleRoutes;
+const mapMatchedVehicleRoutes = [
+  ...osmLoopVehicleRoutes,
+  ...osmMatchedVehicleRoutes,
+];
+const activeVehicleRoutes =
+  mapMatchedVehicleRoutes.length > 0 ? mapMatchedVehicleRoutes : vehicleRoutes;
 
-const pedestrianRoutes = [pedestrianCrossing, pedestrianCrossingNorth, pedestrianCrossingSouth];
+const pedestrianRoutes = [
+  pedestrianCrossing,
+  pedestrianCrossingNorth,
+  pedestrianCrossingSouth,
+];
 
 function createCars(count: number): Actor[] {
   return Array.from({ length: count }, (_, index) => {
@@ -441,7 +480,8 @@ function createCars(count: number): Actor[] {
       label: `Car ${index + 1}`,
       route,
       speedMps: 8.8 + ((index * 7) % 18) / 2.7,
-      routeOffsetSeconds: routeGroup * 4 + Math.floor(index / activeVehicleRoutes.length) * 11,
+      routeOffsetSeconds:
+        routeGroup * 4 + Math.floor(index / activeVehicleRoutes.length) * 11,
       lengthMeters: 4.8,
     };
   });
@@ -505,69 +545,9 @@ export const scenarios: Scenario[] = [
     center: timisoaraCenter,
     zoom: 13.15,
     durationSeconds: 520,
-    actors: [...createCars(54), ...createBuses(), ...createPedestrians(18)],
-    signals: [
-      {
-        id: "signal-republicii",
-        name: "Republicii / Core",
-        position: { lng: 21.2101, lat: 45.7502 },
-        primaryHeadingDeg: 116,
-        offsetSeconds: 0,
-        phases: [
-          { state: "green", durationSeconds: 38 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 32 },
-        ],
-      },
-      {
-        id: "signal-aradului",
-        name: "Calea Aradului / Ring",
-        position: { lng: 21.2139, lat: 45.7581 },
-        primaryHeadingDeg: 166,
-        offsetSeconds: 13,
-        phases: [
-          { state: "green", durationSeconds: 34 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 38 },
-        ],
-      },
-      {
-        id: "signal-sagului",
-        name: "Sagului / Core",
-        position: { lng: 21.2113, lat: 45.7466 },
-        primaryHeadingDeg: 15,
-        offsetSeconds: 22,
-        phases: [
-          { state: "green", durationSeconds: 32 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 40 },
-        ],
-      },
-      {
-        id: "signal-take-ionescu",
-        name: "Take Ionescu / Core",
-        position: { lng: 21.2161, lat: 45.7522 },
-        primaryHeadingDeg: 42,
-        offsetSeconds: 48,
-        phases: [
-          { state: "green", durationSeconds: 36 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 34 },
-        ],
-      },
-      {
-        id: "signal-rebreanu",
-        name: "Rebreanu / South Gate",
-        position: { lng: 21.2219, lat: 45.7424 },
-        primaryHeadingDeg: 300,
-        offsetSeconds: 7,
-        phases: [
-          { state: "green", durationSeconds: 30 },
-          { state: "yellow", durationSeconds: 4 },
-          { state: "red", durationSeconds: 42 },
-        ],
-      },
-    ],
+    actors: [],
+    // actors: [...createCars(54), ...createBuses(), ...createPedestrians(18)],
+    signals: importedSignalPrograms,
   },
 ];
 
@@ -576,7 +556,8 @@ export const datasets: DatasetEntry[] = [
     id: "osm-road-context",
     name: "OSM road context",
     format: ["OSM", "GeoJSON", "Overpass"],
-    description: "Road graph, lanes, intersections, crossings, and corridor context for Timișoara.",
+    description:
+      "Road graph, lanes, intersections, crossings, and corridor context for Timișoara.",
     source: "https://www.openstreetmap.org",
     folder: "data/osm",
   },
@@ -584,7 +565,8 @@ export const datasets: DatasetEntry[] = [
     id: "traffic-light-intervals",
     name: "Traffic-light intervals",
     format: ["JSON", "CSV"],
-    description: "Future real signal programs used to compare live timing with model timing.",
+    description:
+      "Future real signal programs used to compare live timing with model timing.",
     source: "Provided during hackathon",
     folder: "data/traffic-lights",
   },
@@ -592,7 +574,8 @@ export const datasets: DatasetEntry[] = [
     id: "sumo-pipeline",
     name: "SUMO simulation artifacts",
     format: ["net.xml", "rou.xml", "fcd.xml"],
-    description: "SUMO-compatible network, route, detector, and floating-car-data exports.",
+    description:
+      "SUMO-compatible network, route, detector, and floating-car-data exports.",
     source: "Generated from OSM and scenarios",
     folder: "data/sumo",
   },
@@ -600,7 +583,8 @@ export const datasets: DatasetEntry[] = [
     id: "timisoara-road-closures",
     name: "Timișoara road closures",
     format: ["JSON", "HTML", "GeoJSON"],
-    description: "Official municipal closure notices mirrored locally for live overlay and planning views.",
+    description:
+      "Official municipal closure notices mirrored locally for live overlay and planning views.",
     source: "Primăria Municipiului Timișoara",
     folder: "data/sources/timisoara-road-closures",
   },
@@ -608,7 +592,8 @@ export const datasets: DatasetEntry[] = [
     id: "scenario-packs",
     name: "Scenario packs",
     format: ["JSON"],
-    description: "Shared task definitions for browser-native, SUMO, and future SOTA model runs.",
+    description:
+      "Shared task definitions for browser-native, SUMO, and future SOTA model runs.",
     source: "OpenTrafficTM",
     folder: "data/scenarios",
   },
@@ -616,7 +601,8 @@ export const datasets: DatasetEntry[] = [
     id: "traffic-validation",
     name: "Traffic validation assets",
     format: ["JSON"],
-    description: "Licensed validation snapshots, derived metrics, and run manifests for private API traffic sources.",
+    description:
+      "Licensed validation snapshots, derived metrics, and run manifests for private API traffic sources.",
     source: "OpenTrafficTM",
     folder: "data/traffic-validation",
   },
@@ -628,7 +614,8 @@ export const officialSources: OfficialSourceEntry[] = [
     name: "Road closures and restrictions notices",
     organization: "Primăria Municipiului Timișoara",
     url: "https://www.primariatm.ro/dfmt/servicii-online",
-    purpose: "Official notices about current and recent road closures, restrictions, and event-based blocks.",
+    purpose:
+      "Official notices about current and recent road closures, restrictions, and event-based blocks.",
     localFolder: "data/sources/timisoara-road-closures",
     note: "Used for the closure overlay and kept locally as mirrored notice text plus normalized JSON.",
   },
@@ -637,7 +624,8 @@ export const officialSources: OfficialSourceEntry[] = [
     name: "Live STPT vehicle feed",
     organization: "Societatea de Transport Public Timișoara",
     url: "https://live.stpt.ro/",
-    purpose: "Live public-transport vehicle positions and route context for corridor delay and probe movement.",
+    purpose:
+      "Live public-transport vehicle positions and route context for corridor delay and probe movement.",
     localFolder: "data/sources/stpt-live",
     note: "Local snapshots are refreshed from the public vehicle feed; useful as a transit probe layer.",
   },
@@ -646,7 +634,8 @@ export const officialSources: OfficialSourceEntry[] = [
     name: "Timișoara open mobility data",
     organization: "Municipiul Timișoara",
     url: "https://data.primariatm.ro/",
-    purpose: "Public mobility and infrastructure datasets for city-level planning and validation.",
+    purpose:
+      "Public mobility and infrastructure datasets for city-level planning and validation.",
     localFolder: "data/sources/timisoara-open-data",
     note: "Annual and structured municipal mobility resources, stored locally in normalized form.",
   },
@@ -655,7 +644,8 @@ export const officialSources: OfficialSourceEntry[] = [
     name: "Municipal RSS/XML service entry",
     organization: "Primăria Municipiului Timișoara",
     url: "https://www.primariatm.ro/dfmt/servicii-online",
-    purpose: "Entry point for official XML/RSS notices and related public-service updates.",
+    purpose:
+      "Entry point for official XML/RSS notices and related public-service updates.",
     localFolder: null,
     note: "Useful for discovering other municipal feeds and notice endpoints without scraping map products.",
   },
@@ -668,7 +658,8 @@ export const leaderboards: LeaderboardEntry[] = [
     score: 97.4,
     scenarios: 12,
     schemaErrors: 0,
-    summary: "Highest seeded score with tight calibration across core corridors.",
+    summary:
+      "Highest seeded score with tight calibration across core corridors.",
   },
   {
     name: "Browser Native IDM Baseline",
@@ -676,7 +667,8 @@ export const leaderboards: LeaderboardEntry[] = [
     score: 89.6,
     scenarios: 4,
     schemaErrors: 0,
-    summary: "Deterministic web baseline ready for traffic-light interval comparisons.",
+    summary:
+      "Deterministic web baseline ready for traffic-light interval comparisons.",
   },
   {
     name: "SUMO Import Baseline",
@@ -684,19 +676,22 @@ export const leaderboards: LeaderboardEntry[] = [
     score: 0,
     scenarios: 0,
     schemaErrors: 0,
-    summary: "Adapter placeholder for imported SUMO traces and signal programs.",
+    summary:
+      "Adapter placeholder for imported SUMO traces and signal programs.",
   },
 ];
 
 export const technicalPapers = [
   {
-    title: "Hybrid Solution Combining Kalman Filtering with Takagi-Sugeno Fuzzy Inference System for Online Car-Following Model Calibration",
+    title:
+      "Hybrid Solution Combining Kalman Filtering with Takagi-Sugeno Fuzzy Inference System for Online Car-Following Model Calibration",
     status: "Open access",
     summary:
       "Uses Timisoara traffic-monitoring data to calibrate car-following parameters against real movement.",
   },
   {
-    title: "Ensemble based traffic light control for city zones using a reduced number of sensors",
+    title:
+      "Ensemble based traffic light control for city zones using a reduced number of sensors",
     status: "Timisoara case study",
     summary:
       "Provides a Timisoara signal-control case study with a reduced sensor footprint and city-center simulations.",
@@ -708,19 +703,22 @@ export const technicalPapers = [
       "Uses a Timisoara sensor-network case study for congestion prediction on crowded intersections.",
   },
   {
-    title: "A dataset of urban traffic flow for 13 Romanian cities amid lockdown and after ease of COVID19 related restrictions",
+    title:
+      "A dataset of urban traffic flow for 13 Romanian cities amid lockdown and after ease of COVID19 related restrictions",
     status: "Open access",
     summary:
       "Includes Timisoara traffic-flow traces sampled at 15-minute intervals and suitable for short-term validation.",
   },
   {
-    title: "Analysis of the problems related to traffic and road infrastructure in the area of the Timisoara student complex",
+    title:
+      "Analysis of the problems related to traffic and road infrastructure in the area of the Timisoara student complex",
     status: "Open access",
     summary:
       "Summarizes local congestion and road-infrastructure issues in the student complex area.",
   },
   {
-    title: "TACTICS: Adaptive Framework for Reactive Control of Road Traffic Systems",
+    title:
+      "TACTICS: Adaptive Framework for Reactive Control of Road Traffic Systems",
     status: "Open access",
     summary:
       "Shows a Timisoara adaptive signal-control framework that reduces waiting times and queue lengths.",

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "signal-republicii",
+    "name": "Republicii / Core",
+    "position": { "lng": 21.2101, "lat": 45.7502 },
+    "primaryHeadingDeg": 116,
+    "offsetSeconds": 0,
+    "phases": [
+      { "state": "green", "durationSeconds": 38 },
+      { "state": "yellow", "durationSeconds": 4 },
+      { "state": "red", "durationSeconds": 32 }
+    ]
+  }
+]
