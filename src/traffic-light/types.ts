@@ -61,6 +61,32 @@ export interface TrafficHourlyStateSlice {
   greenDurationSeconds: number;
 }
 
+export interface TrafficCycleLengthCandidate {
+  cycleLengthSeconds: number;
+  confidence: number;
+  sampleCount: number;
+}
+
+export interface TrafficPhaseOffsetCandidate {
+  offsetSeconds: number;
+  confidence: number;
+  source: string;
+}
+
+export interface TrafficLightEvidencePath {
+  lightId: string;
+  routeKey: string;
+  routeId: string;
+  directionId?: string;
+  approachHeadingDeg: number;
+  points?: Array<{ lat: number; lon: number }>;
+  passCount: number;
+  stopPassCount: number;
+  greenPassCount: number;
+  redPassCount: number;
+  confidence: number;
+}
+
 export interface TrafficLightPass {
   lightId: string;
   vehicleId: string;
@@ -105,6 +131,8 @@ export interface TrafficLightEstimate {
   greenStartCount: number;
   cycleConfidence: number;
   phaseSeparationScore: number;
+  cycleLengthDistribution?: TrafficCycleLengthCandidate[];
+  phaseOffsetDistribution?: TrafficPhaseOffsetCandidate[];
   neighborSupportCount: number;
   syncAdjustmentSeconds: number;
   explanation: string;
@@ -122,5 +150,13 @@ export interface TrafficLightDataset {
   sourceFiles: string[];
   lights: TrafficLightLocation[];
   traces: TrafficVehicleTrace[];
+  inferenceTraces?: TrafficVehicleTrace[];
   busStops: TrafficStopLocation[];
+  evidencePathsByLightId?: Record<string, TrafficLightEvidencePath[]>;
+}
+
+export interface PrecomputedTrafficLightDataset extends TrafficLightDataset {
+  estimates: TrafficLightEstimate[];
+  passCount: number;
+  passCountsByLightId: Record<string, number>;
 }

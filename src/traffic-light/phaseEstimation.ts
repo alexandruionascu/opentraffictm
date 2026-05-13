@@ -109,6 +109,13 @@ type DailyProfileResult = {
   temporalStabilityScore: number;
 };
 
+type CycleLengthResult = {
+  cycleLengthSeconds: number;
+  anchorTimestamp: number;
+  cycleConfidence: number;
+  distribution: TrafficLightEstimate["cycleLengthDistribution"];
+};
+
 function circularDistance(a: number, b: number, cycle: number) {
   const raw = Math.abs(modulo(a, cycle) - modulo(b, cycle));
   return Math.min(raw, cycle - raw);
@@ -552,7 +559,7 @@ function estimateKalmanDrift(
   };
 }
 
-function estimateCycleLength(passes: TrafficLightPass[]) {
+function estimateCycleLength(passes: TrafficLightPass[]): CycleLengthResult {
   const events = passes
     .filter((pass) => pass.greenStartTimestamp !== undefined)
     .map((pass) => pass.greenStartTimestamp! / 1000)
@@ -564,18 +571,34 @@ function estimateCycleLength(passes: TrafficLightPass[]) {
       cycleLengthSeconds: fallback,
       anchorTimestamp: events[0] ?? (passes[0]?.crossingTimestamp ?? Date.now()) / 1000,
       cycleConfidence: 0.18,
+      distribution: [
+        {
+          cycleLengthSeconds: fallback,
+          confidence: 0.18,
+          sampleCount: events.length,
+        },
+      ],
     };
   }
 
   const anchorTimestamp = events[0];
   let bestPeriod = 120;
   let bestScore = -1;
+  const candidates: NonNullable<TrafficLightEstimate["cycleLengthDistribution"]> = [];
+  const commonCycles = [60, 70, 75, 80, 90, 100, 110, 120, 130, 140, 150, 160, 180];
 
-  for (let period = 60; period <= 220; period += 1) {
+  for (let period = 60; period <= 180; period += 1) {
     const phases = events.map((event) => modulo(event - anchorTimestamp, period));
     const concentration = circularConcentration(phases, period);
     const support = Math.min(1, phases.length / 10);
-    const score = concentration * 0.78 + support * 0.22;
+    const nearestCommonCycleDistance = Math.min(...commonCycles.map((cycle) => Math.abs(cycle - period)));
+    const commonCyclePrior = Math.exp(-0.5 * (nearestCommonCycleDistance / 4) ** 2);
+    const score = concentration * 0.62 + support * 0.18 + commonCyclePrior * 0.2;
+    candidates.push({
+      cycleLengthSeconds: period,
+      confidence: Math.max(0, Math.min(1, score)),
+      sampleCount: events.length,
+    });
     if (score > bestScore) {
       bestScore = score;
       bestPeriod = period;
@@ -586,7 +609,56 @@ function estimateCycleLength(passes: TrafficLightPass[]) {
     cycleLengthSeconds: bestPeriod,
     anchorTimestamp,
     cycleConfidence: Math.max(0, Math.min(1, bestScore)),
+    distribution: candidates
+      .sort((a, b) => b.confidence - a.confidence)
+      .filter((candidate, index, sorted) =>
+        index < 12 &&
+        sorted.findIndex((other) => Math.abs(other.cycleLengthSeconds - candidate.cycleLengthSeconds) <= 2) === index,
+      )
+      .slice(0, 6),
   };
+}
+
+function buildPhaseOffsetDistribution(
+  cycleLengthSeconds: number,
+  bayesian: BayesianResult,
+  hmm: HMMResult,
+  particle: ParticleResult,
+  kalman: KalmanResult,
+): TrafficLightEstimate["phaseOffsetDistribution"] {
+  const bayesianPeaks = bayesian.posterior
+    .map((confidence, offsetSeconds) => ({ offsetSeconds, confidence, source: "Bayesian posterior" }))
+    .sort((a, b) => b.confidence - a.confidence)
+    .filter((candidate, index, sorted) =>
+      index < 18 && sorted.findIndex((other) => circularDistance(other.offsetSeconds, candidate.offsetSeconds, cycleLengthSeconds) <= 2) === index,
+    )
+    .slice(0, 4);
+
+  return [
+    ...bayesianPeaks,
+    {
+      offsetSeconds: hmm.window.start,
+      confidence: hmm.confidence,
+      source: "HMM green window",
+    },
+    {
+      offsetSeconds: particle.offsetSeconds,
+      confidence: particle.confidence,
+      source: "Particle filter",
+    },
+    {
+      offsetSeconds: kalman.offsetSeconds,
+      confidence: kalman.confidence,
+      source: "Kalman drift",
+    },
+  ]
+    .map((candidate) => ({
+      ...candidate,
+      offsetSeconds: modulo(candidate.offsetSeconds, cycleLengthSeconds),
+      confidence: Math.max(0, Math.min(1, candidate.confidence)),
+    }))
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 7);
 }
 
 function findDominantGreenWindow(
@@ -660,7 +732,7 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
   const greenPassCount = usable.filter((pass) => pass.passState === "green").length;
   const redPassCount = usable.filter((pass) => pass.passState === "red").length;
   const greenStartCount = usable.filter((pass) => pass.greenStartTimestamp !== undefined).length;
-  const { cycleLengthSeconds, anchorTimestamp, cycleConfidence } = estimateCycleLength(usable);
+  const { cycleLengthSeconds, anchorTimestamp, cycleConfidence, distribution: cycleLengthDistribution } = estimateCycleLength(usable);
   const samples = buildPhaseSamples(usable, cycleLengthSeconds, anchorTimestamp);
   const bayesian = estimateBayesianPosterior(samples, cycleLengthSeconds);
   const hmm = estimateHmmWindow(samples, cycleLengthSeconds, bayesian);
@@ -701,9 +773,10 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
     cycleLengthSeconds,
   );
   const greenShare = greenPassCount / Math.max(1, greenPassCount + redPassCount);
-  const evidenceScore = Math.min(1, usable.length / 18);
+  const hasStateContrast = greenPassCount > 0 && redPassCount > 0;
+  const evidenceScore = Math.min(1, usable.length / 16);
   const routeScore = Math.min(1, routeCount / 3);
-  const stopScore = Math.min(1, stopPassCount / 6);
+  const stopScore = Math.min(1, stopPassCount / 5);
   const offsetSpread = Math.max(1, particle.spreadSeconds);
   const methodOffsets = [bayesian.bestBin, hmm.window.start, particle.offsetSeconds, kalman.offsetSeconds];
   const meanOffset = circularMean(methodOffsets, cycleLengthSeconds);
@@ -719,26 +792,38 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
     ),
   );
   const dailyProfile = buildDailyProfile(samples, cycleLengthSeconds, greenDurationSeconds, kalmanAdjustedOffset);
-  const confidence = Math.max(
+  const phaseOffsetDistribution = buildPhaseOffsetDistribution(cycleLengthSeconds, bayesian, hmm, particle, kalman);
+  const posteriorQuality =
+    cycleConfidence * 0.22 +
+    bayesian.confidence * 0.22 +
+    hmm.confidence * 0.2 +
+    routeAlignment.alignmentScore * 0.12 +
+    particle.confidence * 0.08 +
+    kalman.confidence * 0.06 +
+    methodAgreementScore * 0.1;
+  const rawConfidence = Math.max(
     0.1,
     Math.min(
       0.98,
-      0.18 +
-        evidenceScore * 0.28 +
-        routeScore * 0.16 +
-        cycleConfidence * 0.2 +
-        bayesian.confidence * 0.14 +
-        hmm.confidence * 0.18 +
-        routeAlignment.alignmentScore * 0.1 +
-        particle.confidence * 0.13 +
-        kalman.confidence * 0.08 +
-        methodAgreementScore * 0.08 +
-        dailyProfile.temporalStabilityScore * 0.12 +
-        stopScore * 0.05 -
+      0.12 +
+        evidenceScore * 0.12 +
+        routeScore * 0.08 +
+        posteriorQuality * 0.52 +
+        dailyProfile.temporalStabilityScore * 0.04 +
+        stopScore * 0.08 +
+        (hasStateContrast ? 0.08 : 0) -
         Math.min(0.12, offsetSpread / Math.max(12, cycleLengthSeconds * 0.24)) +
-        Math.abs(greenShare - 0.5) * 0.06,
+        (hasStateContrast ? Math.abs(greenShare - 0.5) * 0.02 : 0),
     ),
   );
+  const confidenceCap = hasStateContrast
+    ? greenStartCount >= 3 && cycleConfidence >= 0.32 && bayesian.confidence >= 0.22
+      ? 0.9
+      : 0.78
+    : greenStartCount > 0
+      ? 0.58
+      : 0.42;
+  const confidence = Math.min(rawConfidence, confidenceCap);
 
   return {
     lightId: light.id,
@@ -767,6 +852,8 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
     greenStartCount,
     cycleConfidence,
     phaseSeparationScore: Math.max(hmm.confidence, bayesian.confidence),
+    cycleLengthDistribution,
+    phaseOffsetDistribution,
     neighborSupportCount: 0,
     syncAdjustmentSeconds: 0,
   } satisfies Omit<TrafficLightEstimate, "explanation" | "evidenceSummary" | "pipelineStages">;
@@ -775,6 +862,19 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
 function syncOffsetDifference(reference: number, candidate: number, cycleLengthSeconds: number) {
   const delta = modulo(candidate - reference + cycleLengthSeconds / 2, cycleLengthSeconds) - cycleLengthSeconds / 2;
   return delta;
+}
+
+function hasReliableSyncSupport(
+  estimate: Omit<TrafficLightEstimate, "explanation" | "evidenceSummary" | "pipelineStages">,
+) {
+  return (
+    estimate.passCount >= 4 &&
+    estimate.greenStartCount >= 2 &&
+    estimate.greenPassCount > 0 &&
+    estimate.redPassCount > 0 &&
+    estimate.confidence >= 0.42 &&
+    (estimate.methodAgreementScore ?? 0) >= 0.35
+  );
 }
 
 export function synchronizeNeighborOffsets(
@@ -787,13 +887,26 @@ export function synchronizeNeighborOffsets(
       return estimate;
     }
 
+    if (!hasReliableSyncSupport(estimate)) {
+      return {
+        ...estimate,
+        neighborSupportCount: 0,
+        syncAdjustmentSeconds: 0,
+      };
+    }
+
     const neighbors = estimates.filter((other) => {
       if (other.lightId === estimate.lightId) return false;
+      if (!hasReliableSyncSupport(other)) return false;
       const neighborLight = lights.find((light) => light.id === other.lightId);
       if (!neighborLight) return false;
-      const distance =
-        ((currentLight.lat - neighborLight.lat) ** 2 + (currentLight.lng - neighborLight.lng) ** 2) ** 0.5 * 111_320;
-      return distance < 220 && Math.abs(other.cycleLengthSeconds - estimate.cycleLengthSeconds) < 20;
+      const latMeters = (currentLight.lat - neighborLight.lat) * 111_320;
+      const lngMeters =
+        (currentLight.lng - neighborLight.lng) *
+        111_320 *
+        Math.cos((currentLight.lat * Math.PI) / 180);
+      const distance = Math.hypot(latMeters, lngMeters);
+      return distance < 150 && Math.abs(other.cycleLengthSeconds - estimate.cycleLengthSeconds) < 12;
     });
 
     if (!neighbors.length) {

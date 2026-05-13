@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { ExplanationPanel } from "./ExplanationPanel";
-import { loadTrafficLightDataset } from "./mockData";
-import { extractTrafficLightPasses } from "./passExtraction";
-import { finalizeTrafficLightEstimate, estimateTrafficLightPhases, synchronizeNeighborOffsets } from "./phaseEstimation";
+import { loadPrecomputedTrafficLightDataset } from "./precomputedData";
 import { projectTrafficLightState } from "./livePrediction";
 import { TrafficLightMap } from "./TrafficLightMap";
-import type { TrafficLightDataset, TrafficLightEstimate, TrafficLightPass } from "./types";
+import type { PrecomputedTrafficLightDataset, TrafficLightEstimate } from "./types";
 
 function scoreCandidate(estimate: TrafficLightEstimate) {
   const hasPassSupport = estimate.passCount > 0 ? 1 : 0;
@@ -34,19 +32,16 @@ function sortBySupport(a: TrafficLightEstimate, b: TrafficLightEstimate) {
 }
 
 export function TrafficLightInferenceApp() {
-  const [dataset, setDataset] = useState<TrafficLightDataset | null>(null);
-  const [passes, setPasses] = useState<TrafficLightPass[]>([]);
+  const [dataset, setDataset] = useState<PrecomputedTrafficLightDataset | null>(null);
   const [selectedLightId, setSelectedLightId] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     let cancelled = false;
-    loadTrafficLightDataset()
+    loadPrecomputedTrafficLightDataset()
       .then((loaded) => {
         if (cancelled) return;
         setDataset(loaded);
-        const nextPasses = extractTrafficLightPasses(loaded.lights, loaded.traces, loaded.busStops);
-        setPasses(nextPasses);
       })
       .catch(() => {
         if (!cancelled) {
@@ -55,9 +50,11 @@ export function TrafficLightInferenceApp() {
             sourceFiles: [],
             lights: [],
             traces: [],
+            estimates: [],
+            passCount: 0,
+            passCountsByLightId: {},
             busStops: [],
           });
-          setPasses([]);
         }
       });
     return () => {
@@ -72,15 +69,8 @@ export function TrafficLightInferenceApp() {
 
   const estimates = useMemo(() => {
     if (!dataset) return [];
-    const seeded = dataset.lights.map((light) => estimateTrafficLightPhases(light, passes));
-    const synced = synchronizeNeighborOffsets(seeded, dataset.lights);
-    return synced.map((estimate) =>
-      finalizeTrafficLightEstimate(
-        dataset.lights.find((light) => light.id === estimate.lightId) ?? dataset.lights[0]!,
-        estimate,
-      ),
-    );
-  }, [dataset, passes]);
+    return dataset.estimates;
+  }, [dataset]);
 
   const livePredictions = useMemo(() => estimates.map((estimate) => projectTrafficLightState(estimate, now)), [estimates, now]);
   const rankedPredictions = useMemo(() => [...livePredictions].sort(sortBySupport), [livePredictions]);
@@ -96,10 +86,7 @@ export function TrafficLightInferenceApp() {
     () => livePredictions.find((item) => item.lightId === activeLightId) ?? rankedPredictions[0] ?? null,
     [activeLightId, livePredictions, rankedPredictions],
   );
-  const selectedPasses = useMemo(
-    () => passes.filter((pass) => pass.lightId === activeLightId).sort((a, b) => b.confidence - a.confidence),
-    [activeLightId, passes],
-  );
+  const selectedPassCount = activeLightId ? (dataset?.passCountsByLightId[activeLightId] ?? selectedPrediction?.passCount ?? 0) : 0;
 
   const loading = !dataset;
 
@@ -110,7 +97,7 @@ export function TrafficLightInferenceApp() {
           <TrafficLightMap
             dataset={dataset}
             predictions={livePredictions}
-            selectedLightId={activeLightId}
+            selectedLightId={selectedLightId}
             onSelectLight={setSelectedLightId}
           />
         ) : (
@@ -124,7 +111,7 @@ export function TrafficLightInferenceApp() {
         lights={dataset?.lights ?? []}
         selectedLight={selectedLight}
         selectedPrediction={selectedPrediction}
-        selectedPasses={selectedPasses}
+        selectedPassCount={selectedPassCount}
         topPredictions={topPredictions}
         sparsePredictions={sparsePredictions}
         supportedPredictions={supportedPredictions}
@@ -137,7 +124,7 @@ export function TrafficLightInferenceApp() {
         </div>
         <div className="traffic-light-footer-item">
           <span>Passes</span>
-          <strong>{passes.length}</strong>
+          <strong>{dataset?.passCount ?? 0}</strong>
         </div>
         <div className="traffic-light-footer-item">
           <span>Best lights</span>

@@ -1,11 +1,11 @@
 import type { LiveTrafficLightPrediction } from "./livePrediction";
-import type { TrafficLightLocation, TrafficLightPass } from "./types";
+import type { TrafficLightLocation } from "./types";
 
 type Props = {
   lights: TrafficLightLocation[];
   selectedLight: TrafficLightLocation | null;
   selectedPrediction: LiveTrafficLightPrediction | null;
-  selectedPasses: TrafficLightPass[];
+  selectedPassCount: number;
   topPredictions: LiveTrafficLightPrediction[];
   sparsePredictions: LiveTrafficLightPrediction[];
   supportedPredictions: LiveTrafficLightPrediction[];
@@ -29,7 +29,7 @@ export function ExplanationPanel({
   lights,
   selectedLight,
   selectedPrediction,
-  selectedPasses,
+  selectedPassCount,
   topPredictions,
   sparsePredictions,
   supportedPredictions,
@@ -114,7 +114,7 @@ export function ExplanationPanel({
             <h2>{selectedLight ? selectedLight.name : "Pick a traffic light"}</h2>
             <p>
               {selectedLight
-                ? `${selectedPasses.length} inferred passes, ${selectedPrediction?.routeCount ?? 0} route combinations`
+                ? `${selectedPassCount} inferred passes, ${selectedPrediction?.routeCount ?? 0} route combinations`
                 : "The map markers are color-coded by the current inferred state."}
             </p>
           </div>
@@ -175,6 +175,34 @@ export function ExplanationPanel({
                 <strong>{(selectedPrediction.offsetDriftSecondsPerHour ?? 0).toFixed(1)}s/h</strong>
               </div>
             </div>
+            <section className="traffic-light-distribution-card">
+              <div className="traffic-light-section-head">
+                <h2>Cycle and offset distributions</h2>
+                <span>Candidate periods and phase offsets from the active pass samples</span>
+              </div>
+              <div className="traffic-light-distribution-grid">
+                <div>
+                  <strong>Cycle length</strong>
+                  {(selectedPrediction.cycleLengthDistribution ?? []).map((candidate) => (
+                    <span key={candidate.cycleLengthSeconds}>
+                      {candidate.cycleLengthSeconds}s
+                      <i style={{ width: `${Math.max(4, candidate.confidence * 100)}%` }} />
+                      <small>{Math.round(candidate.confidence * 100)}% · {candidate.sampleCount} starts</small>
+                    </span>
+                  ))}
+                </div>
+                <div>
+                  <strong>Phase offset</strong>
+                  {(selectedPrediction.phaseOffsetDistribution ?? []).map((candidate) => (
+                    <span key={`${candidate.source}-${candidate.offsetSeconds}`}>
+                      {candidate.offsetSeconds.toFixed(1)}s
+                      <i style={{ width: `${Math.max(4, candidate.confidence * 100)}%` }} />
+                      <small>{Math.round(candidate.confidence * 100)}% · {candidate.source}</small>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </section>
             <section className="traffic-light-visual-card">
               <div className="traffic-light-section-head">
                 <h2>Step-by-step visual markers</h2>

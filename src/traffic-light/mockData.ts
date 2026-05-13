@@ -146,23 +146,31 @@ export async function loadTrafficLightDataset(): Promise<TrafficLightDataset> {
     traceBuckets.set(key, existing);
   }
 
-  const tracesByRoute = new Map<string, TrafficVehicleTrace[]>();
+  const inferenceTracesByRoute = new Map<string, TrafficVehicleTrace[]>();
+  const displayTracesByRoute = new Map<string, TrafficVehicleTrace[]>();
   for (const [id, points] of traceBuckets.entries()) {
     const sorted = points.sort((a, b) => a.timestamp - b.timestamp);
     const routeId = sorted[0]?.routeId ?? "unknown";
-    const nextTrace: TrafficVehicleTrace = {
+    const inferenceTrace: TrafficVehicleTrace = {
       id,
       vehicleId: sorted[0]?.vehicleId ?? id,
       routeId,
       directionId: sorted[0]?.directionId,
+      observations: sorted,
+    };
+    const displayTrace: TrafficVehicleTrace = {
+      ...inferenceTrace,
       observations: sampleTrace(sorted),
     };
-    const list = tracesByRoute.get(routeId) ?? [];
-    list.push(nextTrace);
-    tracesByRoute.set(routeId, list);
+    const inferenceList = inferenceTracesByRoute.get(routeId) ?? [];
+    inferenceList.push(inferenceTrace);
+    inferenceTracesByRoute.set(routeId, inferenceList);
+    const displayList = displayTracesByRoute.get(routeId) ?? [];
+    displayList.push(displayTrace);
+    displayTracesByRoute.set(routeId, displayList);
   }
 
-  const traces = [...tracesByRoute.entries()]
+  const traces = [...displayTracesByRoute.entries()]
     .flatMap(([, routeTraces]) =>
       routeTraces
         .sort((a, b) => b.observations.length - a.observations.length)
@@ -170,6 +178,10 @@ export async function loadTrafficLightDataset(): Promise<TrafficLightDataset> {
     )
     .sort((a, b) => b.observations.length - a.observations.length)
     .slice(0, 48);
+
+  const inferenceTraces = [...inferenceTracesByRoute.values()]
+    .flat()
+    .sort((a, b) => a.routeId.localeCompare(b.routeId) || a.vehicleId.localeCompare(b.vehicleId));
 
   const lights: TrafficLightLocation[] = ((signalsJson as SignalsJson).programs ?? []).map((program) => ({
     id: program.id,
@@ -186,7 +198,7 @@ export async function loadTrafficLightDataset(): Promise<TrafficLightDataset> {
     sourceFiles,
     lights,
     traces,
+    inferenceTraces,
     busStops,
   };
 }
-

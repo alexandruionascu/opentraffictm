@@ -1765,7 +1765,10 @@ p {
 }
 
 .traffic-light-map {
-  background: #07131f;
+  background:
+    radial-gradient(circle at 35% 22%, rgba(20, 184, 166, 0.16), transparent 34%),
+    radial-gradient(circle at 72% 70%, rgba(239, 68, 68, 0.12), transparent 30%),
+    #050b12;
   border: 1px solid var(--line);
   border-radius: 28px;
   box-shadow: var(--shadow);
@@ -1773,68 +1776,80 @@ p {
   position: relative;
 }
 
+.traffic-light-map .leaflet-container {
+  background: #050b12;
+  font-family: inherit;
+}
+
+.traffic-light-map .leaflet-tile-pane {
+  filter: saturate(0.72) contrast(1.08) brightness(0.78);
+}
+
+.traffic-light-map .leaflet-control-zoom {
+  border: 0;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+}
+
+.traffic-light-map .leaflet-control-zoom a {
+  background: rgba(5, 12, 21, 0.84);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  color: #e5f4ff;
+}
+
+.traffic-light-map .leaflet-control-zoom a:hover {
+  background: rgba(14, 25, 39, 0.94);
+  color: white;
+}
+
+.traffic-light-map .leaflet-tooltip {
+  background: rgba(4, 10, 18, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+  color: #e6f7ff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.traffic-light-map .leaflet-tooltip::before {
+  display: none;
+}
+
+.traffic-light-map-glass {
+  background:
+    linear-gradient(135deg, rgba(10, 20, 32, 0.34), transparent 32%),
+    linear-gradient(0deg, rgba(3, 7, 13, 0.38), transparent 28%, transparent 72%, rgba(3, 7, 13, 0.28));
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 450;
+}
+
 .traffic-light-map-legend {
-  background: rgba(3, 7, 13, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+  backdrop-filter: blur(18px);
+  background: linear-gradient(135deg, rgba(3, 7, 13, 0.78), rgba(8, 18, 30, 0.62));
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 20px;
   bottom: 18px;
   display: grid;
-  gap: 2px;
+  gap: 5px;
   left: 18px;
-  max-width: 320px;
-  padding: 12px 14px;
+  max-width: 360px;
+  padding: 14px 16px;
   position: absolute;
   z-index: 500;
 }
 
 .traffic-light-map-legend strong {
-  font-size: 13px;
+  font-size: 14px;
+  letter-spacing: -0.01em;
 }
 
 .traffic-light-map-legend span {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.35;
-}
-
-.traffic-light-marker-shell {
-  background: transparent;
-  border: 0;
-}
-
-.traffic-light-marker {
-  align-items: center;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 2px rgba(3, 7, 13, 0.92),
-    0 0 18px color-mix(in srgb, var(--traffic-marker-color) 64%, transparent);
-  display: grid;
-  height: 20px;
-  justify-items: center;
-  position: relative;
-  width: 20px;
-}
-
-.traffic-light-marker::before {
-  background: color-mix(in srgb, var(--traffic-marker-color) 22%, transparent);
-  border-radius: 50%;
-  content: "";
-  inset: -7px;
-  opacity: 0.75;
-  position: absolute;
-}
-
-.traffic-light-marker.selected {
-  transform: scale(1.18);
-}
-
-.traffic-light-marker-core {
-  background: var(--traffic-marker-color);
-  border-radius: 50%;
-  height: 8px;
-  position: relative;
-  width: 8px;
-  z-index: 1;
 }
 
 .traffic-light-panel {
@@ -1871,7 +1886,8 @@ p {
 }
 
 .traffic-light-rank-card,
-.traffic-light-visual-card {
+.traffic-light-visual-card,
+.traffic-light-distribution-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 18px;
@@ -2095,6 +2111,47 @@ p {
 
 .traffic-light-method-grid strong {
   font-size: 17px;
+}
+
+.traffic-light-distribution-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.traffic-light-distribution-grid > div {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.traffic-light-distribution-grid strong {
+  font-size: 13px;
+}
+
+.traffic-light-distribution-grid span {
+  color: var(--text);
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.traffic-light-distribution-grid i {
+  background: linear-gradient(90deg, rgba(101, 214, 255, 0.86), rgba(124, 255, 178, 0.72));
+  border-radius: 999px;
+  display: block;
+  height: 7px;
+}
+
+.traffic-light-distribution-grid small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .traffic-light-visual-step {
@@ -2344,6 +2401,10 @@ p {
 
   .traffic-light-summary-grid,
   .traffic-light-detail-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .traffic-light-distribution-grid {
     grid-template-columns: 1fr;
   }
 

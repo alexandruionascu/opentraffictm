@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { haversineMeters, sampleTrace } from "./mapMatching";
-import type { TrafficLightDataset, TrafficLightLocation, TrafficLightPass, TrafficVehicleTrace } from "./types";
+import type { TrafficLightDataset, TrafficLightEvidencePath, TrafficLightLocation } from "./types";
 import type { LiveTrafficLightPrediction } from "./livePrediction";
 
 type Props = {
@@ -13,42 +12,49 @@ type Props = {
 };
 
 function stateColor(state: string, confidence: number) {
-  if (state === "green") return confidence >= 0.7 ? "#2ecc71" : "#81d4a3";
-  if (state === "red") return confidence >= 0.7 ? "#ef4444" : "#f59e0b";
-  return "#94a3b8";
+  if (state === "green") return confidence >= 0.7 ? "#33d17a" : "#8edfb0";
+  if (state === "red") return confidence >= 0.7 ? "#ff5b5f" : "#f59e0b";
+  return "#64748b";
 }
 
-function buildMarkerIcon(state: string, confidence: number, selected: boolean) {
-  return L.divIcon({
-    className: "traffic-light-marker-shell",
-    html: `
-      <span class="traffic-light-marker ${selected ? "selected" : ""}" style="--traffic-marker-color:${stateColor(state, confidence)}">
-        <span class="traffic-light-marker-core"></span>
-      </span>
-    `,
-    iconSize: [26, 26],
-    iconAnchor: [13, 13],
-  });
+function evidenceColor(path: TrafficLightEvidencePath) {
+  if (path.redPassCount > path.greenPassCount) {
+    return "#fb7185";
+  }
+  if (path.greenPassCount > 0) {
+    return "#5ee6a8";
+  }
+  return "#7dd3fc";
 }
 
-function buildTraceLayer(traces: TrafficVehicleTrace[], selectedLight: TrafficLightLocation | null) {
+function buildEvidenceLayer(selectedLight: TrafficLightLocation | null, evidencePaths: TrafficLightEvidencePath[]) {
   const layer = L.layerGroup();
-  const selectedLatLng = selectedLight ? L.latLng(selectedLight.lat, selectedLight.lng) : null;
+  if (!selectedLight) {
+    return layer;
+  }
 
-  for (const trace of traces) {
-    const points = sampleTrace(trace.observations, 60);
-    if (points.length < 2) continue;
-    const isRelevant = selectedLatLng
-      ? points.some(
-          (point) => haversineMeters({ lng: point.lon, lat: point.lat }, { lng: selectedLatLng.lng, lat: selectedLatLng.lat }) < 260,
-        )
-      : true;
+  for (const [index, path] of evidencePaths.entries()) {
+    if (!path.points || path.points.length < 2) {
+      continue;
+    }
+    const color = evidenceColor(path);
     const polyline = L.polyline(
-      points.map((point) => [point.lat, point.lon] as [number, number]),
+      path.points.map((point) => [point.lat, point.lon] as [number, number]),
       {
-        color: isRelevant ? "#93c5fd" : "#64748b",
-        weight: isRelevant ? 3 : 2,
-        opacity: isRelevant ? 0.28 : 0.12,
+        color,
+        weight: Math.max(2.5, Math.min(8, 2 + Math.sqrt(path.passCount))),
+        opacity: Math.max(0.32, Math.min(0.82, 0.26 + path.confidence * 0.62 - index * 0.025)),
+        lineCap: "round",
+        lineJoin: "round",
+      },
+    );
+    polyline.bindTooltip(
+      `${path.routeKey} · ${path.passCount} passes · ${Math.round(path.confidence * 100)}% confidence`,
+      {
+        direction: "top",
+        offset: [0, -6],
+        opacity: 0.98,
+        sticky: true,
       },
     );
     polyline.addTo(layer);
@@ -57,17 +63,44 @@ function buildTraceLayer(traces: TrafficVehicleTrace[], selectedLight: TrafficLi
   return layer;
 }
 
+function buildBusStopLayer(dataset: TrafficLightDataset) {
+  const layer = L.layerGroup();
+  for (const stop of dataset.busStops) {
+    const marker = L.circleMarker([stop.lat, stop.lng], {
+      radius: Math.max(4, Math.min(8, 3 + Math.sqrt(stop.sampleCount) / 5)),
+      color: "rgba(14, 165, 233, 0.72)",
+      weight: 1.5,
+      fillColor: "#bae6fd",
+      fillOpacity: 0.58,
+      opacity: 0.84,
+    });
+    marker.bindTooltip(`${stop.name} · ${stop.sampleCount} stop samples`, {
+      direction: "top",
+      offset: [0, -6],
+      opacity: 0.98,
+      sticky: true,
+    });
+    marker.addTo(layer);
+  }
+  return layer;
+}
+
 export function TrafficLightMap({ dataset, predictions, selectedLightId, onSelectLight }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const markerLayer = useRef<L.LayerGroup | null>(null);
-  const traceLayer = useRef<L.LayerGroup | null>(null);
+  const busStopLayer = useRef<L.LayerGroup | null>(null);
   const highlightedTraceLayer = useRef<L.LayerGroup | null>(null);
   const selectionRing = useRef<L.LayerGroup | null>(null);
-  const markerRefs = useRef(new Map<string, L.Marker>());
+  const markerRefs = useRef(new Map<string, L.CircleMarker>());
+  const canvasRenderer = useRef<L.Canvas | null>(null);
   const selectedLight = useMemo(
     () => dataset.lights.find((light) => light.id === selectedLightId) ?? null,
     [dataset.lights, selectedLightId],
+  );
+  const selectedEvidencePaths = useMemo(
+    () => (selectedLightId ? dataset.evidencePathsByLightId?.[selectedLightId] ?? [] : []),
+    [dataset.evidencePathsByLightId, selectedLightId],
   );
   const predictionByLightId = useMemo(
     () => new Map(predictions.map((prediction) => [prediction.lightId, prediction] as const)),
@@ -80,18 +113,20 @@ export function TrafficLightMap({ dataset, predictions, selectedLightId, onSelec
     }
 
     const map = L.map(mapRef.current, {
+      attributionControl: false,
       zoomControl: true,
       preferCanvas: true,
     }).setView([45.7489, 21.2087], 12.7);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors",
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: "&copy; OpenStreetMap &copy; CARTO",
       maxZoom: 19,
     }).addTo(map);
 
     mapInstance.current = map;
+    canvasRenderer.current = L.canvas({ padding: 0.35 });
     markerLayer.current = L.layerGroup().addTo(map);
-    traceLayer.current = buildTraceLayer(dataset.traces, null).addTo(map);
+    busStopLayer.current = buildBusStopLayer(dataset).addTo(map);
     highlightedTraceLayer.current = L.layerGroup().addTo(map);
     selectionRing.current = L.layerGroup().addTo(map);
 
@@ -106,12 +141,13 @@ export function TrafficLightMap({ dataset, predictions, selectedLightId, onSelec
       map.remove();
       mapInstance.current = null;
       markerLayer.current = null;
-      traceLayer.current = null;
+      busStopLayer.current = null;
       highlightedTraceLayer.current = null;
       selectionRing.current = null;
+      canvasRenderer.current = null;
       markerRefs.current.clear();
     };
-  }, [dataset.lights, dataset.traces]);
+  }, [dataset]);
 
   useEffect(() => {
     const markers = markerRefs.current;
@@ -125,10 +161,16 @@ export function TrafficLightMap({ dataset, predictions, selectedLightId, onSelec
       const confidence = prediction?.confidence ?? 0;
       const isSelected = light.id === selectedLightId;
       let marker = markers.get(light.id);
+      const color = stateColor(state, confidence);
       if (!marker) {
-        marker = L.marker([light.lat, light.lng], {
-          icon: buildMarkerIcon(state, confidence, isSelected),
-          keyboard: true,
+        marker = L.circleMarker([light.lat, light.lng], {
+          renderer: canvasRenderer.current ?? undefined,
+          radius: isSelected ? 9 : Math.max(3.2, Math.min(6.4, 3.4 + confidence * 3)),
+          color: isSelected ? "#e0f2fe" : "rgba(2, 6, 23, 0.9)",
+          weight: isSelected ? 2 : 1,
+          fillColor: color,
+          fillOpacity: state === "unknown" ? 0.42 : Math.max(0.58, Math.min(0.92, confidence)),
+          opacity: 1,
         });
         marker.on("click", () => onSelectLight(light.id));
         marker.bindTooltip(
@@ -143,7 +185,14 @@ export function TrafficLightMap({ dataset, predictions, selectedLightId, onSelec
         marker.addTo(markerLayer.current);
         markers.set(light.id, marker);
       } else {
-        marker.setIcon(buildMarkerIcon(state, confidence, isSelected));
+        marker.setStyle({
+          radius: isSelected ? 9 : Math.max(3.2, Math.min(6.4, 3.4 + confidence * 3)),
+          color: isSelected ? "#e0f2fe" : "rgba(2, 6, 23, 0.9)",
+          weight: isSelected ? 2 : 1,
+          fillColor: color,
+          fillOpacity: state === "unknown" ? 0.42 : Math.max(0.58, Math.min(0.92, confidence)),
+          opacity: 1,
+        });
         marker.setTooltipContent(`${light.name} · ${state.toUpperCase()} · ${Math.round(confidence * 100)}%`);
       }
     }
@@ -169,20 +218,22 @@ export function TrafficLightMap({ dataset, predictions, selectedLightId, onSelec
       color: stateColor(predictionByLightId.get(selectedLight.id)?.currentState ?? "unknown", predictionByLightId.get(selectedLight.id)?.confidence ?? 0),
       weight: 2,
       fillOpacity: 0.06,
+      interactive: false,
     }).addTo(ring);
 
     if (highlightedTraceLayer.current) {
-      const focusLayer = buildTraceLayer(dataset.traces, selectedLight).addTo(highlightedTraceLayer.current);
+      const focusLayer = buildEvidenceLayer(selectedLight, selectedEvidencePaths).addTo(highlightedTraceLayer.current);
       void focusLayer;
     }
-  }, [dataset.traces, predictionByLightId, selectedLight]);
+  }, [predictionByLightId, selectedEvidencePaths, selectedLight]);
 
   return (
     <div className="traffic-light-map">
       <div ref={mapRef} className="traffic-light-map-canvas" />
+      <div className="traffic-light-map-glass" aria-hidden="true" />
       <div className="traffic-light-map-legend">
-        <strong>OSM traffic lights</strong>
-        <span>Markers are stable; the selected example is highlighted without re-centering the map on every update.</span>
+        <strong>Signal confidence map</strong>
+        <span>Blue markers are observed bus stops. Select a signal to reveal actual recorded route snippets that support confidence.</span>
       </div>
     </div>
   );
