@@ -147,20 +147,33 @@ function normalizeTomTomFlow(response, label) {
   const current = flow?.currentFlow ?? {};
   const freeFlow = flow?.freeFlowSpeed ?? current?.freeFlowSpeed;
   const currentSpeed = current?.speed ?? flow?.currentSpeed;
+
+  const coords = flow?.coordinates;
+  let geometry;
+  if (coords) {
+    if (Array.isArray(coords.coordinate)) {
+      const pts = coords.coordinate;
+      geometry = pts.map((pt) => [pt.longitude ?? pt.lng ?? 0, pt.latitude ?? pt.lat ?? 0]);
+    } else if (coords.longitude != null || coords.lng != null) {
+      geometry = [[coords.longitude ?? coords.lng, coords.latitude ?? coords.lat]];
+    } else {
+      geometry = [[minLng, minLat], [maxLng, maxLat]];
+    }
+  } else {
+    geometry = [[minLng, minLat], [maxLng, maxLat]];
+  }
+
   return [
     {
       segmentId: flow?.location?.description ?? label ?? "tomtom-flow-0",
       roadName: flow?.roadName ?? flow?.location?.description ?? undefined,
-      geometry: [
-        [flow?.coordinates?.longitude ?? minLng, flow?.coordinates?.latitude ?? minLat],
-        [flow?.coordinates?.longitude ?? maxLng, flow?.coordinates?.latitude ?? maxLat],
-      ],
+      geometry,
       speedKph: currentSpeed,
       travelTimeSeconds: flow?.currentTravelTime ?? undefined,
       delaySeconds:
         typeof currentSpeed === "number" && typeof freeFlow === "number" ? Math.max(0, freeFlow - currentSpeed) : undefined,
       congestionLevel:
-        typeof flow?.currentSpeed === "number" && typeof freeFlow === "number"
+        typeof currentSpeed === "number" && typeof freeFlow === "number"
           ? currentSpeed < freeFlow * 0.4
             ? "severe"
             : currentSpeed < freeFlow * 0.7
@@ -245,6 +258,31 @@ async function runTomTom() {
   const incidents = await fetchJson(incidentsUrl);
   const incidentsItems = incidents?.incidents ?? incidents?.results ?? [];
 
+  function extractCoordinates(geom) {
+    if (!geom) return null;
+    if (geom.type === "LineString" && Array.isArray(geom.coordinates)) {
+      return geom.coordinates;
+    }
+    if (geom.type === "Point" && Array.isArray(geom.coordinates)) {
+      return geom.coordinates;
+    }
+    return null;
+  }
+
+  function parseIncidentCoords(item) {
+    const rawCoords = item?.geometry?.coordinates;
+    if (!rawCoords) return { lat: null, lng: null };
+    if (Array.isArray(rawCoords) && rawCoords.length > 0) {
+      if (Array.isArray(rawCoords[0])) {
+        const first = rawCoords[0];
+        return { lng: first[0] ?? null, lat: first[1] ?? null };
+      } else {
+        return { lng: rawCoords[0] ?? null, lat: rawCoords[1] ?? null };
+      }
+    }
+    return { lat: null, lng: null };
+  }
+
   return {
     provider: "tomtom",
     requestId,
@@ -255,13 +293,18 @@ async function runTomTom() {
     corridor: "Timișoara validation corridor",
     mode: "traffic",
     segments: flowItems,
-    incidents: incidentsItems.map((item, index) => ({
-      incidentId: item?.id ?? item?.properties?.iconCategory ?? `tomtom-incident-${index}`,
-      kind: item?.properties?.iconCategory ?? item?.type ?? "incident",
-      description: item?.properties?.description ?? undefined,
-      severity: item?.properties?.magnitudeOfDelay ?? undefined,
-      geometry: item?.geometry?.coordinates ? item.geometry.coordinates : undefined,
-    })),
+    incidents: incidentsItems.map((item, index) => {
+      const { lng, lat } = parseIncidentCoords(item);
+      return {
+        incidentId: item?.id ?? item?.properties?.iconCategory ?? `tomtom-incident-${index}`,
+        kind: item?.properties?.iconCategory ?? item?.type ?? "incident",
+        description: item?.properties?.description ?? undefined,
+        severity: item?.properties?.magnitudeOfDelay ?? undefined,
+        geometry: extractCoordinates(item?.geometry) ?? undefined,
+        lat,
+        lng,
+      };
+    }),
     rawStored: true,
     raw: { incidents },
     transactionCount: samplePoints.length + 1,

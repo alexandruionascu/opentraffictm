@@ -1201,77 +1201,75 @@ export function LiveMap({
       try {
         const url =
           probeSource === "tomtom"
-            ? `/data/traffic-validation/providers/tomtom/latest.json?t=${Date.now()}`
+            ? `/data/traffic-live/tomtom-live-geojson.json?t=${Date.now()}`
             : `/data/sources/stpt-live/latest-vehicles.json?t=${Date.now()}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error("traffic snapshot unavailable");
         const json = await response.json();
 
         if (probeSource === "tomtom") {
-          const snapshot = json as {
-            segments?: Array<{
-              segmentId?: string;
-              roadName?: string;
-              speedKph?: number;
-              delaySeconds?: number;
-              congestionLevel?: string;
-              geometry?: [number, number][];
+          const geojson = json as {
+            features?: Array<{
+              properties?: {
+                roadId?: string;
+                speed?: number;
+                freeFlow?: number;
+                congestionLevel?: string;
+                delaySeconds?: string | number;
+                frc?: string;
+                roadClosure?: boolean;
+                probeKey?: string;
+              };
+              geometry?: {
+                type?: string;
+                coordinates?: [number, number][];
+              };
             }>;
-            incidents?: Array<{ incidentId?: string; kind?: string; geometry?: [number, number][] }>;
           };
           const lines: LineCollection["features"] = [];
-          const features: PointCollection["features"] = [
-            ...(snapshot.segments ?? []).map((segment, index) => {
-              const coords = (segment.geometry ?? []).filter(
-                (coord): coord is [number, number] => Array.isArray(coord) && coord.length === 2,
-              );
-              if (coords.length >= 2) {
-                lines.push({
-                  type: "Feature" as const,
-                  properties: {
-                    kind: "flow",
-                    probeKey: `flow:${segment.segmentId ?? index}`,
-                    route: segment.roadName ?? segment.segmentId ?? `segment-${index}`,
-                    speed: segment.speedKph ?? 0,
-                    delaySeconds: segment.delaySeconds ?? 0,
-                    congestionLevel: segment.congestionLevel ?? "unknown",
-                  },
-                  geometry: {
-                    type: "LineString" as const,
-                    coordinates: coords,
-                  },
-                });
-              }
-              const pointCoord = coords[Math.floor((coords.length - 1) / 2)] ?? [scenario.center.lng, scenario.center.lat];
-              return {
+          const features: PointCollection["features"] = [];
+
+          for (const feature of geojson.features ?? []) {
+            const coords = feature.geometry?.coordinates ?? [];
+            const props = feature.properties ?? {};
+            const probeKey = props.probeKey ?? props.roadId ?? "unknown";
+            const speed = props.speed ?? 0;
+
+            if (coords.length >= 2) {
+              lines.push({
                 type: "Feature" as const,
                 properties: {
                   kind: "flow",
-                  probeKey: `flow:${segment.segmentId ?? index}`,
-                  route: segment.roadName ?? segment.segmentId ?? `segment-${index}`,
-                  speed: segment.speedKph ?? 0,
+                  probeKey,
+                  route: props.roadId ?? "road",
+                  speed,
+                  delaySeconds: typeof props.delaySeconds === "string" ? parseFloat(props.delaySeconds) : (props.delaySeconds ?? 0),
+                  congestionLevel: props.congestionLevel ?? "unknown",
                 },
                 geometry: {
-                  type: "Point" as const,
-                  coordinates: pointCoord,
+                  type: "LineString" as const,
+                  coordinates: coords,
                 },
-              };
-            }),
-            ...(snapshot.incidents ?? []).map((incident, index) => ({
+              });
+            }
+
+            const midIdx = Math.floor((coords.length - 1) / 2);
+            const pointCoord = coords[midIdx] ?? [21.215, 45.75];
+            features.push({
               type: "Feature" as const,
               properties: {
-                kind: "incident",
-                probeKey: `incident:${incident.incidentId ?? index}`,
-                route: incident.kind ?? incident.incidentId ?? `incident-${index}`,
-                speed: 0,
+                kind: "flow",
+                probeKey,
+                route: props.roadId ?? "road",
+                speed,
               },
               geometry: {
                 type: "Point" as const,
-                coordinates:
-                  incident.geometry?.[0] ?? incident.geometry?.[1] ?? [scenario.center.lng, scenario.center.lat],
+                coordinates: pointCoord,
               },
-            })),
-          ];
+            });
+          }
+
           if (!disposed) {
             setStptVehicles({ type: "FeatureCollection", features });
             setTomtomFlowLines({ type: "FeatureCollection", features: lines });

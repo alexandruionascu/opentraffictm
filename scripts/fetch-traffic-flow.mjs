@@ -44,6 +44,27 @@ const routes = [
   { id: "rt-008", name: "Modei-Sagetii", from: { lat: 45.7289, lng: 21.2234 }, to: { lat: 45.7543, lng: 21.2387 } },
 ];
 
+async function fetchJsonWithRetry(url, retries = 2, delayMs = 500) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          accept: "application/json",
+          "user-agent": "OpenTrafficTM traffic flow collector",
+        },
+      });
+      if (!response.ok) {
+        const body = await response.text().catch(() => "");
+        throw new Error(`Fetch failed ${response.status} ${response.statusText}: ${url}\n${body.slice(0, 200)}`);
+      }
+      return response.json();
+    } catch (err) {
+      if (attempt === retries) throw err;
+      await new Promise((resolve) => setTimeout(resolve, delayMs * Math.pow(2, attempt)));
+    }
+  }
+}
+
 async function fetchJson(url) {
   const response = await fetch(url, {
     headers: {
@@ -138,7 +159,7 @@ async function fetchFlowPoint(apiKey, point, relative) {
   url.searchParams.set("point", `${point.lat},${point.lng}`);
   url.searchParams.set("unit", unit);
   url.searchParams.set("openLr", "false");
-  return fetchJson(url);
+  return fetchJsonWithRetry(url.toString());
 }
 
 async function fetchIncidents(apiKey) {
@@ -148,7 +169,7 @@ async function fetchIncidents(apiKey) {
   url.searchParams.set("fields", "{incidents{type,geometry{type,coordinates},properties{iconCategory}}}");
   url.searchParams.set("language", "en-GB");
   url.searchParams.set("timeValidityFilter", "present");
-  return fetchJson(url);
+  return fetchJsonWithRetry(url.toString());
 }
 
 async function main() {
@@ -181,29 +202,38 @@ async function main() {
     const slotTime = new Date(Number(y), Number(mo) - 1, Number(d), slot.hour, slot.minute);
     const slotLabel = slot.label;
 
-    for (const point of samplePoints) {
-      try {
-        const [relData, absData] = await Promise.all([
-          fetchFlowPoint(apiKey, point, true),
-          fetchFlowPoint(apiKey, point, false),
-        ]);
+    const batchSize = 5;
+    for (let b = 0; b < samplePoints.length; b += batchSize) {
+      const batch = samplePoints.slice(b, b + batchSize);
+      const batchResults = await Promise.all(
+        batch.map(async (point) => {
+          try {
+            const [relData, absData] = await Promise.all([
+              fetchFlowPoint(apiKey, point, true),
+              fetchFlowPoint(apiKey, point, false),
+            ]);
+            const relRecords = normalizeFlowSegment(relData, point.id, slotTime, slot.hour);
+            const absRecords = normalizeFlowSegment(absData, point.id, slotTime, slot.hour);
+            relRecords.forEach((r) => (r.measurementMode = "relative"));
+            absRecords.forEach((r) => (r.measurementMode = "absolute"));
+            return { point, relRecords, absRecords, error: null };
+          } catch (err) {
+            return { point, relRecords: [], absRecords: [], error: err };
+          }
+        })
+      );
 
-        const relRecords = normalizeFlowSegment(relData, point.id, slotTime, slot.hour);
-        const absRecords = normalizeFlowSegment(absData, point.id, slotTime, slot.hour);
-
-        relRecords.forEach((r) => (r.measurementMode = "relative"));
-        absRecords.forEach((r) => (r.measurementMode = "absolute"));
-
-        allFlowRecords.push(...relRecords, ...absRecords);
+      for (const result of batchResults) {
+        if (result.error) {
+          console.error(`\nFailed ${result.point.id} @ ${slotLabel}: ${result.error.message}`);
+          continue;
+        }
+        allFlowRecords.push(...result.relRecords, ...result.absRecords);
         txUsed += 2;
-
-        const speedInfo = relRecords[0]?.currentSpeedKph != null
-          ? `${relRecords[0].currentSpeedKph.toFixed(0)}/${relRecords[0]?.freeFlowSpeedKph?.toFixed(0)} kph [${relRecords[0]?.congestionLevel}]`
+        const speedInfo = result.relRecords[0]?.currentSpeedKph != null
+          ? `${result.relRecords[0].currentSpeedKph.toFixed(0)}/${result.relRecords[0]?.freeFlowSpeedKph?.toFixed(0)} kph [${result.relRecords[0]?.congestionLevel}]`
           : "no data";
-
-        process.stdout.write(`[${txUsed}/${samplePoints.length * 2 + 1}] ${slotLabel} ${point.id}: ${speedInfo}\n`);
-      } catch (err) {
-        console.error(`\nFailed ${point.id} @ ${slotLabel}: ${err.message}`);
+        process.stdout.write(`[${txUsed}/${samplePoints.length * 2 + 1}] ${slotLabel} ${result.point.id}: ${speedInfo}\n`);
       }
     }
   }

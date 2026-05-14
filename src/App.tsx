@@ -1,4 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import {
   datasets,
   leaderboards,
@@ -670,225 +672,276 @@ function AnalysisChart({ candidate }: { candidate?: TrafficLightIntersectionAnal
 }
 
 function TomTomTrafficPage() {
-  const [summary, setSummary] = useState<{
-    slotSummary: Array<{
-      label: string;
-      hour: number;
-      sampleCount: number;
-      avgSpeedKph: number | null;
-      avgSpeedRatio: number | null;
-      severe: number;
-      heavy: number;
-      moderate: number;
-      low: number;
+  const [roadData, setRoadData] = useState<{
+    features: Array<{
+      properties: { roadId: string; speed: number; freeFlow: number; congestionLevel: string; delaySeconds: string | number; frc: string; roadClosure: boolean };
+      geometry: { coordinates: [number, number][] };
     }>;
-    pointMatrix: Array<Record<string, string>>;
-    incidents: Array<{ id: string; type: string; lat: number | null; lng: number | null }>;
-    meta: { collectedAt: string; bbox: number[]; flowRecordCount: number; incidentCount: number };
+  } | null>(null);
+  const [osmData, setOsmData] = useState<{
+    roads: any[]; controls: any[];
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"summary" | "heatmap" | "incidents">("summary");
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<maplibregl.Map | null>(null);
+  const popupRef = useRef<maplibregl.Popup | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/data/traffic-flow/summary.json")
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelled) setSummary(data);
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load");
-      });
-    return () => {
-      cancelled = true;
-    };
+    fetch("/data/traffic-live/tomtom-live-geojson.json")
+      .then((r) => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
+      .then((data) => { if (!cancelled) setRoadData(data); })
+      .catch((err) => { if (!cancelled) setError(err.message); });
+    return () => { cancelled = true; };
   }, []);
 
-  if (error) {
-    return (
-      <main className="page">
-        <p className="eyebrow">TomTom</p>
-        <h1>Traffic flow data</h1>
-        <p style={{ color: "var(--danger)" }}>Error: {error}</p>
-      </main>
-    );
-  }
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      fetch("/data/osm/timisoara-roads.geojson").then(r => r.ok ? r.json() : Promise.resolve(null)),
+      fetch("/data/osm/timisoara-controls.geojson").then(r => r.ok ? r.json() : Promise.resolve(null)),
+    ]).then(([roads, controls]) => {
+      if (!cancelled) setOsmData({ roads: roads?.features ?? [], controls: controls?.features ?? [] });
+    });
+    return () => { cancelled = true; };
+  }, []);
 
-  if (!summary) {
-    return (
-      <main className="page">
-        <p className="eyebrow">TomTom</p>
-        <h1>Traffic flow data</h1>
-        <p>Loading...</p>
-      </main>
-    );
-  }
+  useEffect(() => {
+    if (!roadData || !mapRef.current) return;
+    if (mapInstanceRef.current) return;
 
-  const congestionColor: Record<string, string> = { S: "#c0392b", H: "#e67e22", M: "#f1c40f", L: "#27ae60" };
-  const congestionLabel: Record<string, string> = { S: "Severe", H: "Heavy", M: "Moderate", L: "Low" };
-  const timeSlotLabels = summary.slotSummary.map((s) => s.label);
-  const maxSevere = Math.max(...summary.slotSummary.map((s) => s.severe), 1);
+    const backgroundStyle: maplibregl.StyleSpecification = {
+      version: 8,
+      sources: {},
+      layers: [{ id: "background", type: "background", paint: { "background-color": "#06111d" } }],
+    };
+
+    const map = new maplibregl.Map({
+      container: mapRef.current,
+      style: backgroundStyle,
+      center: [21.215, 45.75],
+      zoom: 12,
+    });
+
+    map.on("load", () => {
+      // --- OSM base map (roads only) ---
+      if (osmData?.roads?.length) {
+        map.addSource("osm-roads", {
+          type: "geojson",
+          data: { type: "FeatureCollection", features: osmData.roads },
+        });
+        map.addLayer({
+          id: "osm-roads-minor",
+          type: "line",
+          source: "osm-roads",
+          filter: ["<", ["get", "rank"], 5],
+          paint: {
+            "line-color": "rgba(112, 144, 168, 0.42)",
+            "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.25, 13, 0.75, 16, 2.2],
+          },
+        });
+        map.addLayer({
+          id: "osm-roads-major-halo",
+          type: "line",
+          source: "osm-roads",
+          filter: [">=", ["get", "rank"], 5],
+          paint: {
+            "line-color": "rgba(8, 18, 30, 0.9)",
+            "line-width": ["interpolate", ["linear"], ["zoom"], 10, 2.4, 13, 5.5, 16, 12],
+          },
+        });
+        map.addLayer({
+          id: "osm-roads-major",
+          type: "line",
+          source: "osm-roads",
+          filter: [">=", ["get", "rank"], 5],
+          paint: {
+            "line-color": [
+              "interpolate", ["linear"], ["get", "rank"],
+              5, "#8aa7bb",
+              7, "#65d6ff",
+              9, "#ffd166",
+            ],
+            "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1, 13, 2.4, 16, 6],
+            "line-opacity": 0.92,
+          },
+        });
+        // OSM road name labels — rendered below TomTom overlay
+        map.addLayer({
+          id: "osm-road-labels",
+          type: "symbol",
+          source: "osm-roads",
+          minzoom: 13.5,
+          layout: {
+            "symbol-placement": "line",
+            "text-field": ["coalesce", ["get", "name"], ""],
+            "text-size": 11,
+            "text-font": ["Open Sans Regular"],
+            "text-letter-spacing": 0.4,
+          },
+          paint: {
+            "text-color": "#94a3b8",
+            "text-halo-color": "#06111d",
+            "text-halo-width": 1.5,
+          },
+        });
+      }
+
+      // --- TomTom traffic overlay ---
+      map.addSource("tomtom-traffic", {
+        type: "geojson",
+        data: roadData,
+      });
+
+      // Glow layer (below road lines)
+      map.addLayer({
+        id: "road-lines-glow",
+        type: "line",
+        source: "tomtom-traffic",
+        paint: {
+          "line-color": [
+            "match", ["get", "congestionLevel"],
+            "severe", "#ef4444",
+            "heavy", "#f97316",
+            "moderate", "#eab308",
+            "low", "#22c55e",
+            "#64748b",
+          ],
+          "line-width": 8,
+          "line-opacity": 0.25,
+          "line-blur": 4,
+        },
+      });
+
+      // TomTom road lines
+      map.addLayer({
+        id: "road-lines",
+        type: "line",
+        source: "tomtom-traffic",
+        paint: {
+          "line-color": [
+            "match", ["get", "congestionLevel"],
+            "severe", "#ef4444",
+            "heavy", "#f97316",
+            "moderate", "#eab308",
+            "low", "#22c55e",
+            "#64748b",
+          ],
+          "line-width": ["case", ["get", "roadClosure"], 5, 3],
+          "line-opacity": 0.85,
+        },
+      });
+
+      // TomTom labels — use probeKey (more stable identifier)
+      map.addLayer({
+        id: "tomtom-road-labels",
+        type: "symbol",
+        source: "tomtom-traffic",
+        minzoom: 11,
+        layout: {
+          "symbol-placement": "line",
+          "text-field": ["get", "probeKey"],
+          "text-size": 10,
+          "text-font": ["Open Sans Regular"],
+          "text-letter-spacing": 0.3,
+        },
+        paint: {
+          "text-color": "#e2e8f0",
+          "text-halo-color": "#0b0f14",
+          "text-halo-width": 2,
+        },
+      });
+
+      // Invisible wide hitbox — always on top, for reliable click detection
+      map.addLayer({
+        id: "road-lines-hitbox",
+        type: "line",
+        source: "tomtom-traffic",
+        paint: {
+          "line-width": 16,
+          "line-opacity": 0,
+        },
+      });
+
+      // --- Interaction handlers (always registered, outside conditional) ---
+      map.on("click", "road-lines-hitbox", (e) => {
+        if (!e.features?.length) return;
+        const f = e.features[0];
+        const props = f.properties ?? {};
+        const coords = (f.geometry as any).coordinates;
+        const midIdx = Math.floor((coords.length - 1) / 2);
+        const mid = coords[midIdx] ?? coords[0];
+        const delaySeconds = typeof props.delaySeconds === "string" ? parseFloat(props.delaySeconds) : (props.delaySeconds ?? 0);
+        const congestionLevel = props.congestionLevel ?? "unknown";
+        const congestionColors: Record<string, string> = {
+          severe: "#ef4444", heavy: "#f97316", moderate: "#eab308", low: "#22c55e", unknown: "#94a3b8",
+        };
+        if (popupRef.current) popupRef.current.remove();
+        popupRef.current = new maplibregl.Popup({ closeButton: true, closeOnClick: true, maxWidth: "300px" })
+          .setLngLat([mid[0], mid[1]])
+          .setHTML(`
+            <div style="font-family:system-ui,sans-serif;padding:6px;min-width:220px">
+              <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:#e2e8f0">${props.probeKey ?? props.roadId ?? "road"}</div>
+              <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12px;color:#94a3b8">
+                <span>Speed</span><span style="color:#e2e8f0">${props.speed ?? 0} km/h</span>
+                <span>Free flow</span><span style="color:#e2e8f0">${props.freeFlow ?? 0} km/h</span>
+                <span>Delay</span><span style="color:#e2e8f0">${delaySeconds.toFixed(1)} s</span>
+                <span>Congestion</span><span style="color:${congestionColors[congestionLevel]};font-weight:600;text-transform:capitalize">${congestionLevel}</span>
+                <span>FRC</span><span style="color:#e2e8f0">${props.frc ?? "—"}</span>
+                <span>Closed</span><span style="color:${props.roadClosure ? "#ef4444" : "#22c55e"};font-weight:600">${props.roadClosure ? "Yes" : "No"}</span>
+              </div>
+            </div>
+          `)
+          .addTo(map);
+      });
+      map.on("mouseenter", "road-lines-hitbox", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "road-lines-hitbox", () => { map.getCanvas().style.cursor = ""; });
+    });
+
+    mapInstanceRef.current = map;
+    return () => {
+      map.remove();
+      mapInstanceRef.current = null;
+    };
+  }, [roadData, osmData]);
+
+  const congestionLabel: Record<string, string> = { severe: "Severe", heavy: "Heavy", moderate: "Moderate", low: "Low" };
+  const congestionColor: Record<string, string> = { severe: "#ef4444", heavy: "#f97316", moderate: "#eab308", low: "#22c55e" };
+
+  const counts = roadData
+    ? roadData.features.reduce((acc: Record<string, number>, f) => {
+        const lvl = f.properties?.congestionLevel ?? "unknown";
+        acc[lvl] = (acc[lvl] ?? 0) + 1;
+        return acc;
+      }, {})
+    : {};
 
   return (
-    <main className="page">
-      <div className="page-intro">
-        <p className="eyebrow">TomTom Traffic API</p>
-        <h1>Flow segment data — Timișoara</h1>
-        <p>{summary.meta.flowRecordCount} records · {summary.meta.incidentCount} incidents · collected {summary.meta.collectedAt}</p>
-      </div>
-
-      <div className="toolbar">
-        <div className="sheet-tabs" role="tablist">
-          {(["summary", "heatmap", "incidents"] as const).map((tab) => (
-            <button
-              key={tab}
-              className={activeTab === tab ? "sheet-tab active" : "sheet-tab"}
-              onClick={() => setActiveTab(tab)}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === tab}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+    <main className="page" style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
+      <div style={{ padding: "16px 24px", borderBottom: "1px solid #1e293b", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <div>
+          <p className="eyebrow">TomTom Traffic API</p>
+          <h1 style={{ fontSize: 20, margin: 0 }}>Live roads — Timișoara</h1>
         </div>
-        <a className="btn secondary" href="/map">
-          View on map
-        </a>
-        <button
-          className="btn secondary"
-          onClick={() => {
-            const a = document.createElement("a");
-            a.href = "/data/traffic-flow/tomtom-latest.json";
-            a.download = "tomtom-flow-latest.json";
-            a.click();
-          }}
-          type="button"
-        >
-          Download JSON
-        </button>
-      </div>
-
-      {activeTab === "summary" && (
-        <section>
-          <div className="tomtom-summary-grid">
-            {summary.slotSummary.map((slot) => (
-              <div key={slot.label} className="tomtom-slot-card">
-                <div className="tomtom-slot-header">
-                  <strong>{slot.label}</strong>
-                  <span style={{ fontFamily: "monospace", fontSize: 11 }}>{slot.hour}:00</span>
-                </div>
-                <div className="tomtom-slot-metric">
-                  <span className="tomtom-big-value">{slot.avgSpeedKph ?? "—"}</span>
-                  <span className="tomtom-unit">km/h avg</span>
-                </div>
-                <div className="tomtom-slot-metric">
-                  <span className="tomtom-big-value">{slot.avgSpeedRatio ?? "—"}</span>
-                  <span className="tomtom-unit">speed ratio</span>
-                </div>
-                <div className="tomtom-congestion-bar">
-                  <div className="bar-segment" style={{ background: "#c0392b", flex: slot.severe / maxSevere, minWidth: 4 }} title={`Severe: ${slot.severe}`} />
-                  <div className="bar-segment" style={{ background: "#e67e22", flex: slot.heavy / maxSevere }} title={`Heavy: ${slot.heavy}`} />
-                  <div className="bar-segment" style={{ background: "#f1c40f", flex: slot.moderate / maxSevere }} title={`Moderate: ${slot.moderate}`} />
-                  <div className="bar-segment" style={{ background: "#27ae60", flex: slot.low / maxSevere }} title={`Low: ${slot.low}`} />
-                </div>
-                <div className="tomtom-legend">
-                  {(["S", "H", "M", "L"] as const).map((key) => (
-                    <span key={key} className="tomtom-legend-item">
-                      <span style={{ background: congestionColor[key], borderRadius: 2, display: "inline-block", height: 8, width: 8 }} />
-                      {key}={slot[key === "S" ? "severe" : key === "H" ? "heavy" : key === "M" ? "moderate" : "low"]}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 20, display: "flex", gap: 20, flexWrap: "wrap" }}>
-            {Object.entries(congestionLabel).map(([key, label]) => (
-              <div key={key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 14, height: 14, borderRadius: 3, background: congestionColor[key] }} />
-                <span style={{ fontSize: 12 }}>
-                  {label} ({key}) — ratio {key === "S" ? "<0.4" : key === "H" ? "0.4–0.65" : key === "M" ? "0.65–0.85" : "≥0.85"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {activeTab === "heatmap" && (
-        <section>
-          <p className="lede" style={{ marginBottom: 16 }}>
-            Congestion level per sample point. Rows = 5×5 grid (p-1-1 SW, p-5-5 NE). Columns = time slots.
-          </p>
-          <div className="heatmap-grid" style={{ fontSize: 11 }}>
-            <div className="heatmap-row heatmap-header" style={{ gridTemplateColumns: "56px repeat(6, 1fr)" }}>
-              <span className="heatmap-cell">Point</span>
-              {timeSlotLabels.map((l) => (
-                <span key={l} className="heatmap-cell" style={{ fontSize: 9 }}>
-                  {l.replace("-rush", "").replace("afternoon-", "PM ").replace("morning-", "AM ").replace("mid-", "")}
-                </span>
-              ))}
-            </div>
-            {summary.pointMatrix.map((row) => (
-              <div key={row.pointId} className="heatmap-row" style={{ gridTemplateColumns: "56px repeat(6, 1fr)" }}>
-                <span className="heatmap-cell heatmap-point" style={{ fontSize: 10 }}>{row.pointId}</span>
-                {timeSlotLabels.map((l) => {
-                  const val = row[l] ?? "-";
-                  return (
-                    <span
-                      key={l}
-                      className="heatmap-cell"
-                      style={{
-                        background: val === "-" ? "#1a1a1a" : congestionColor[val] ?? "#1a1a1a",
-                        color: val !== "-" ? "white" : "#666",
-                        fontWeight: "700",
-                        fontSize: 12,
-                      }}
-                      title={`${row.pointId} @ ${l}: ${val === "-" ? "no data" : congestionLabel[val] ?? val}`}
-                    >
-                      {val}
-                    </span>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 16, display: "flex", gap: 16, flexWrap: "wrap" }}>
+        {roadData && (
+          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
             {Object.entries(congestionLabel).map(([key, label]) => (
               <div key={key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ width: 18, height: 18, borderRadius: 4, background: congestionColor[key] }} />
-                <span style={{ fontSize: 12 }}>{label}</span>
+                <div style={{ width: 12, height: 12, borderRadius: 2, background: congestionColor[key] }} />
+                <span style={{ fontSize: 12, color: "#94a3b8" }}>
+                  {label} ({counts[key] ?? 0})
+                </span>
               </div>
             ))}
           </div>
-        </section>
-      )}
-
-      {activeTab === "incidents" && (
-        <section>
-          <p className="lede" style={{ marginBottom: 16 }}>
-            {summary.incidents.length} incidents — bbox [{summary.meta.bbox.join(", ")}]
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
-            {summary.incidents.map((inc) => (
-              <div key={inc.id} className="panel" style={{ padding: "12px 16px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <strong style={{ fontFamily: "monospace", fontSize: 12 }}>{inc.id}</strong>
-                  <span style={{
-                    background: inc.type === "closure" ? "#c0392b" : inc.type === "roadwork" ? "#e67e22" : "#7cffb2",
-                    borderRadius: 999, color: "#03070d", fontSize: 10, fontWeight: 700, padding: "2px 8px",
-                  }}>
-                    {inc.type}
-                  </span>
-                </div>
-                <div style={{ marginTop: 6, fontFamily: "monospace", fontSize: 11, color: "var(--muted)" }}>
-                  {inc.lat != null ? `${inc.lat.toFixed(5)}, ${inc.lng?.toFixed(5)}` : "no coordinates"}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        )}
+      </div>
+      {error ? (
+        <div style={{ padding: 24, color: "var(--danger)" }}>Error loading: {error}</div>
+      ) : !roadData ? (
+        <div style={{ padding: 24, color: "#64748b" }}>Loading...</div>
+      ) : (
+        <div ref={mapRef} style={{ flex: 1, minHeight: 0 }} />
       )}
     </main>
   );
