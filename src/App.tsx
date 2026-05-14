@@ -20,6 +20,7 @@ import {
   type TrafficProviderAdapter,
   type ValidationResult,
 } from "./traffic-validation";
+import { TrafficLightInferenceApp } from "./traffic-light/TrafficLightInferenceApp";
 import type {
   TrafficLightIntersectionAnalysis,
   TrafficLightProbeExportManifest,
@@ -115,7 +116,7 @@ export function App() {
       {path === "/datasets" ? <DatasetsPage /> : null}
       {path === "/sources" ? <SourcesPage /> : null}
       {path === "/validation" ? <ValidationPage /> : null}
-      {path === "/traffic-lights" ? <TrafficLightIntersectionPage /> : null}
+      {path === "/traffic-lights" ? <TrafficLightInferenceApp /> : null}
       {path === "/tomtom" ? <TomTomTrafficPage /> : null}
       {path === "/sheet" ? <SpreadsheetPage /> : null}
       {path === "/scenarios" ? <ScenariosPage /> : null}

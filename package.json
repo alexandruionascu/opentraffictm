@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "npm run build:timelines && tsc && vite build",
+    "build": "npm run build:timelines && npm run build:traffic-lights && tsc && vite build",
     "build:timelines": "node scripts/build-simulation-timelines.mjs",
+    "build:traffic-lights": "node scripts/build-traffic-light-inference.mjs",
     "fetch:stpt-live": "node scripts/fetch-stpt-live.mjs",
     "fetch:timisoara-open-data": "node scripts/fetch-timisoara-open-data.mjs",
     "fetch:timisoara-road-closures": "node scripts/fetch-timisoara-road-closures.mjs",
@@ -19,15 +20,18 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",
+    "better-sqlite3": "^9.4.3",
+    "cheerio": "^1.0.0",
+    "leaflet": "^1.9.4",
     "maplibre-gl": "^5.24.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.9.0",
-    "vite": "^7.0.0",
-    "better-sqlite3": "^9.4.3",
-    "cheerio": "^1.0.0"
+    "vite": "^7.0.0"
   },
   "devDependencies": {
+    "esbuild": "^0.27.7",
+    "@types/leaflet": "^1.9.21",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0"
   }
