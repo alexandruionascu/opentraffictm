@@ -5,63 +5,63 @@
  * Also fetches and caches static data: stations, line configs, routes, legends.
  */
 
-import Database from 'better-sqlite3';
-import * as cheerio from 'cheerio';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { readFileSync, existsSync } from 'fs';
-import { createRequire } from 'module';
+import Database from "better-sqlite3";
+import * as cheerio from "cheerio";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import { readFileSync, existsSync } from "fs";
+import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const BASE_URL = 'https://live.stpt.ro';
+const BASE_URL = "https://live.stpt.ro";
 const VEHICLES_URL = `${BASE_URL}/gtfs-vehicles.php`;
 const POLL_INTERVAL = 5;
-const DB_PATH = join(__dirname, '../data/stpt.db');
+const DB_PATH = join(__dirname, "../data/stpt.db");
 const REQUEST_TIMEOUT = 10000;
 const STATIC_REFRESH_HOURS = 24;
 const STATIC_CHECK_INTERVAL = 17280;
 
 const COLORS = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  dim: '\x1b[2m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-  white: '\x1b[37m',
-  gray: '\x1b[90m'
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  dim: "\x1b[2m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+  white: "\x1b[37m",
+  gray: "\x1b[90m",
 };
 
 function formatTime(date) {
   return date.toISOString();
 }
 
-function log(message, level = 'INFO') {
+function log(message, level = "INFO") {
   const timestamp = formatTime(new Date());
   let prefix, color;
 
   switch (level) {
-    case 'DEBUG':
-      prefix = '[DBG]';
+    case "DEBUG":
+      prefix = "[DBG]";
       color = COLORS.gray;
       break;
-    case 'INFO':
-      prefix = '[INF]';
+    case "INFO":
+      prefix = "[INF]";
       color = COLORS.green;
       break;
-    case 'WARN':
-      prefix = '[WRN]';
+    case "WARN":
+      prefix = "[WRN]";
       color = COLORS.yellow;
       break;
-    case 'ERROR':
-      prefix = '[ERR]';
+    case "ERROR":
+      prefix = "[ERR]";
       color = COLORS.red;
       break;
     default:
@@ -78,10 +78,10 @@ function log(message, level = 'INFO') {
 }
 
 function logSection(title) {
-  const separator = '─'.repeat(60);
-  log(separator, 'DEBUG');
-  log(title, 'INFO');
-  log(separator, 'DEBUG');
+  const separator = "─".repeat(60);
+  log(separator, "DEBUG");
+  log(title, "INFO");
+  log(separator, "DEBUG");
 }
 
 function nowISO() {
@@ -196,18 +196,18 @@ function initDB(db) {
       discovered_at TEXT NOT NULL
     )
   `);
-
-
 }
 
 function loadLastKnown(db) {
-  const rows = db.prepare('SELECT vehicle_id, lat, lng, server_timestamp FROM last_known').all();
+  const rows = db
+    .prepare("SELECT vehicle_id, lat, lng, server_timestamp FROM last_known")
+    .all();
   const result = new Map();
   for (const row of rows) {
     result.set(row.vehicle_id, {
       lat: row.lat,
       lng: row.lng,
-      server_timestamp: row.server_timestamp
+      server_timestamp: row.server_timestamp,
     });
   }
   return result;
@@ -215,9 +215,8 @@ function loadLastKnown(db) {
 
 function saveLastKnown(db, vehicleId, lat, lng, serverTimestamp) {
   db.prepare(
-    'INSERT OR REPLACE INTO last_known (vehicle_id, lat, lng, server_timestamp, updated_at) VALUES (?, ?, ?, ?, ?)'
+    "INSERT OR REPLACE INTO last_known (vehicle_id, lat, lng, server_timestamp, updated_at) VALUES (?, ?, ?, ?, ?)",
   ).run(vehicleId, lat, lng, serverTimestamp, nowISO());
-
 }
 
 function insertPosition(db, vehicle) {
@@ -225,7 +224,7 @@ function insertPosition(db, vehicle) {
     `INSERT INTO vehicle_positions
      (id, route, direction_id, lat, lng, bearing, speed,
       headsign, stop_name, is_accessible, server_timestamp, recorded_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     vehicle.id,
     vehicle.route,
@@ -238,12 +237,17 @@ function insertPosition(db, vehicle) {
     vehicle.stop || null,
     vehicle.isAccessible ? 1 : 0,
     vehicle.timestamp || null,
-    nowISO()
+    nowISO(),
   );
-
 }
 
-async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 1000, retryOnError = true) {
+async function fetchWithRetry(
+  url,
+  options = {},
+  retries = 3,
+  delayMs = 1000,
+  retryOnError = true,
+) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const controller = new AbortController();
@@ -251,7 +255,7 @@ async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 1000, re
 
       const response = await fetch(url, {
         ...options,
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeout);
@@ -269,8 +273,11 @@ async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 1000, re
       return response;
     } catch (error) {
       if (attempt === retries || !retryOnError) throw error;
-      log(`Fetch attempt ${attempt}/${retries} failed: ${error.message}`, 'WARN');
-      await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+      log(
+        `Fetch attempt ${attempt}/${retries} failed: ${error.message}`,
+        "WARN",
+      );
+      await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
     }
   }
 }
@@ -281,9 +288,10 @@ async function fetchVehicles() {
     const data = await response.json();
     return { vehicles: data?.data?.vehicles || [], error: null };
   } catch (error) {
-    const errorMsg = error.name === 'AbortError'
-      ? 'Request timed out'
-      : `Network error: ${error.message}`;
+    const errorMsg =
+      error.name === "AbortError"
+        ? "Request timed out"
+        : `Network error: ${error.message}`;
     return { vehicles: null, error: errorMsg };
   }
 }
@@ -301,7 +309,7 @@ async function fetchStations() {
 async function fetchLineConfig(line) {
   try {
     const response = await fetchWithRetry(
-      `${BASE_URL}/linii-config-json.php?line=${encodeURIComponent(line)}&v=1`
+      `${BASE_URL}/linii-config-json.php?line=${encodeURIComponent(line)}&v=1`,
     );
     const config = await response.json();
     return { data: config, error: null };
@@ -312,7 +320,9 @@ async function fetchLineConfig(line) {
 
 async function fetchLineEndpoints() {
   try {
-    const response = await fetchWithRetry(`${BASE_URL}/routes/capeti-linie.json`);
+    const response = await fetchWithRetry(
+      `${BASE_URL}/routes/capeti-linie.json`,
+    );
     const endpoints = await response.json();
     return { data: endpoints, error: null };
   } catch (err) {
@@ -322,15 +332,21 @@ async function fetchLineEndpoints() {
 
 async function fetchLegends(line) {
   try {
-    const response = await fetchWithRetry(`${BASE_URL}/routes/legends/${line}.json`, {}, 1, 1000, false);
+    const response = await fetchWithRetry(
+      `${BASE_URL}/routes/legends/${line}.json`,
+      {},
+      1,
+      1000,
+      false,
+    );
     if (response.status === 404) {
-      return { data: null, error: 'not_found' };
+      return { data: null, error: "not_found" };
     }
     const legend = await response.json();
     return { data: legend, error: null };
   } catch (err) {
-    if (err.message.includes('404')) {
-      return { data: null, error: 'not_found' };
+    if (err.message.includes("404")) {
+      return { data: null, error: "not_found" };
     }
     return { data: null, error: err.message };
   }
@@ -340,16 +356,19 @@ async function fetchRouteGeometry(line, direction) {
   try {
     const response = await fetchWithRetry(
       `${BASE_URL}/routes/${line}-${direction}.geojson`,
-      {}, 1, 1000, false
+      {},
+      1,
+      1000,
+      false,
     );
     if (response.status === 404) {
-      return { data: null, error: 'not_found' };
+      return { data: null, error: "not_found" };
     }
     const data = await response.json();
     return { data, error: null };
   } catch (err) {
-    if (err.message.includes('404')) {
-      return { data: null, error: 'not_found' };
+    if (err.message.includes("404")) {
+      return { data: null, error: "not_found" };
     }
     return { data: null, error: err.message };
   }
@@ -363,18 +382,18 @@ async function discoverLinesFromHTML() {
     const $ = cheerio.load(html);
     const lines = [];
 
-    $('a.linie-btn').each((_, el) => {
-      const href = $(el).attr('href');
+    $("a.linie-btn").each((_, el) => {
+      const href = $(el).attr("href");
       const match = href?.match(/linie=([^&]+)/);
       const line = match ? match[1] : $(el).text();
-      if (line && line !== '0' && line !== 'all') {
+      if (line && line !== "0" && line !== "all") {
         lines.push(line.trim());
       }
     });
 
     if (lines.length === 0) {
-      log('Could not find any .linie-btn links in main page', 'WARN');
-      return { lines: [], error: 'no_linie_btn_found' };
+      log("Could not find any .linie-btn links in main page", "WARN");
+      return { lines: [], error: "no_linie_btn_found" };
     }
 
     return { lines: [...new Set(lines)], error: null };
@@ -384,15 +403,18 @@ async function discoverLinesFromHTML() {
 }
 
 function getStaticMeta(db, dataType) {
-  const row = db.prepare('SELECT last_updated, record_count FROM static_meta WHERE data_type = ?').get(dataType);
+  const row = db
+    .prepare(
+      "SELECT last_updated, record_count FROM static_meta WHERE data_type = ?",
+    )
+    .get(dataType);
   return row || null;
 }
 
 function setStaticMeta(db, dataType, recordCount) {
   db.prepare(
-    'INSERT OR REPLACE INTO static_meta (data_type, last_updated, record_count) VALUES (?, ?, ?)'
+    "INSERT OR REPLACE INTO static_meta (data_type, last_updated, record_count) VALUES (?, ?, ?)",
   ).run(dataType, nowISO(), recordCount);
-
 }
 
 function isStale(lastUpdated, hours = STATIC_REFRESH_HOURS) {
@@ -413,30 +435,33 @@ function formatDuration(ms) {
 }
 
 async function loadStations(db) {
-  log('Fetching stations...', 'INFO');
-  const meta = getStaticMeta(db, 'stations');
+  log("Fetching stations...", "INFO");
+  const meta = getStaticMeta(db, "stations");
 
   if (meta && !isStale(meta.last_updated)) {
-    log(`Stations: up-to-date (${meta.record_count} stations, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`, 'INFO');
+    log(
+      `Stations: up-to-date (${meta.record_count} stations, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`,
+      "INFO",
+    );
     return;
   }
 
   const { data: stations, error } = await fetchStations();
 
   if (error) {
-    log(`Stations: failed to fetch - ${error}`, 'ERROR');
+    log(`Stations: failed to fetch - ${error}`, "ERROR");
     return;
   }
 
   const insertStmt = db.prepare(
-    'INSERT OR REPLACE INTO stations (id, name, lat, lng, address, raw_json) VALUES (?, ?, ?, ?, ?, ?)'
+    "INSERT OR REPLACE INTO stations (id, name, lat, lng, address, raw_json) VALUES (?, ?, ?, ?, ?, ?)",
   );
 
   const transaction = db.transaction(() => {
-    db.prepare('DELETE FROM stations').run();
+    db.prepare("DELETE FROM stations").run();
 
     let count = 0;
-    if (stations && typeof stations === 'object' && !Array.isArray(stations)) {
+    if (stations && typeof stations === "object" && !Array.isArray(stations)) {
       for (const [id, station] of Object.entries(stations)) {
         insertStmt.run(
           station.id || id,
@@ -444,46 +469,54 @@ async function loadStations(db) {
           station.lat || station.latitudine || null,
           station.lng || station.longitudine || null,
           station.address || station.adresa || null,
-          JSON.stringify(station)
+          JSON.stringify(station),
         );
         count++;
       }
     }
 
-    setStaticMeta(db, 'stations', count);
+    setStaticMeta(db, "stations", count);
     return count;
   });
 
   const count = transaction();
-  const duration = meta ? Date.now() - new Date(meta.last_updated).getTime() : 0;
-  log(`Stations: loaded ${count} stations, ${meta ? `refreshed after ${formatDuration(duration)}` : 'first load'}`, 'INFO');
+  const duration = meta
+    ? Date.now() - new Date(meta.last_updated).getTime()
+    : 0;
+  log(
+    `Stations: loaded ${count} stations, ${meta ? `refreshed after ${formatDuration(duration)}` : "first load"}`,
+    "INFO",
+  );
 }
 
 async function loadLineEndpoints(db) {
-  log('Fetching line endpoints...', 'INFO');
-  const meta = getStaticMeta(db, 'line_endpoints');
+  log("Fetching line endpoints...", "INFO");
+  const meta = getStaticMeta(db, "line_endpoints");
 
   if (meta && !isStale(meta.last_updated)) {
-    log(`Line endpoints: up-to-date (${meta.record_count} lines, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`, 'INFO');
+    log(
+      `Line endpoints: up-to-date (${meta.record_count} lines, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`,
+      "INFO",
+    );
     return;
   }
 
   const { data: endpoints, error } = await fetchLineEndpoints();
 
   if (error) {
-    log(`Line endpoints: failed to fetch - ${error}`, 'ERROR');
+    log(`Line endpoints: failed to fetch - ${error}`, "ERROR");
     return;
   }
 
   const insertStmt = db.prepare(
-    'INSERT OR REPLACE INTO line_endpoints (line, tur, retur, raw_json) VALUES (?, ?, ?, ?)'
+    "INSERT OR REPLACE INTO line_endpoints (line, tur, retur, raw_json) VALUES (?, ?, ?, ?)",
   );
 
   const transaction = db.transaction(() => {
-    db.prepare('DELETE FROM line_endpoints').run();
+    db.prepare("DELETE FROM line_endpoints").run();
 
     let count = 0;
-    if (endpoints && typeof endpoints === 'object') {
+    if (endpoints && typeof endpoints === "object") {
       for (const [line, ep] of Object.entries(endpoints)) {
         const tur = ep?.tur || ep?.[0] || null;
         const retur = ep?.retur || ep?.[1] || null;
@@ -492,21 +525,29 @@ async function loadLineEndpoints(db) {
       }
     }
 
-    setStaticMeta(db, 'line_endpoints', count);
+    setStaticMeta(db, "line_endpoints", count);
     return count;
   });
 
   const count = transaction();
-  const duration = meta ? Date.now() - new Date(meta.last_updated).getTime() : 0;
-  log(`Line endpoints: loaded ${count} lines, ${meta ? `refreshed after ${formatDuration(duration)}` : 'first load'}`, 'INFO');
+  const duration = meta
+    ? Date.now() - new Date(meta.last_updated).getTime()
+    : 0;
+  log(
+    `Line endpoints: loaded ${count} lines, ${meta ? `refreshed after ${formatDuration(duration)}` : "first load"}`,
+    "INFO",
+  );
 }
 
 async function loadLineConfigs(db, lines) {
-  log(`Fetching line configs for ${lines.length} lines...`, 'INFO');
-  const meta = getStaticMeta(db, 'line_configs');
+  log(`Fetching line configs for ${lines.length} lines...`, "INFO");
+  const meta = getStaticMeta(db, "line_configs");
 
   if (meta && !isStale(meta.last_updated)) {
-    log(`Line configs: up-to-date (${meta.record_count} configs, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`, 'INFO');
+    log(
+      `Line configs: up-to-date (${meta.record_count} configs, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`,
+      "INFO",
+    );
     return;
   }
 
@@ -516,17 +557,17 @@ async function loadLineConfigs(db, lines) {
   for (const line of lines) {
     const { data: config, error } = await fetchLineConfig(line);
 
-    if (error === 'not_found') {
+    if (error === "not_found") {
       continue;
     }
 
     if (error) {
-      log(`Line ${line}: config fetch failed - ${error}`, 'WARN');
+      log(`Line ${line}: config fetch failed - ${error}`, "WARN");
       failed++;
       continue;
     }
 
-    if (config && typeof config === 'object' && config[line]) {
+    if (config && typeof config === "object" && config[line]) {
       const lineData = config[line];
       const turStations = lineData.tur?.stations || [];
       const returStations = lineData.retur?.stations || [];
@@ -535,10 +576,20 @@ async function loadLineConfigs(db, lines) {
 
       const allStops = [];
       for (let i = 0; i < turStations.length; i++) {
-        allStops.push({ name: turStations[i], lat: turCoords[i]?.[1], lng: turCoords[i]?.[0], direction: 'tur' });
+        allStops.push({
+          name: turStations[i],
+          lat: turCoords[i]?.[1],
+          lng: turCoords[i]?.[0],
+          direction: "tur",
+        });
       }
       for (let i = 0; i < returStations.length; i++) {
-        allStops.push({ name: returStations[i], lat: returCoords[i]?.[1], lng: returCoords[i]?.[0], direction: 'retur' });
+        allStops.push({
+          name: returStations[i],
+          lat: returCoords[i]?.[1],
+          lng: returCoords[i]?.[0],
+          direction: "retur",
+        });
       }
 
       if (allStops.length > 0) {
@@ -548,11 +599,11 @@ async function loadLineConfigs(db, lines) {
   }
 
   const insertStmt = db.prepare(
-    'INSERT OR REPLACE INTO line_configs (line, stop_order, stop_id, stop_name, stop_lat, stop_lng) VALUES (?, ?, ?, ?, ?, ?)'
+    "INSERT OR REPLACE INTO line_configs (line, stop_order, stop_id, stop_name, stop_lat, stop_lng) VALUES (?, ?, ?, ?, ?, ?)",
   );
 
   const transaction = db.transaction(() => {
-    db.prepare('DELETE FROM line_configs').run();
+    db.prepare("DELETE FROM line_configs").run();
 
     let count = 0;
     for (const { line, stops } of configs) {
@@ -564,27 +615,35 @@ async function loadLineConfigs(db, lines) {
           stop.id || stop.idStatie || null,
           stop.name || stop.den || null,
           stop.lat || stop.latitudine || null,
-          stop.lng || stop.longitudine || null
+          stop.lng || stop.longitudine || null,
         );
         count++;
       }
     }
 
-    setStaticMeta(db, 'line_configs', count);
+    setStaticMeta(db, "line_configs", count);
     return count;
   });
 
   const insertedCount = transaction();
-  const duration = meta ? Date.now() - new Date(meta.last_updated).getTime() : 0;
-  log(`Line configs: loaded ${insertedCount} stops for ${configs.length} lines, ${failed} failed, ${meta ? `refreshed after ${formatDuration(duration)}` : 'first load'}`, 'INFO');
+  const duration = meta
+    ? Date.now() - new Date(meta.last_updated).getTime()
+    : 0;
+  log(
+    `Line configs: loaded ${insertedCount} stops for ${configs.length} lines, ${failed} failed, ${meta ? `refreshed after ${formatDuration(duration)}` : "first load"}`,
+    "INFO",
+  );
 }
 
 async function loadLegends(db, lines) {
-  log(`Fetching legends for ${lines.length} lines...`, 'INFO');
-  const meta = getStaticMeta(db, 'legends');
+  log(`Fetching legends for ${lines.length} lines...`, "INFO");
+  const meta = getStaticMeta(db, "legends");
 
   if (meta && !isStale(meta.last_updated)) {
-    log(`Legends: up-to-date (${meta.record_count} legends, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`, 'INFO');
+    log(
+      `Legends: up-to-date (${meta.record_count} legends, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`,
+      "INFO",
+    );
     return;
   }
 
@@ -594,13 +653,13 @@ async function loadLegends(db, lines) {
   for (const line of lines) {
     const { data: legend, error } = await fetchLegends(line);
 
-    if (error === 'not_found') {
+    if (error === "not_found") {
       notFound++;
       continue;
     }
 
     if (error) {
-      log(`Line ${line}: legend fetch failed - ${error}`, 'WARN');
+      log(`Line ${line}: legend fetch failed - ${error}`, "WARN");
       continue;
     }
 
@@ -610,48 +669,59 @@ async function loadLegends(db, lines) {
   }
 
   const insertStmt = db.prepare(
-    'INSERT OR REPLACE INTO legends (line, raw_json) VALUES (?, ?)'
+    "INSERT OR REPLACE INTO legends (line, raw_json) VALUES (?, ?)",
   );
 
   const transaction = db.transaction(() => {
-    db.prepare('DELETE FROM legends').run();
+    db.prepare("DELETE FROM legends").run();
 
     for (const { line, legend } of legends) {
       insertStmt.run(line, JSON.stringify(legend));
     }
 
-    setStaticMeta(db, 'legends', legends.length);
+    setStaticMeta(db, "legends", legends.length);
     return legends.length;
   });
 
   const insertedCount = transaction();
-  const duration = meta ? Date.now() - new Date(meta.last_updated).getTime() : 0;
-  log(`Legends: loaded ${insertedCount} legends, ${notFound} not found (404), ${meta ? `refreshed after ${formatDuration(duration)}` : 'first load'}`, 'INFO');
+  const duration = meta
+    ? Date.now() - new Date(meta.last_updated).getTime()
+    : 0;
+  log(
+    `Legends: loaded ${insertedCount} legends, ${notFound} not found (404), ${meta ? `refreshed after ${formatDuration(duration)}` : "first load"}`,
+    "INFO",
+  );
 }
 
 async function loadRoutesGeometry(db, lines) {
-  log(`Fetching route geometry for ${lines.length} lines...`, 'INFO');
-  const meta = getStaticMeta(db, 'routes_geometry');
+  log(`Fetching route geometry for ${lines.length} lines...`, "INFO");
+  const meta = getStaticMeta(db, "routes_geometry");
 
-  if (meta && !isStale(meta.last_updated)) {
-    log(`Routes geometry: up-to-date (${meta.record_count} routes, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`, 'INFO');
-    return;
-  }
+  // if (meta && !isStale(meta.last_updated)) {
+  //   log(`Routes geometry: up-to-date (${meta.record_count} routes, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`, 'INFO');
+  //   return;
+  // }
 
   const routes = [];
   let notFound = 0;
 
   for (const line of lines) {
-    for (const direction of ['tur', 'retur']) {
-      const { data: geojson, error } = await fetchRouteGeometry(line, direction);
+    for (const direction of ["tur", "retur"]) {
+      const { data: geojson, error } = await fetchRouteGeometry(
+        line,
+        direction,
+      );
 
-      if (error === 'not_found') {
+      if (error === "not_found") {
         notFound++;
         continue;
       }
 
       if (error) {
-        log(`Line ${line} ${direction}: geometry fetch failed - ${error}`, 'WARN');
+        log(
+          `Line ${line} ${direction}: geometry fetch failed - ${error}`,
+          "WARN",
+        );
         continue;
       }
 
@@ -662,32 +732,43 @@ async function loadRoutesGeometry(db, lines) {
   }
 
   const insertStmt = db.prepare(
-    'INSERT OR REPLACE INTO routes_geometry (line, direction, raw_geojson) VALUES (?, ?, ?)'
+    "INSERT OR REPLACE INTO routes_geometry (line, direction, raw_geojson) VALUES (?, ?, ?)",
   );
 
   const transaction = db.transaction(() => {
-    db.prepare('DELETE FROM routes_geometry').run();
+    db.prepare("DELETE FROM routes_geometry").run();
 
     for (const { line, direction, geojson } of routes) {
       insertStmt.run(line, direction, JSON.stringify(geojson));
     }
 
-    setStaticMeta(db, 'routes_geometry', routes.length);
+    setStaticMeta(db, "routes_geometry", routes.length);
     return routes.length;
   });
 
   const insertedCount = transaction();
-  const duration = meta ? Date.now() - new Date(meta.last_updated).getTime() : 0;
-  log(`Routes geometry: loaded ${insertedCount} route geometries, ${notFound} not found (404), ${meta ? `refreshed after ${formatDuration(duration)}` : 'first load'}`, 'INFO');
+  const duration = meta
+    ? Date.now() - new Date(meta.last_updated).getTime()
+    : 0;
+  log(
+    `Routes geometry: loaded ${insertedCount} route geometries, ${notFound} not found (404), ${meta ? `refreshed after ${formatDuration(duration)}` : "first load"}`,
+    "INFO",
+  );
 }
 
 async function discoverAndSaveLines(db) {
-  log('Discovering lines from main page...', 'INFO');
-  const meta = getStaticMeta(db, 'discovered_lines');
+  log("Discovering lines from main page...", "INFO");
+  const meta = getStaticMeta(db, "discovered_lines");
 
   if (meta && !isStale(meta.last_updated)) {
-    const lines = db.prepare('SELECT line FROM discovered_lines').all().map(r => r.line);
-    log(`Discovered lines: up-to-date (${lines.length} lines, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`, 'INFO');
+    const lines = db
+      .prepare("SELECT line FROM discovered_lines")
+      .all()
+      .map((r) => r.line);
+    log(
+      `Discovered lines: up-to-date (${lines.length} lines, loaded ${formatDuration(Date.now() - new Date(meta.last_updated).getTime())} ago)`,
+      "INFO",
+    );
     return lines;
   }
 
@@ -695,36 +776,50 @@ async function discoverAndSaveLines(db) {
 
   if (error || lines.length === 0) {
     if (error) {
-      log(`Discover lines: failed - ${error}`, 'ERROR');
+      log(`Discover lines: failed - ${error}`, "ERROR");
     }
-    let fallback = db.prepare('SELECT line FROM line_endpoints').all().map(r => r.line);
+    let fallback = db
+      .prepare("SELECT line FROM line_endpoints")
+      .all()
+      .map((r) => r.line);
     if (fallback.length === 0) {
-      fallback = db.prepare('SELECT DISTINCT route FROM vehicle_positions').all().map(r => r.route);
+      fallback = db
+        .prepare("SELECT DISTINCT route FROM vehicle_positions")
+        .all()
+        .map((r) => r.route);
     }
     if (fallback.length > 0) {
-      log(`Using ${fallback.length} lines from line_endpoints/vehicle_positions as fallback`, 'WARN');
+      log(
+        `Using ${fallback.length} lines from line_endpoints/vehicle_positions as fallback`,
+        "WARN",
+      );
       return fallback;
     }
     return [];
   }
 
-  const insertStmt = db.prepare('INSERT OR REPLACE INTO discovered_lines (line, discovered_at) VALUES (?, ?)');
+  const insertStmt = db.prepare(
+    "INSERT OR REPLACE INTO discovered_lines (line, discovered_at) VALUES (?, ?)",
+  );
 
   const transaction = db.transaction(() => {
-    db.prepare('DELETE FROM discovered_lines').run();
+    db.prepare("DELETE FROM discovered_lines").run();
     for (const line of lines) {
       insertStmt.run(line, nowISO());
     }
-    setStaticMeta(db, 'discovered_lines', lines.length);
+    setStaticMeta(db, "discovered_lines", lines.length);
   });
 
   transaction();
-  log(`Discovered lines: found ${lines.length} lines from .linie-selector`, 'INFO');
+  log(
+    `Discovered lines: found ${lines.length} lines from .linie-selector`,
+    "INFO",
+  );
   return lines;
 }
 
 async function loadStaticData(db) {
-  logSection('Static Data Loading');
+  logSection("Static Data Loading");
 
   await loadStations(db);
   await loadLineEndpoints(db);
@@ -737,15 +832,15 @@ async function loadStaticData(db) {
     await loadRoutesGeometry(db, lines);
   }
 
-  logSection('Starting Vehicle Polling');
+  logSection("Starting Vehicle Polling");
 }
 
 async function refreshStaticDataIfNeeded(db) {
-  const stationsMeta = getStaticMeta(db, 'stations');
+  const stationsMeta = getStaticMeta(db, "stations");
   const needsRefresh = !stationsMeta || isStale(stationsMeta.last_updated);
 
   if (needsRefresh) {
-    log('Static data stale, refreshing...', 'INFO');
+    log("Static data stale, refreshing...", "INFO");
     await loadStaticData(db);
   }
 }
@@ -769,7 +864,11 @@ function processVehicles(db, vehicles, lastKnown, dryRun = false) {
         insertPosition(db, v);
         saveLastKnown(db, vid, lat, lng, serverTimestamp);
       }
-      lastKnown.set(vid, { lat: Number(lat), lng: Number(lng), server_timestamp: serverTimestamp });
+      lastKnown.set(vid, {
+        lat: Number(lat),
+        lng: Number(lng),
+        server_timestamp: serverTimestamp,
+      });
       recorded++;
     }
   }
@@ -779,42 +878,54 @@ function processVehicles(db, vehicles, lastKnown, dryRun = false) {
 
 function getStats(db) {
   try {
-    const totalRow = db.prepare('SELECT COUNT(*) as cnt FROM vehicle_positions').get();
-    const vehiclesRow = db.prepare('SELECT COUNT(DISTINCT id) as cnt FROM vehicle_positions').get();
-    const latestRow = db.prepare('SELECT MAX(recorded_at) as latest FROM vehicle_positions').get();
-    return { total: totalRow.cnt, vehicles: vehiclesRow.cnt, latest: latestRow.latest };
+    const totalRow = db
+      .prepare("SELECT COUNT(*) as cnt FROM vehicle_positions")
+      .get();
+    const vehiclesRow = db
+      .prepare("SELECT COUNT(DISTINCT id) as cnt FROM vehicle_positions")
+      .get();
+    const latestRow = db
+      .prepare("SELECT MAX(recorded_at) as latest FROM vehicle_positions")
+      .get();
+    return {
+      total: totalRow.cnt,
+      vehicles: vehiclesRow.cnt,
+      latest: latestRow.latest,
+    };
   } catch {
     return { total: -1, vehicles: -1, latest: null };
   }
 }
 
 function setMeta(db, key, value) {
-  db.prepare('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)').run(key, value);
-
+  db.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)").run(
+    key,
+    value,
+  );
 }
 
 function getMeta(db, key, defaultValue = null) {
-  const row = db.prepare('SELECT value FROM meta WHERE key = ?').get(key);
+  const row = db.prepare("SELECT value FROM meta WHERE key = ?").get(key);
   return row ? row.value : defaultValue;
 }
 
 async function runCollector() {
   const dbExists = existsSync(DB_PATH);
   const db = new Database(DB_PATH);
-  db.pragma('journal_mode = WAL');
+  db.pragma("journal_mode = WAL");
 
   initDB(db);
 
   if (dbExists) {
-    log(`Opened existing database: ${DB_PATH}`, 'INFO');
+    log(`Opened existing database: ${DB_PATH}`, "INFO");
   } else {
-    log(`Created new database: ${DB_PATH}`, 'INFO');
+    log(`Created new database: ${DB_PATH}`, "INFO");
   }
 
   const lastKnown = loadLastKnown(db);
-  log(`Loaded ${lastKnown.size} vehicles from last_known table`, 'INFO');
+  log(`Loaded ${lastKnown.size} vehicles from last_known table`, "INFO");
 
-  setMeta(db, 'started_at', nowISO());
+  setMeta(db, "started_at", nowISO());
 
   await loadStaticData(db);
 
@@ -824,15 +935,18 @@ async function runCollector() {
 
   const signalHandler = (signal) => {
     running = false;
-    log(`Received ${signal} — stopping gracefully...`, 'INFO');
+    log(`Received ${signal} — stopping gracefully...`, "INFO");
   };
 
-  process.on('SIGINT', () => signalHandler('SIGINT'));
-  process.on('SIGTERM', () => signalHandler('SIGTERM'));
+  process.on("SIGINT", () => signalHandler("SIGINT"));
+  process.on("SIGTERM", () => signalHandler("SIGTERM"));
 
-  log(`Starting poll loop — interval: ${POLL_INTERVAL}s, URL: ${VEHICLES_URL}`, 'INFO');
-  log('Press Ctrl+C to stop', 'INFO');
-  logSection('Vehicle Polling');
+  log(
+    `Starting poll loop — interval: ${POLL_INTERVAL}s, URL: ${VEHICLES_URL}`,
+    "INFO",
+  );
+  log("Press Ctrl+C to stop", "INFO");
+  logSection("Vehicle Polling");
 
   while (running) {
     pollCount++;
@@ -845,8 +959,11 @@ async function runCollector() {
 
     if (error) {
       consecutiveErrors++;
-      log(`${error} — retrying in ${POLL_INTERVAL}s (consecutive error #${consecutiveErrors})`, 'ERROR');
-      await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL * 1000));
+      log(
+        `${error} — retrying in ${POLL_INTERVAL}s (consecutive error #${consecutiveErrors})`,
+        "ERROR",
+      );
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL * 1000));
       continue;
     }
 
@@ -856,16 +973,19 @@ async function runCollector() {
     const recorded = processVehicles(db, vehicles, lastKnown);
 
     log(
-      `${vehicles.length} vehicles fetched | ${recorded} new records | total: ${stats.total} rows (${stats.vehicles} vehicles)`
+      `${vehicles.length} vehicles fetched | ${recorded} new records | total: ${stats.total} rows (${stats.vehicles} vehicles)`,
     );
 
-    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL * 1000));
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL * 1000));
   }
 
-  logSection('Collector Stopped');
+  logSection("Collector Stopped");
   const finalStats = getStats(db);
-  log(`Final stats: ${finalStats.total} rows, ${finalStats.vehicles} distinct vehicles`, 'INFO');
-  log(`Database: ${DB_PATH}`, 'INFO');
+  log(
+    `Final stats: ${finalStats.total} rows, ${finalStats.vehicles} distinct vehicles`,
+    "INFO",
+  );
+  log(`Database: ${DB_PATH}`, "INFO");
 
   db.close();
   process.exit(0);
