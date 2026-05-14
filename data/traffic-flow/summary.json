@@ -1,0 +1,484 @@
+{
+  "slotSummary": [
+    {
+      "label": "morning-rush",
+      "hour": 7,
+      "sampleCount": 618,
+      "avgSpeedKph": 25.2,
+      "avgSpeedRatio": 0.643,
+      "severe": 62,
+      "heavy": 294,
+      "moderate": 110,
+      "low": 152
+    },
+    {
+      "label": "mid-morning",
+      "hour": 10,
+      "sampleCount": 656,
+      "avgSpeedKph": 26,
+      "avgSpeedRatio": 0.649,
+      "severe": 62,
+      "heavy": 294,
+      "moderate": 148,
+      "low": 152
+    },
+    {
+      "label": "midday",
+      "hour": 12,
+      "sampleCount": 656,
+      "avgSpeedKph": 25.9,
+      "avgSpeedRatio": 0.648,
+      "severe": 62,
+      "heavy": 294,
+      "moderate": 148,
+      "low": 152
+    },
+    {
+      "label": "afternoon-rush",
+      "hour": 17,
+      "sampleCount": 656,
+      "avgSpeedKph": 24.5,
+      "avgSpeedRatio": 0.62,
+      "severe": 108,
+      "heavy": 248,
+      "moderate": 222,
+      "low": 78
+    },
+    {
+      "label": "evening",
+      "hour": 19,
+      "sampleCount": 656,
+      "avgSpeedKph": 24.5,
+      "avgSpeedRatio": 0.62,
+      "severe": 108,
+      "heavy": 248,
+      "moderate": 222,
+      "low": 78
+    },
+    {
+      "label": "night",
+      "hour": 22,
+      "sampleCount": 656,
+      "avgSpeedKph": 24.5,
+      "avgSpeedRatio": 0.62,
+      "severe": 108,
+      "heavy": 248,
+      "moderate": 222,
+      "low": 78
+    }
+  ],
+  "pointMatrix": [
+    {
+      "pointId": "p-1-1",
+      "morning-rush": "-",
+      "mid-morning": "M",
+      "midday": "M",
+      "afternoon-rush": "M",
+      "evening": "M",
+      "night": "M"
+    },
+    {
+      "pointId": "p-1-2",
+      "morning-rush": "M",
+      "mid-morning": "M",
+      "midday": "M",
+      "afternoon-rush": "M",
+      "evening": "M",
+      "night": "M"
+    },
+    {
+      "pointId": "p-1-3",
+      "morning-rush": "S",
+      "mid-morning": "S",
+      "midday": "S",
+      "afternoon-rush": "S",
+      "evening": "S",
+      "night": "S"
+    },
+    {
+      "pointId": "p-1-4",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-1-5",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-2-1",
+      "morning-rush": "L",
+      "mid-morning": "L",
+      "midday": "L",
+      "afternoon-rush": "L",
+      "evening": "L",
+      "night": "L"
+    },
+    {
+      "pointId": "p-2-2",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-2-3",
+      "morning-rush": "S",
+      "mid-morning": "S",
+      "midday": "S",
+      "afternoon-rush": "S",
+      "evening": "S",
+      "night": "S"
+    },
+    {
+      "pointId": "p-2-4",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-2-5",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "S",
+      "evening": "S",
+      "night": "S"
+    },
+    {
+      "pointId": "p-3-1",
+      "morning-rush": "L",
+      "mid-morning": "L",
+      "midday": "L",
+      "afternoon-rush": "L",
+      "evening": "L",
+      "night": "L"
+    },
+    {
+      "pointId": "p-3-2",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-3-3",
+      "morning-rush": "L",
+      "mid-morning": "L",
+      "midday": "L",
+      "afternoon-rush": "L",
+      "evening": "L",
+      "night": "L"
+    },
+    {
+      "pointId": "p-3-4",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-3-5",
+      "morning-rush": "L",
+      "mid-morning": "L",
+      "midday": "L",
+      "afternoon-rush": "M",
+      "evening": "M",
+      "night": "M"
+    },
+    {
+      "pointId": "p-4-1",
+      "morning-rush": "L",
+      "mid-morning": "L",
+      "midday": "L",
+      "afternoon-rush": "L",
+      "evening": "L",
+      "night": "L"
+    },
+    {
+      "pointId": "p-4-2",
+      "morning-rush": "L",
+      "mid-morning": "L",
+      "midday": "L",
+      "afternoon-rush": "L",
+      "evening": "L",
+      "night": "L"
+    },
+    {
+      "pointId": "p-4-3",
+      "morning-rush": "L",
+      "mid-morning": "L",
+      "midday": "L",
+      "afternoon-rush": "M",
+      "evening": "M",
+      "night": "M"
+    },
+    {
+      "pointId": "p-4-4",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-4-5",
+      "morning-rush": "M",
+      "mid-morning": "M",
+      "midday": "M",
+      "afternoon-rush": "M",
+      "evening": "M",
+      "night": "M"
+    },
+    {
+      "pointId": "p-5-1",
+      "morning-rush": "M",
+      "mid-morning": "M",
+      "midday": "M",
+      "afternoon-rush": "M",
+      "evening": "M",
+      "night": "M"
+    },
+    {
+      "pointId": "p-5-2",
+      "morning-rush": "S",
+      "mid-morning": "S",
+      "midday": "S",
+      "afternoon-rush": "S",
+      "evening": "S",
+      "night": "S"
+    },
+    {
+      "pointId": "p-5-3",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-5-4",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    },
+    {
+      "pointId": "p-5-5",
+      "morning-rush": "H",
+      "mid-morning": "H",
+      "midday": "H",
+      "afternoon-rush": "H",
+      "evening": "H",
+      "night": "H"
+    }
+  ],
+  "incidents": [
+    {
+      "id": "inc-0",
+      "type": "closure",
+      "lat": 45.7569274493,
+      "lng": 21.1943998563
+    },
+    {
+      "id": "inc-1",
+      "type": "closure",
+      "lat": 45.732825149,
+      "lng": 21.2020736563
+    },
+    {
+      "id": "inc-2",
+      "type": "closure",
+      "lat": 45.7487587712,
+      "lng": 21.2031975019
+    },
+    {
+      "id": "inc-3",
+      "type": "closure",
+      "lat": 45.7474887759,
+      "lng": 21.2039632726
+    },
+    {
+      "id": "inc-4",
+      "type": "closure",
+      "lat": 45.7456809729,
+      "lng": 21.2053177881
+    },
+    {
+      "id": "inc-5",
+      "type": "closure",
+      "lat": 45.7460859746,
+      "lng": 21.2049503255
+    },
+    {
+      "id": "inc-6",
+      "type": "closure",
+      "lat": 45.7443907857,
+      "lng": 21.1995228755
+    },
+    {
+      "id": "inc-7",
+      "type": "closure",
+      "lat": 45.7469214712,
+      "lng": 21.207240932
+    },
+    {
+      "id": "inc-8",
+      "type": "roadwork",
+      "lat": 45.7443680316,
+      "lng": 21.2090836096
+    },
+    {
+      "id": "inc-9",
+      "type": "roadwork",
+      "lat": 45.7471709362,
+      "lng": 21.2100076306
+    },
+    {
+      "id": "inc-10",
+      "type": "roadwork",
+      "lat": 45.7509595677,
+      "lng": 21.2109692025
+    },
+    {
+      "id": "inc-11",
+      "type": "roadwork",
+      "lat": 45.7474860853,
+      "lng": 21.2172093618
+    },
+    {
+      "id": "inc-12",
+      "type": "roadwork",
+      "lat": 45.7490417423,
+      "lng": 21.2162182855
+    },
+    {
+      "id": "inc-13",
+      "type": "incident",
+      "lat": 45.7690040775,
+      "lng": 21.2202778089
+    },
+    {
+      "id": "inc-14",
+      "type": "roadwork",
+      "lat": 45.7618198021,
+      "lng": 21.224436574
+    },
+    {
+      "id": "inc-15",
+      "type": "roadwork",
+      "lat": 45.7582712648,
+      "lng": 21.2232577431
+    },
+    {
+      "id": "inc-16",
+      "type": "roadwork",
+      "lat": 45.7737516105,
+      "lng": 21.2320111322
+    },
+    {
+      "id": "inc-17",
+      "type": "roadwork",
+      "lat": 45.7481486062,
+      "lng": 21.2320486832
+    },
+    {
+      "id": "inc-18",
+      "type": "roadwork",
+      "lat": 45.7628577952,
+      "lng": 21.2329820919
+    },
+    {
+      "id": "inc-19",
+      "type": "incident",
+      "lat": null,
+      "lng": null
+    },
+    {
+      "id": "inc-20",
+      "type": "incident",
+      "lat": null,
+      "lng": null
+    },
+    {
+      "id": "inc-21",
+      "type": "roadwork",
+      "lat": 45.7531938478,
+      "lng": 21.2325556207
+    },
+    {
+      "id": "inc-22",
+      "type": "roadwork",
+      "lat": 45.7567705449,
+      "lng": 21.2338229644
+    },
+    {
+      "id": "inc-23",
+      "type": "roadwork",
+      "lat": 45.7557084024,
+      "lng": 21.2337103116
+    },
+    {
+      "id": "inc-24",
+      "type": "roadwork",
+      "lat": 45.7690457068,
+      "lng": 21.2328265238
+    },
+    {
+      "id": "inc-25",
+      "type": "incident",
+      "lat": null,
+      "lng": null
+    },
+    {
+      "id": "inc-26",
+      "type": "incident",
+      "lat": null,
+      "lng": null
+    },
+    {
+      "id": "inc-27",
+      "type": "roadwork",
+      "lat": 45.7408194374,
+      "lng": 21.2384484339
+    },
+    {
+      "id": "inc-28",
+      "type": "roadwork",
+      "lat": 45.7463568514,
+      "lng": 21.2389956045
+    }
+  ],
+  "meta": {
+    "collectedAt": "2026-05-14T10:02:50.386Z",
+    "bbox": [
+      21.19,
+      45.73,
+      21.24,
+      45.77
+    ],
+    "flowRecordCount": 3898,
+    "incidentCount": 29
+  }
+}

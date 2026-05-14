@@ -15,6 +15,10 @@
     "fetch:traffic:here:dry": "node scripts/fetch-traffic-validation.mjs here --dry-run",
     "fetch:traffic:tomtom": "node scripts/fetch-traffic-validation.mjs tomtom",
     "fetch:traffic:tomtom:dry": "node scripts/fetch-traffic-validation.mjs tomtom --dry-run",
+    "fetch:traffic:routes": "node scripts/fetch-traffic-routes.mjs tomtom",
+    "fetch:traffic:routes:dry": "node scripts/fetch-traffic-routes.mjs tomtom --dry-run",
+    "fetch:traffic:flow": "node scripts/fetch-traffic-flow.mjs",
+    "fetch:traffic:flow:dry": "node scripts/fetch-traffic-flow.mjs --dry-run",
     "fetch:papers": "node scripts/fetch-timisoara-papers.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },

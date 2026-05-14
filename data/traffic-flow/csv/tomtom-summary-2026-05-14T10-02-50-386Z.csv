@@ -1,0 +1,7 @@
+timeSlot,hour,sampleCount,avgSpeedKph,avgSpeedRatio,congestionDistribution,severeCount,heavyCount,moderateCount,lowCount
+morning-rush,7,618,25.2,0.643,"{""moderate"":110,""severe"":62,""heavy"":294,""low"":152}",62,294,110,152
+mid-morning,10,656,26,0.649,"{""moderate"":148,""severe"":62,""heavy"":294,""low"":152}",62,294,148,152
+midday,12,656,25.9,0.648,"{""moderate"":148,""severe"":62,""heavy"":294,""low"":152}",62,294,148,152
+afternoon-rush,17,656,24.5,0.62,"{""moderate"":222,""severe"":108,""heavy"":248,""low"":78}",108,248,222,78
+evening,19,656,24.5,0.62,"{""moderate"":222,""severe"":108,""heavy"":248,""low"":78}",108,248,222,78
+night,22,656,24.5,0.62,"{""moderate"":222,""severe"":108,""heavy"":248,""low"":78}",108,248,222,78

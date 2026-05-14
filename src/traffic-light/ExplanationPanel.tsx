@@ -222,42 +222,84 @@ export function ExplanationPanel({
             </section>
             <section className="traffic-light-hourly-card">
               <div className="traffic-light-section-head">
-                <h2>24-hour posterior</h2>
+                <h2>24-hour timing pattern</h2>
                 <span>
-                  This is the distribution users should trust: hourly state probability with the amount of evidence
-                  behind each hour.
+                  Adaptive signals vary green/red split by time of day — bars show probability, intensity shows evidence strength
                 </span>
               </div>
-              <div className="traffic-light-hourly-grid">
-                {(selectedPrediction.hourlyProfile ??
-                  Array.from({ length: 24 }, (_, hourOfDay) => ({
-                    hourOfDay,
-                    sampleCount: 0,
-                    greenProbability: 0.5,
-                    redProbability: 0.5,
-                    confidence: 0,
-                    phaseOffsetSeconds: selectedPrediction.phaseOffsetSeconds,
-                    greenDurationSeconds: selectedPrediction.greenDurationSeconds,
-                  }))).map((slice) => {
-                  const active = slice.hourOfDay === currentHour;
-                  const greenShare = Math.round(slice.greenProbability * 100);
-                  const redShare = Math.round(slice.redProbability * 100);
-                  const background = `linear-gradient(90deg, rgba(46, 204, 113, 0.82) 0%, rgba(46, 204, 113, 0.82) ${greenShare}%, rgba(239, 68, 68, 0.72) ${greenShare}%, rgba(239, 68, 68, 0.72) 100%)`;
-                  return (
-                    <div key={slice.hourOfDay} className={active ? "traffic-light-hourly-cell active" : "traffic-light-hourly-cell"}>
-                      <span>{String(slice.hourOfDay).padStart(2, "0")}:00</span>
-                      <div className="traffic-light-hourly-bar" style={{ background }}>
-                        <i style={{ width: `${Math.max(6, slice.confidence * 100)}%` }} />
+              {(() => {
+                const profile = selectedPrediction?.hourlyProfile ?? [];
+                const hasData = profile.some(s => s.sampleCount > 0);
+                const greenDurations = profile.map(s => s.greenDurationSeconds);
+                const maxGreen = Math.max(...greenDurations, 1);
+                const variance = hasData
+                  ? Math.round(Math.sqrt(greenDurations.reduce((sum, d) => sum + (d - greenDurations[12]) ** 2, 0) / 24))
+                  : 0;
+                const isAdaptive = variance > 8;
+
+                return (
+                  <>
+                    {isAdaptive && (
+                      <div className="traffic-light-adaptive-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        Adaptive signal · {variance}s variability
                       </div>
-                      <small>
-                        {slice.sampleCount > 0
-                          ? `${greenShare}% green / ${redShare}% red · ${slice.sampleCount} passes`
-                          : "no samples"}
-                      </small>
+                    )}
+                    <div className="traffic-light-hourly-chart">
+                      <div className="traffic-light-hourly-y-axis">
+                        <span>100%</span>
+                        <span>50%</span>
+                        <span>0%</span>
+                      </div>
+                      <div className="traffic-light-hourly-bars">
+                        {(selectedPrediction?.hourlyProfile ?? Array.from({ length: 24 }, (_, h) => ({ hourOfDay: h, sampleCount: 0, greenProbability: 0.5, redProbability: 0.5, confidence: 0, phaseOffsetSeconds: selectedPrediction?.phaseOffsetSeconds ?? 0, greenDurationSeconds: selectedPrediction?.greenDurationSeconds ?? 0 }))).map((slice) => {
+                          const active = slice.hourOfDay === currentHour;
+                          const greenPct = Math.round(slice.greenProbability * 100);
+                          const confidence = slice.confidence;
+                          return (
+                            <div key={slice.hourOfDay} className={`traffic-light-hourly-bar-cell ${active ? "active" : ""}`}>
+                              <div className="traffic-light-hourly-bar-wrap">
+                                <div
+                                  className="traffic-light-hourly-green-bar"
+                                  style={{
+                                    height: `${greenPct}%`,
+                                    opacity: 0.4 + confidence * 0.6,
+                                  }}
+                                />
+                                <div
+                                  className="traffic-light-hourly-red-bar"
+                                  style={{
+                                    height: `${100 - greenPct}%`,
+                                    opacity: 0.4 + confidence * 0.6,
+                                  }}
+                                />
+                              </div>
+                              <span className="traffic-light-hourly-hour-label">{String(slice.hourOfDay).padStart(2, "0")}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="traffic-light-hourly-legend">
+                      <span className="legend-green">Green probability</span>
+                      <span className="legend-red">Red probability</span>
+                      <span className="legend-intensity">Bar height = state probability · opacity = evidence strength</span>
+                    </div>
+                    <div className="traffic-light-hourly-stats">
+                      {(selectedPrediction?.hourlyProfile ?? []).filter(s => s.sampleCount > 0).slice(0, 6).map((slice) => {
+                        const greenPct = Math.round(slice.greenProbability * 100);
+                        return (
+                          <div key={slice.hourOfDay} className={`traffic-light-hourly-stat ${slice.hourOfDay === currentHour ? "current" : ""}`}>
+                            <span className="stat-hour">{String(slice.hourOfDay).padStart(2, "0")}:00</span>
+                            <span className="stat-split">{greenPct}%g / {100 - greenPct}%r</span>
+                            <span className="stat-samples">{slice.sampleCount} passes</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                );
+              })()}
             </section>
           </>
         ) : (

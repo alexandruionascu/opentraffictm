@@ -1,0 +1,45 @@
+{
+  "provider": "tomtom-routing",
+  "collectedAt": "2026-05-14T09:42:22.023Z",
+  "timeSlots": [
+    {
+      "label": "morning-rush",
+      "hour": 8,
+      "minute": 0,
+      "date": "2026-05-14"
+    },
+    {
+      "label": "mid-morning",
+      "hour": 10,
+      "minute": 0,
+      "date": "2026-05-14"
+    },
+    {
+      "label": "midday",
+      "hour": 12,
+      "minute": 0,
+      "date": "2026-05-14"
+    },
+    {
+      "label": "afternoon-rush",
+      "hour": 17,
+      "minute": 0,
+      "date": "2026-05-14"
+    },
+    {
+      "label": "evening",
+      "hour": 19,
+      "minute": 0,
+      "date": "2026-05-14"
+    },
+    {
+      "label": "night",
+      "hour": 22,
+      "minute": 0,
+      "date": "2026-05-14"
+    }
+  ],
+  "routeCount": 8,
+  "transactionCount": 0,
+  "summary": []
+}

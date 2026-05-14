@@ -1,0 +1,7 @@
+timeSlot,hour,sampleCount,avgSpeedKph,avgSpeedRatio,congestionDistribution,severeCount,heavyCount,moderateCount,lowCount
+morning-rush,7,656,24.9,0.63,"{""heavy"":312,""severe"":104,""low"":136,""moderate"":104}",104,312,104,136
+mid-morning,10,0,,,{},0,0,0,0
+midday,12,0,,,{},0,0,0,0
+afternoon-rush,17,0,,,{},0,0,0,0
+evening,19,656,24.8,0.623,"{""heavy"":312,""severe"":104,""low"":136,""moderate"":104}",104,312,104,136
+night,22,0,,,{},0,0,0,0

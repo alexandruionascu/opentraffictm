@@ -670,83 +670,226 @@ function AnalysisChart({ candidate }: { candidate?: TrafficLightIntersectionAnal
 }
 
 function TomTomTrafficPage() {
-  const [snapshot, setSnapshot] = useState<{
-    collectedAt?: string;
-    bbox?: [number, number, number, number];
-    segments?: Array<{ segmentId?: string; roadName?: string; speedKph?: number; delaySeconds?: number; congestionLevel?: string }>;
-    incidents?: Array<{ incidentId?: string; kind?: string; description?: string; severity?: number }>;
+  const [summary, setSummary] = useState<{
+    slotSummary: Array<{
+      label: string;
+      hour: number;
+      sampleCount: number;
+      avgSpeedKph: number | null;
+      avgSpeedRatio: number | null;
+      severe: number;
+      heavy: number;
+      moderate: number;
+      low: number;
+    }>;
+    pointMatrix: Array<Record<string, string>>;
+    incidents: Array<{ id: string; type: string; lat: number | null; lng: number | null }>;
+    meta: { collectedAt: string; bbox: number[]; flowRecordCount: number; incidentCount: number };
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"summary" | "heatmap" | "incidents">("summary");
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/data/traffic-validation/providers/tomtom/latest.json")
-      .then(async (response) => {
-        if (!response.ok) throw new Error("TomTom snapshot unavailable");
-        return response.json();
+    fetch("/data/traffic-flow/summary.json")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled) setSummary(data);
       })
-      .then((json) => {
-        if (!cancelled) setSnapshot(json);
-      })
-      .catch((fetchError) => {
-        if (!cancelled) setError(fetchError instanceof Error ? fetchError.message : "TomTom snapshot unavailable");
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load");
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  return (
-    <main className="map-page">
-      <aside className="sim-panel">
+  if (error) {
+    return (
+      <main className="page">
         <p className="eyebrow">TomTom</p>
-        <h2>Traffic snapshot</h2>
-        <p>Click a row to highlight the matching TomTom flow segment or incident on the map.</p>
-        <div className="toolbar">
-          <a className="btn secondary" href="/validation">
-            Back
-          </a>
-          <span className="toolbar-note">
-            {error
-              ? error
-              : `${snapshot?.segments?.length ?? 0} flow, ${snapshot?.incidents?.length ?? 0} incidents, ${(snapshot?.segments?.length ?? 0) + (snapshot?.incidents?.length ?? 0)} total`}
-          </span>
+        <h1>Traffic flow data</h1>
+        <p style={{ color: "var(--danger)" }}>Error: {error}</p>
+      </main>
+    );
+  }
+
+  if (!summary) {
+    return (
+      <main className="page">
+        <p className="eyebrow">TomTom</p>
+        <h1>Traffic flow data</h1>
+        <p>Loading...</p>
+      </main>
+    );
+  }
+
+  const congestionColor: Record<string, string> = { S: "#c0392b", H: "#e67e22", M: "#f1c40f", L: "#27ae60" };
+  const congestionLabel: Record<string, string> = { S: "Severe", H: "Heavy", M: "Moderate", L: "Low" };
+  const timeSlotLabels = summary.slotSummary.map((s) => s.label);
+  const maxSevere = Math.max(...summary.slotSummary.map((s) => s.severe), 1);
+
+  return (
+    <main className="page">
+      <div className="page-intro">
+        <p className="eyebrow">TomTom Traffic API</p>
+        <h1>Flow segment data — Timișoara</h1>
+        <p>{summary.meta.flowRecordCount} records · {summary.meta.incidentCount} incidents · collected {summary.meta.collectedAt}</p>
+      </div>
+
+      <div className="toolbar">
+        <div className="sheet-tabs" role="tablist">
+          {(["summary", "heatmap", "incidents"] as const).map((tab) => (
+            <button
+              key={tab}
+              className={activeTab === tab ? "sheet-tab active" : "sheet-tab"}
+              onClick={() => setActiveTab(tab)}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
-        <div className="scenario-picker">
-          {(snapshot?.segments ?? []).map((segment, index) => {
-            const key = `flow:${segment.segmentId ?? index}`;
-            return (
-              <button
-                key={key}
-                className={selectedKey === key ? "scenario-chip active" : "scenario-chip"}
-                onClick={() => setSelectedKey(key)}
-                type="button"
-              >
-                <strong>{segment.roadName ?? `Flow segment ${index + 1}`}</strong>
-                <span>{segment.speedKph ?? 0} km/h</span>
-              </button>
-            );
-          })}
-          {(snapshot?.incidents ?? []).map((incident, index) => {
-            const key = `incident:${incident.incidentId ?? index}`;
-            return (
-              <button
-                key={key}
-                className={selectedKey === key ? "scenario-chip active" : "scenario-chip"}
-                onClick={() => setSelectedKey(key)}
-                type="button"
-              >
-                <strong>{incident.kind ?? `Incident ${index + 1}`}</strong>
-                <span>{incident.severity !== undefined ? `severity ${incident.severity}` : "incident"}</span>
-              </button>
-            );
-          })}
-        </div>
-      </aside>
-      <Suspense fallback={<MapLoading />}>
-        <LiveMap scenarios={[emptyScenario]} probeSource="tomtom" validationOnly selectedProbeKey={selectedKey} />
-      </Suspense>
+        <a className="btn secondary" href="/map">
+          View on map
+        </a>
+        <button
+          className="btn secondary"
+          onClick={() => {
+            const a = document.createElement("a");
+            a.href = "/data/traffic-flow/tomtom-latest.json";
+            a.download = "tomtom-flow-latest.json";
+            a.click();
+          }}
+          type="button"
+        >
+          Download JSON
+        </button>
+      </div>
+
+      {activeTab === "summary" && (
+        <section>
+          <div className="tomtom-summary-grid">
+            {summary.slotSummary.map((slot) => (
+              <div key={slot.label} className="tomtom-slot-card">
+                <div className="tomtom-slot-header">
+                  <strong>{slot.label}</strong>
+                  <span style={{ fontFamily: "monospace", fontSize: 11 }}>{slot.hour}:00</span>
+                </div>
+                <div className="tomtom-slot-metric">
+                  <span className="tomtom-big-value">{slot.avgSpeedKph ?? "—"}</span>
+                  <span className="tomtom-unit">km/h avg</span>
+                </div>
+                <div className="tomtom-slot-metric">
+                  <span className="tomtom-big-value">{slot.avgSpeedRatio ?? "—"}</span>
+                  <span className="tomtom-unit">speed ratio</span>
+                </div>
+                <div className="tomtom-congestion-bar">
+                  <div className="bar-segment" style={{ background: "#c0392b", flex: slot.severe / maxSevere, minWidth: 4 }} title={`Severe: ${slot.severe}`} />
+                  <div className="bar-segment" style={{ background: "#e67e22", flex: slot.heavy / maxSevere }} title={`Heavy: ${slot.heavy}`} />
+                  <div className="bar-segment" style={{ background: "#f1c40f", flex: slot.moderate / maxSevere }} title={`Moderate: ${slot.moderate}`} />
+                  <div className="bar-segment" style={{ background: "#27ae60", flex: slot.low / maxSevere }} title={`Low: ${slot.low}`} />
+                </div>
+                <div className="tomtom-legend">
+                  {(["S", "H", "M", "L"] as const).map((key) => (
+                    <span key={key} className="tomtom-legend-item">
+                      <span style={{ background: congestionColor[key], borderRadius: 2, display: "inline-block", height: 8, width: 8 }} />
+                      {key}={slot[key === "S" ? "severe" : key === "H" ? "heavy" : key === "M" ? "moderate" : "low"]}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 20, display: "flex", gap: 20, flexWrap: "wrap" }}>
+            {Object.entries(congestionLabel).map(([key, label]) => (
+              <div key={key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ width: 14, height: 14, borderRadius: 3, background: congestionColor[key] }} />
+                <span style={{ fontSize: 12 }}>
+                  {label} ({key}) — ratio {key === "S" ? "<0.4" : key === "H" ? "0.4–0.65" : key === "M" ? "0.65–0.85" : "≥0.85"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {activeTab === "heatmap" && (
+        <section>
+          <p className="lede" style={{ marginBottom: 16 }}>
+            Congestion level per sample point. Rows = 5×5 grid (p-1-1 SW, p-5-5 NE). Columns = time slots.
+          </p>
+          <div className="heatmap-grid" style={{ fontSize: 11 }}>
+            <div className="heatmap-row heatmap-header" style={{ gridTemplateColumns: "56px repeat(6, 1fr)" }}>
+              <span className="heatmap-cell">Point</span>
+              {timeSlotLabels.map((l) => (
+                <span key={l} className="heatmap-cell" style={{ fontSize: 9 }}>
+                  {l.replace("-rush", "").replace("afternoon-", "PM ").replace("morning-", "AM ").replace("mid-", "")}
+                </span>
+              ))}
+            </div>
+            {summary.pointMatrix.map((row) => (
+              <div key={row.pointId} className="heatmap-row" style={{ gridTemplateColumns: "56px repeat(6, 1fr)" }}>
+                <span className="heatmap-cell heatmap-point" style={{ fontSize: 10 }}>{row.pointId}</span>
+                {timeSlotLabels.map((l) => {
+                  const val = row[l] ?? "-";
+                  return (
+                    <span
+                      key={l}
+                      className="heatmap-cell"
+                      style={{
+                        background: val === "-" ? "#1a1a1a" : congestionColor[val] ?? "#1a1a1a",
+                        color: val !== "-" ? "white" : "#666",
+                        fontWeight: "700",
+                        fontSize: 12,
+                      }}
+                      title={`${row.pointId} @ ${l}: ${val === "-" ? "no data" : congestionLabel[val] ?? val}`}
+                    >
+                      {val}
+                    </span>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 16, display: "flex", gap: 16, flexWrap: "wrap" }}>
+            {Object.entries(congestionLabel).map(([key, label]) => (
+              <div key={key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ width: 18, height: 18, borderRadius: 4, background: congestionColor[key] }} />
+                <span style={{ fontSize: 12 }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {activeTab === "incidents" && (
+        <section>
+          <p className="lede" style={{ marginBottom: 16 }}>
+            {summary.incidents.length} incidents — bbox [{summary.meta.bbox.join(", ")}]
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
+            {summary.incidents.map((inc) => (
+              <div key={inc.id} className="panel" style={{ padding: "12px 16px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <strong style={{ fontFamily: "monospace", fontSize: 12 }}>{inc.id}</strong>
+                  <span style={{
+                    background: inc.type === "closure" ? "#c0392b" : inc.type === "roadwork" ? "#e67e22" : "#7cffb2",
+                    borderRadius: 999, color: "#03070d", fontSize: 10, fontWeight: 700, padding: "2px 8px",
+                  }}>
+                    {inc.type}
+                  </span>
+                </div>
+                <div style={{ marginTop: 6, fontFamily: "monospace", fontSize: 11, color: "var(--muted)" }}>
+                  {inc.lat != null ? `${inc.lat.toFixed(5)}, ${inc.lng?.toFixed(5)}` : "no coordinates"}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
