@@ -1,0 +1,167 @@
+# Plan: Probe-Based Traffic Analysis Pipeline
+
+## Context
+
+Four Timișoara-focused research papers were analyzed for replicable methodologies:
+- **Hybrid Kalman Fuzzy Car-Following** (Pop et al., 2020) — online car-following model calibration using Kalman filtering + Takagi-Sugeno fuzzy inference, fed by 5-min aggregated loop detector data
+- **TACTICS Adaptive Control** (Cosariu et al., 2015) — fuzzy reactive signal control, queue/delay metrics from a real corridor
+- **Air Quality / Traffic Intensity** (Mustață et al., 2023) — roadside PM as a proxy for traffic demand
+- **Student Complex Road Infrastructure** (Zot et al., 2024) — district-level infrastructure survey
+
+The codebase already has:
+- `stpt-probe.ts` — STPT vehicle probe segment queries from SQLite (speed, delay, haversine distance from consecutive positions)
+- `traffic-validation.ts` — validation framework comparing simulation frames to probe snapshots
+- `simulation.ts` — microsimulation engine producing per-frame actor states and metrics
+- TomTom flow data (`data/traffic-flow/tomtom-latest.json`, 3936 records, 6 time slots) and live data
+- STPT live vehicle positions + SQLite history in `data/stpt.db`
+
+## Goal
+
+Extract **observable traffic phenomena** from the probe data and TomTom flow data alone — no authority data required. Produce analyzable results (tables, CSV, JSON stats) that can later be wired into a web UI. Specifically: car-following calibration, corridor speed/delay profiling, and congestion regime classification.
+
+---
+
+## Phase 1 — Probe Data Aggregation Layer
+
+**`src/probe-aggregator.ts`** (new)
+
+Reads raw probe segments from `stpt.db` (project root, 84MB) via `queryAllProbeSegments()` in `stpt-probe.ts`. Pools into fixed-interval windows (default 5 min, configurable) per road segment or route, producing:
+
+- `ProbeWindow`: `{ windowStart: Date, windowEnd: Date, segmentId: string, sampleCount: number, avgSpeedKph: number, minSpeedKph: number, maxSpeedKph: number, avgDelaySeconds: number, totalDistanceMeters: number, geometry: [lng, lat][] }`
+- Aggregate across all routes to produce city-wide speed/delay distribution per time window
+
+Windowing strategy (mirrors Pop et al.):
+- 5-minute rolling windows aligned to the hour (00:00, 05:00, 10:00, ...)
+- Time-of-day binning: morning-rush (7–9), mid-morning (10–12), midday (12–14), afternoon-rush (17–19), evening (19–21), night (21–7)
+- Per-route and city-wide aggregation
+
+Data source: `stpt.db` — 21.6 hours of historical GPS data (406,931 rows, 192 vehicles, 57 routes), producing 290,727 valid probe segments after filtering (dist>1m, timeDelta 0-60s).
+
+Output: `data/derived/probe-aggregation.json` (machine-readable), printed summary to stdout.
+
+---
+
+## Phase 2 — Car-Following Parameter Calibration
+
+**`src/calibration.ts`** (new)
+
+Implements **IDM (Intelligent Driver Model) distribution-based parameter estimation** per route segment, replacing the original Kalman filter approach which proved not viable for this data.
+
+**IDM Parameters estimated per route:**
+- `desiredSpeedKph` — p85 of observed speed distribution (proxy for free-flow desired speed)
+- `timeGapSeconds` — average gap time = distance / speed, filtered for moving vehicles
+- `maxAccelMps2` — 85th percentile of observed positive accelerations (filtered for realism)
+- `comfortDecelMps2` — absolute value of 15th percentile of observed decelerations
+
+**Why not Kalman filter:** The EKF requires same-vehicle consecutive observations to estimate acceleration (leader-follower model). The STPT probe data provides consecutive observations of *different* buses on the same route — not a tracked vehicle pair. Therefore EKF state cannot converge. Replaced with statistical distribution estimation from all probe segments per route.
+
+**Fallback:** City-wide defaults computed from high-quality routes (≥5000 segments, stdDev < 12).
+
+---
+
+## Phase 3 — TomTom Speed/Delay Corridor Profiling
+
+**`src/tomtom-profiler.ts`** (new)
+
+Parses `data/traffic-flow/tomtom-latest.json` (already fetched). For each flow record:
+- Extract speed, travel time, congestion level per point
+- Join to OSM road segments if possible, else use raw lat/lng
+- Aggregate by time slot (morning-rush, midday, afternoon-rush, etc.)
+
+Produces:
+- Per-slot speed heatmap (slot × road segment matrix)
+- Delay vs. free-flow speed ratio per segment
+- Congestion regime classification: `free` (speed ≥ 0.85×free), `light` (0.65–0.85×), `heavy` (0.40–0.65×), `blocked` (< 0.40×)
+
+Output: `data/derived/tomtom-corridor-profiles.json`
+
+---
+
+## Phase 4 — Congestion Regime Classifier
+
+**`src/congestion-classifier.ts`** (new)
+
+Combines probe data and TomTom data to classify each road segment into congestion regimes.
+
+**Input sources:**
+1. STPT probe segments → speed, delay per route/segment
+2. TomTom flow data → free-flow speed reference per segment
+3. Simulation frames → baseline "uncongested" reference from `simulation.ts`
+
+**Classification method:**
+- Compute `speed_ratio = current_speed / free_flow_speed` for each data point
+- Cluster into 4 regimes using simple thresholding (matching TomTom's own `congestionLevel` labels)
+- Flag segments where probe-derived speed and TomTom-derived speed disagree by > 20% (indicator of local anomaly or probe penetration bias)
+
+Output: `data/derived/congestion-regimes.json` — per-segment regime time series, plus anomaly flags.
+
+---
+
+## Phase 5 — Results Export & Summaries
+
+**`scripts/analyze-traffic.mjs`** (new, or extend existing)
+
+Runs all four phases in sequence, writes results to `data/derived/`. Produces human-readable stdout summary:
+- Top-10 slowest routes (by avg probe speed)
+- Calibrated car-following parameters per route
+- Congestion hotspots (TomTom heavy/blocked segments)
+- Regime breakdown table (free / light / heavy / blocked counts per time slot)
+
+Also exports:
+- `data/derived/calibration-results.csv`
+- `data/derived/speed-profiles.csv` — long-form table of speed by route × time-slot
+- `data/derived/congestion-summary.csv` — regime matrix
+
+---
+
+## File Map
+
+```
+stpt.db                        ← Historical STPT GPS data (84MB, 406k rows, 192 vehicles, 57 routes)
+src/
+  stpt-probe.ts              ← SQL probe segment queries via node:sqlite (DatabaseSync)
+  probe-aggregator.ts        ← Phase 1: route aggregation from stpt.db (290,727 segments)
+  calibration.ts             ← Phase 2: IDM parameter calibration per route (57 routes, 8 high-quality)
+  tomtom-profiler.ts         ← Phase 3: TomTom corridor profiling (308 segments)
+  congestion-classifier.ts   ← Phase 4: cross-source anomaly detection (123 segments, 26 anomalies)
+scripts/
+  analyze-traffic.mjs         ← Phase 5: end-to-end runner
+data/derived/
+  probe-aggregation.json      ← per-route probe stats (57 routes, 290k segments)
+  calibration-results.json   ← IDM parameters per route + city defaults (JSON)
+  calibration-results.csv     ← same, CSV format (57 rows)
+  tomtom-corridor-profiles.json ← TomTom per-segment profiles (JSON)
+  speed-profiles.csv         ← long-form: slot × segment (1848 rows)
+  congestion-regimes.json     ← cross-source regime classification (JSON)
+  congestion-summary.csv      ← regime per route/segment (123 rows)
+```
+
+---
+
+## Dependency Ordering
+
+1. `probe-aggregator.ts` (Phase 1) — all downstream depends on aggregated windows
+2. `calibration.ts` (Phase 2) — depends on Phase 1 output
+3. `tomtom-profiler.ts` (Phase 3) — independent, depends only on TomTom JSON
+4. `congestion-classifier.ts` (Phase 4) — depends on Phase 1 + Phase 3
+5. `scripts/analyze-traffic.mjs` (Phase 5) — runs all, generates CSVs + summary
+
+---
+
+## What This Does NOT Cover
+
+- Web UI / visualization (user's responsibility per original request)
+- SUMO integration (traffic-validation.ts already handles simulation comparison)
+- Authority data or official traffic counts (deliberately excluded)
+- Real-time streaming (runs on demand from existing collected data)
+
+## Success Criteria
+
+- `scripts/analyze-traffic.mjs` runs end-to-end with no errors ✓
+- Output CSVs are valid, non-empty, and contain real numeric values ✓
+- Results are reproducible across runs with same data ✓
+- Each phase is independently testable/runnable ✓
+
+## Implementation Status
+
+All five phases have been implemented and verified running (`npx tsx scripts/analyze-traffic.mjs`). Outputs are in `data/derived/`. Key findings and methodology mapping are documented in `docs/roadmap/05-technical-papers.md`.

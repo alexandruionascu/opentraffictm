@@ -1,0 +1,2434 @@
+{
+  "generatedAt": "2026-05-14T20:41:25.476Z",
+  "description": "Congestion regime classification combining STPT probe data and TomTom flow data",
+  "records": [
+    {
+      "route": "33",
+      "regime": "blocked",
+      "avgSpeedKph": 16.1,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.209641,
+          45.739101
+        ],
+        [
+          21.215111,
+          45.73838
+        ]
+      ]
+    },
+    {
+      "route": "E1",
+      "regime": "blocked",
+      "avgSpeedKph": 17.7,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.223021,
+          45.790409
+        ],
+        [
+          21.208731,
+          45.73254
+        ]
+      ]
+    },
+    {
+      "route": "M37",
+      "regime": "light",
+      "avgSpeedKph": 34.5,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.203609,
+          45.726582
+        ],
+        [
+          21.205351,
+          45.728062
+        ]
+      ]
+    },
+    {
+      "route": "13",
+      "regime": "blocked",
+      "avgSpeedKph": 17,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.223261,
+          45.75346
+        ],
+        [
+          21.224739,
+          45.756592
+        ]
+      ]
+    },
+    {
+      "route": "E3",
+      "regime": "blocked",
+      "avgSpeedKph": 18.5,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.170361,
+          45.72044
+        ],
+        [
+          21.19268,
+          45.738091
+        ]
+      ]
+    },
+    {
+      "route": "E8",
+      "regime": "blocked",
+      "avgSpeedKph": 18,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.25403,
+          45.7556
+        ],
+        [
+          21.23728,
+          45.743832
+        ]
+      ]
+    },
+    {
+      "route": "E7",
+      "regime": "blocked",
+      "avgSpeedKph": 19.3,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.194031,
+          45.735519
+        ],
+        [
+          21.23308,
+          45.7542
+        ]
+      ]
+    },
+    {
+      "route": "33b",
+      "regime": "heavy",
+      "avgSpeedKph": 20,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.20797,
+          45.731419
+        ],
+        [
+          21.215139,
+          45.74548
+        ]
+      ]
+    },
+    {
+      "route": "40",
+      "regime": "blocked",
+      "avgSpeedKph": 16.8,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.233629,
+          45.755409
+        ],
+        [
+          21.234381,
+          45.750721
+        ]
+      ]
+    },
+    {
+      "route": "M11",
+      "regime": "blocked",
+      "avgSpeedKph": 16.1,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.221991,
+          45.753151
+        ],
+        [
+          21.23563,
+          45.758579
+        ]
+      ]
+    },
+    {
+      "route": "M22",
+      "regime": "heavy",
+      "avgSpeedKph": 23.3,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.247829,
+          45.731201
+        ],
+        [
+          21.292789,
+          45.724079
+        ]
+      ]
+    },
+    {
+      "route": "E4",
+      "regime": "heavy",
+      "avgSpeedKph": 30.8,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.236,
+          45.758751
+        ],
+        [
+          21.322371,
+          45.80912
+        ]
+      ]
+    },
+    {
+      "route": "1",
+      "regime": "blocked",
+      "avgSpeedKph": 15.7,
+      "speedRatio": 0.333,
+      "confidence": 0.85,
+      "anomaly": false,
+      "source": "both",
+      "geometry": [
+        [
+          21.207291,
+          45.7505
+        ],
+        [
+          21.260349,
+          45.76955
+        ]
+      ]
+    },
+    {
+      "route": "8",
+      "regime": "blocked",
+      "avgSpeedKph": 17.5,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.257959,
+          45.736691
+        ],
+        [
+          21.258869,
+          45.73418
+        ]
+      ]
+    },
+    {
+      "route": "9",
+      "regime": "blocked",
+      "avgSpeedKph": 18.8,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.19669,
+          45.74033
+        ],
+        [
+          21.25827,
+          45.73362
+        ]
+      ]
+    },
+    {
+      "route": "2",
+      "regime": "blocked",
+      "avgSpeedKph": 16.1,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.195101,
+          45.739651
+        ],
+        [
+          21.232651,
+          45.753639
+        ]
+      ]
+    },
+    {
+      "route": "4",
+      "regime": "blocked",
+      "avgSpeedKph": 18.5,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.212589,
+          45.757191
+        ],
+        [
+          21.252729,
+          45.74818
+        ]
+      ]
+    },
+    {
+      "route": "18",
+      "regime": "blocked",
+      "avgSpeedKph": 14,
+      "speedRatio": 0.333,
+      "confidence": 0.85,
+      "anomaly": false,
+      "source": "both",
+      "geometry": [
+        [
+          21.2076,
+          45.750431
+        ],
+        [
+          21.20945,
+          45.747742
+        ]
+      ]
+    },
+    {
+      "route": "7",
+      "regime": "blocked",
+      "avgSpeedKph": 16.9,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.204941,
+          45.7286
+        ],
+        [
+          21.19561,
+          45.738319
+        ]
+      ]
+    },
+    {
+      "route": "5",
+      "regime": "blocked",
+      "avgSpeedKph": 17.8,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.21792,
+          45.75666
+        ],
+        [
+          21.22224,
+          45.756351
+        ]
+      ]
+    },
+    {
+      "route": "5b",
+      "regime": "heavy",
+      "avgSpeedKph": 20.2,
+      "speedRatio": 0.333,
+      "confidence": 0.85,
+      "anomaly": false,
+      "source": "both",
+      "geometry": [
+        [
+          21.209379,
+          45.747822
+        ],
+        [
+          21.208179,
+          45.750542
+        ]
+      ]
+    },
+    {
+      "route": "11",
+      "regime": "blocked",
+      "avgSpeedKph": 15.4,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.22156,
+          45.75272
+        ],
+        [
+          21.2332,
+          45.755581
+        ]
+      ]
+    },
+    {
+      "route": "M14",
+      "regime": "blocked",
+      "avgSpeedKph": 18.2,
+      "speedRatio": 0.8,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.2013,
+          45.74947
+        ],
+        [
+          21.249399,
+          45.802189
+        ]
+      ]
+    },
+    {
+      "route": "16",
+      "regime": "blocked",
+      "avgSpeedKph": 14.2,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.24577,
+          45.731232
+        ],
+        [
+          21.24951,
+          45.740929
+        ]
+      ]
+    },
+    {
+      "route": "15",
+      "regime": "blocked",
+      "avgSpeedKph": 14.2,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.24803,
+          45.73312
+        ],
+        [
+          21.250139,
+          45.736691
+        ]
+      ]
+    },
+    {
+      "route": "14",
+      "regime": "blocked",
+      "avgSpeedKph": 14.9,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.22925,
+          45.76791
+        ],
+        [
+          21.22777,
+          45.75922
+        ]
+      ]
+    },
+    {
+      "route": "17",
+      "regime": "blocked",
+      "avgSpeedKph": 14.7,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.229179,
+          45.759541
+        ],
+        [
+          21.23349,
+          45.757809
+        ]
+      ]
+    },
+    {
+      "route": "M48",
+      "regime": "light",
+      "avgSpeedKph": 41.2,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": false,
+      "source": "both",
+      "geometry": [
+        [
+          21.23587,
+          45.758678
+        ],
+        [
+          21.23222,
+          45.75573
+        ]
+      ]
+    },
+    {
+      "route": "V1",
+      "regime": "blocked",
+      "avgSpeedKph": 8.8,
+      "speedRatio": 0.667,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.22496,
+          45.74868
+        ],
+        [
+          21.240379,
+          45.75515
+        ]
+      ]
+    },
+    {
+      "route": "E6",
+      "regime": "heavy",
+      "avgSpeedKph": 23,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.228939,
+          45.759399
+        ],
+        [
+          21.260691,
+          45.763599
+        ]
+      ]
+    },
+    {
+      "route": "46",
+      "regime": "heavy",
+      "avgSpeedKph": 21.8,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.24749,
+          45.779572
+        ],
+        [
+          21.236179,
+          45.75877
+        ]
+      ]
+    },
+    {
+      "route": "M23",
+      "regime": "heavy",
+      "avgSpeedKph": 29.4,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.258739,
+          45.734039
+        ],
+        [
+          21.248859,
+          45.731079
+        ]
+      ]
+    },
+    {
+      "route": "M24",
+      "regime": "heavy",
+      "avgSpeedKph": 27.8,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.249599,
+          45.735619
+        ],
+        [
+          21.322531,
+          45.719082
+        ]
+      ]
+    },
+    {
+      "route": "32",
+      "regime": "blocked",
+      "avgSpeedKph": 19.7,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.21916,
+          45.7327
+        ],
+        [
+          21.20867,
+          45.719398
+        ]
+      ]
+    },
+    {
+      "route": "E4b",
+      "regime": "heavy",
+      "avgSpeedKph": 27,
+      "speedRatio": 0.8,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.201139,
+          45.749401
+        ],
+        [
+          21.25922,
+          45.76062
+        ]
+      ]
+    },
+    {
+      "route": "M35",
+      "regime": "heavy",
+      "avgSpeedKph": 24.6,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.23633,
+          45.758831
+        ],
+        [
+          21.25876,
+          45.759979
+        ]
+      ]
+    },
+    {
+      "route": "M51",
+      "regime": "light",
+      "avgSpeedKph": 36.2,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.202971,
+          45.725479
+        ],
+        [
+          21.211399,
+          45.74094
+        ]
+      ]
+    },
+    {
+      "route": "21",
+      "regime": "blocked",
+      "avgSpeedKph": 19.8,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.279079,
+          45.74894
+        ],
+        [
+          21.278549,
+          45.74992
+        ]
+      ]
+    },
+    {
+      "route": "23",
+      "regime": "blocked",
+      "avgSpeedKph": 19.2,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.240549,
+          45.757389
+        ],
+        [
+          21.24341,
+          45.759029
+        ]
+      ]
+    },
+    {
+      "route": "M43",
+      "regime": "light",
+      "avgSpeedKph": 34.4,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.23245,
+          45.75848
+        ],
+        [
+          21.11017,
+          45.76022
+        ]
+      ]
+    },
+    {
+      "route": "M49",
+      "regime": "heavy",
+      "avgSpeedKph": 26.4,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.232519,
+          45.758881
+        ],
+        [
+          21.23246,
+          45.75861
+        ]
+      ]
+    },
+    {
+      "route": "24",
+      "regime": "heavy",
+      "avgSpeedKph": 22.6,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.281219,
+          45.726189
+        ],
+        [
+          21.272169,
+          45.715462
+        ]
+      ]
+    },
+    {
+      "route": "M39",
+      "regime": "free",
+      "avgSpeedKph": 53.8,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.203461,
+          45.726398
+        ],
+        [
+          21.205059,
+          45.727821
+        ]
+      ]
+    },
+    {
+      "route": "28",
+      "regime": "blocked",
+      "avgSpeedKph": 18.4,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.23715,
+          45.759159
+        ],
+        [
+          21.2526,
+          45.7635
+        ]
+      ]
+    },
+    {
+      "route": "E2",
+      "regime": "blocked",
+      "avgSpeedKph": 17.8,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.239349,
+          45.74176
+        ],
+        [
+          21.238529,
+          45.77541
+        ]
+      ]
+    },
+    {
+      "route": "M30",
+      "regime": "heavy",
+      "avgSpeedKph": 23.1,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.236059,
+          45.758781
+        ],
+        [
+          21.235399,
+          45.748039
+        ]
+      ]
+    },
+    {
+      "route": "M42",
+      "regime": "heavy",
+      "avgSpeedKph": 27.1,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.253309,
+          45.747871
+        ],
+        [
+          21.25325,
+          45.74836
+        ]
+      ]
+    },
+    {
+      "route": "M38",
+      "regime": "light",
+      "avgSpeedKph": 41.6,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.203501,
+          45.72644
+        ],
+        [
+          21.19261,
+          45.71336
+        ]
+      ]
+    },
+    {
+      "route": "M27",
+      "regime": "light",
+      "avgSpeedKph": 35.7,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.232361,
+          45.757999
+        ],
+        [
+          21.39238,
+          45.784161
+        ]
+      ]
+    },
+    {
+      "route": "M46",
+      "regime": "heavy",
+      "avgSpeedKph": 30.4,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.203581,
+          45.726521
+        ],
+        [
+          21.20528,
+          45.728069
+        ]
+      ]
+    },
+    {
+      "route": "M36",
+      "regime": "heavy",
+      "avgSpeedKph": 28.4,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.11618,
+          45.710751
+        ],
+        [
+          21.215759,
+          45.745861
+        ]
+      ]
+    },
+    {
+      "route": "M41",
+      "regime": "heavy",
+      "avgSpeedKph": 31.8,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.22994,
+          45.759369
+        ],
+        [
+          21.23225,
+          45.757889
+        ]
+      ]
+    },
+    {
+      "route": "M47",
+      "regime": "light",
+      "avgSpeedKph": 39.5,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.232531,
+          45.75848
+        ],
+        [
+          21.223379,
+          45.769718
+        ]
+      ]
+    },
+    {
+      "route": "M50",
+      "regime": "free",
+      "avgSpeedKph": 43.8,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.252819,
+          45.74807
+        ],
+        [
+          21.23177,
+          45.758881
+        ]
+      ]
+    },
+    {
+      "route": "M44",
+      "regime": "light",
+      "avgSpeedKph": 36.2,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.233931,
+          45.75742
+        ],
+        [
+          21.232309,
+          45.758289
+        ]
+      ]
+    },
+    {
+      "route": "M45",
+      "regime": "heavy",
+      "avgSpeedKph": 21.1,
+      "speedRatio": 1,
+      "confidence": 0.85,
+      "anomaly": true,
+      "source": "both",
+      "geometry": [
+        [
+          21.22533,
+          45.766232
+        ],
+        [
+          21.23188,
+          45.75872
+        ]
+      ]
+    },
+    {
+      "route": "M29",
+      "regime": "heavy",
+      "avgSpeedKph": 23,
+      "speedRatio": null,
+      "confidence": 0.65,
+      "anomaly": false,
+      "source": "probe",
+      "geometry": [
+        [
+          21.262751,
+          45.765991
+        ],
+        [
+          21.260321,
+          45.76038
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73791,21.20967",
+      "regime": "free",
+      "avgSpeedKph": 52,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20967,
+          45.73791
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73683,21.20950",
+      "regime": "free",
+      "avgSpeedKph": 52,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.2095,
+          45.73683
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73559,21.20926",
+      "regime": "free",
+      "avgSpeedKph": 52,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20926,
+          45.73559
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73396,21.20897",
+      "regime": "free",
+      "avgSpeedKph": 52,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20897,
+          45.73396
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73466,21.22534",
+      "regime": "free",
+      "avgSpeedKph": 55,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22534,
+          45.73466
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73416,21.22402",
+      "regime": "free",
+      "avgSpeedKph": 55,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22402,
+          45.73416
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73724,21.23343",
+      "regime": "free",
+      "avgSpeedKph": 53,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23343,
+          45.73724
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73678,21.23194",
+      "regime": "free",
+      "avgSpeedKph": 53,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23194,
+          45.73678
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74927,21.20272",
+      "regime": "light",
+      "avgSpeedKph": 28,
+      "speedRatio": 0.8,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20272,
+          45.74927
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74846,21.20329",
+      "regime": "light",
+      "avgSpeedKph": 28,
+      "speedRatio": 0.8,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20329,
+          45.74846
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74749,21.20396",
+      "regime": "light",
+      "avgSpeedKph": 28,
+      "speedRatio": 0.8,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20396,
+          45.74749
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74609,21.20495",
+      "regime": "light",
+      "avgSpeedKph": 28,
+      "speedRatio": 0.8,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20495,
+          45.74609
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74487,21.20579",
+      "regime": "light",
+      "avgSpeedKph": 28,
+      "speedRatio": 0.8,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20579,
+          45.74487
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.73999,21.20935",
+      "regime": "free",
+      "avgSpeedKph": 34,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20935,
+          45.73999
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74109,21.20860",
+      "regime": "free",
+      "avgSpeedKph": 34,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.2086,
+          45.74109
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74218,21.20785",
+      "regime": "free",
+      "avgSpeedKph": 34,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20785,
+          45.74218
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74338,21.20700",
+      "regime": "free",
+      "avgSpeedKph": 34,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.207,
+          45.74338
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74299,21.21300",
+      "regime": "light",
+      "avgSpeedKph": 28,
+      "speedRatio": 0.683,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.213,
+          45.74299
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74385,21.21373",
+      "regime": "light",
+      "avgSpeedKph": 28,
+      "speedRatio": 0.683,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.21373,
+          45.74385
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74827,21.22344",
+      "regime": "light",
+      "avgSpeedKph": 10,
+      "speedRatio": 0.667,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22344,
+          45.74827
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74784,21.22556",
+      "regime": "light",
+      "avgSpeedKph": 10,
+      "speedRatio": 0.667,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22556,
+          45.74784
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74815,21.23205",
+      "regime": "free",
+      "avgSpeedKph": 35,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23205,
+          45.74815
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74795,21.23060",
+      "regime": "free",
+      "avgSpeedKph": 35,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.2306,
+          45.74795
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74781,21.22923",
+      "regime": "free",
+      "avgSpeedKph": 35,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22923,
+          45.74781
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74775,21.22788",
+      "regime": "free",
+      "avgSpeedKph": 35,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22788,
+          45.74775
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74916,21.19942",
+      "regime": "free",
+      "avgSpeedKph": 47,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.19942,
+          45.74916
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74865,21.19674",
+      "regime": "free",
+      "avgSpeedKph": 47,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.19674,
+          45.74865
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75000,21.20520",
+      "regime": "blocked",
+      "avgSpeedKph": 5,
+      "speedRatio": 0.333,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.2052,
+          45.75
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75169,21.21598",
+      "regime": "free",
+      "avgSpeedKph": 37,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.21598,
+          45.75169
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75066,21.21656",
+      "regime": "free",
+      "avgSpeedKph": 37,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.21656,
+          45.75066
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75048,21.22242",
+      "regime": "free",
+      "avgSpeedKph": 18,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22242,
+          45.75048
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75108,21.22362",
+      "regime": "free",
+      "avgSpeedKph": 18,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22362,
+          45.75108
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75138,21.23845",
+      "regime": "heavy",
+      "avgSpeedKph": 36,
+      "speedRatio": 0.621,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23845,
+          45.75138
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75056,21.23779",
+      "regime": "heavy",
+      "avgSpeedKph": 36,
+      "speedRatio": 0.621,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23779,
+          45.75056
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74925,21.23639",
+      "regime": "heavy",
+      "avgSpeedKph": 36,
+      "speedRatio": 0.621,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23639,
+          45.74925
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.74857,21.23456",
+      "regime": "heavy",
+      "avgSpeedKph": 36,
+      "speedRatio": 0.621,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23456,
+          45.74857
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75761,21.19599",
+      "regime": "free",
+      "avgSpeedKph": 44,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.19599,
+          45.75761
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75813,21.19790",
+      "regime": "free",
+      "avgSpeedKph": 44,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.1979,
+          45.75813
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75855,21.20446",
+      "regime": "free",
+      "avgSpeedKph": 52,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20446,
+          45.75855
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75838,21.20591",
+      "regime": "free",
+      "avgSpeedKph": 52,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20591,
+          45.75838
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75815,21.20749",
+      "regime": "free",
+      "avgSpeedKph": 52,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20749,
+          45.75815
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75671,21.21483",
+      "regime": "free",
+      "avgSpeedKph": 15,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.21483,
+          45.75671
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75660,21.21617",
+      "regime": "free",
+      "avgSpeedKph": 15,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.21617,
+          45.7566
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75902,21.22086",
+      "regime": "light",
+      "avgSpeedKph": 18,
+      "speedRatio": 0.692,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22086,
+          45.75902
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75860,21.22218",
+      "regime": "light",
+      "avgSpeedKph": 18,
+      "speedRatio": 0.692,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22218,
+          45.7586
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75818,21.22354",
+      "regime": "light",
+      "avgSpeedKph": 18,
+      "speedRatio": 0.692,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22354,
+          45.75818
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75779,21.22479",
+      "regime": "light",
+      "avgSpeedKph": 18,
+      "speedRatio": 0.692,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22479,
+          45.75779
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75708,21.23223",
+      "regime": "free",
+      "avgSpeedKph": 30,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23223,
+          45.75708
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.75607,21.23219",
+      "regime": "free",
+      "avgSpeedKph": 30,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23219,
+          45.75607
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76665,21.19564",
+      "regime": "free",
+      "avgSpeedKph": 40,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.19564,
+          45.76665
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76629,21.19799",
+      "regime": "free",
+      "avgSpeedKph": 40,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.19799,
+          45.76629
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76601,21.19929",
+      "regime": "free",
+      "avgSpeedKph": 40,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.19929,
+          45.76601
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76521,21.20255",
+      "regime": "free",
+      "avgSpeedKph": 40,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20255,
+          45.76521
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76451,21.20519",
+      "regime": "free",
+      "avgSpeedKph": 34,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20519,
+          45.76451
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76417,21.20651",
+      "regime": "free",
+      "avgSpeedKph": 34,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20651,
+          45.76417
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76384,21.20772",
+      "regime": "free",
+      "avgSpeedKph": 34,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.20772,
+          45.76384
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76101,21.21609",
+      "regime": "free",
+      "avgSpeedKph": 50,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.21609,
+          45.76101
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76171,21.21430",
+      "regime": "free",
+      "avgSpeedKph": 50,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.2143,
+          45.76171
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76289,21.22071",
+      "regime": "free",
+      "avgSpeedKph": 46,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22071,
+          45.76289
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76350,21.22182",
+      "regime": "free",
+      "avgSpeedKph": 46,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22182,
+          45.7635
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76388,21.22304",
+      "regime": "free",
+      "avgSpeedKph": 46,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.22304,
+          45.76388
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76700,21.23037",
+      "regime": "free",
+      "avgSpeedKph": 32,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23037,
+          45.767
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76606,21.23072",
+      "regime": "free",
+      "avgSpeedKph": 32,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23072,
+          45.76606
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76529,21.23150",
+      "regime": "free",
+      "avgSpeedKph": 32,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.2315,
+          45.76529
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76451,21.23234",
+      "regime": "free",
+      "avgSpeedKph": 32,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23234,
+          45.76451
+        ]
+      ]
+    },
+    {
+      "route": "tomtom-45.76358,21.23299",
+      "regime": "free",
+      "avgSpeedKph": 32,
+      "speedRatio": 1,
+      "confidence": 0.8,
+      "anomaly": false,
+      "source": "tomtom",
+      "geometry": [
+        [
+          21.23299,
+          45.76358
+        ]
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "segmentId": "33",
+      "source": "both",
+      "description": "Probe ratio 0.32 vs TomTom ratio 1.00 (disagree by 68%)",
+      "probeSpeedKph": 16.1,
+      "tomtomSpeedKph": 34,
+      "disagreement": 0.6779999999999999
+    },
+    {
+      "segmentId": "13",
+      "source": "both",
+      "description": "Probe ratio 0.34 vs TomTom ratio 1.00 (disagree by 66%)",
+      "probeSpeedKph": 17,
+      "tomtomSpeedKph": 18,
+      "disagreement": 0.6599999999999999
+    },
+    {
+      "segmentId": "33b",
+      "source": "both",
+      "description": "Probe ratio 0.40 vs TomTom ratio 1.00 (disagree by 60%)",
+      "probeSpeedKph": 20,
+      "tomtomSpeedKph": 52,
+      "disagreement": 0.6
+    },
+    {
+      "segmentId": "40",
+      "source": "both",
+      "description": "Probe ratio 0.34 vs TomTom ratio 1.00 (disagree by 66%)",
+      "probeSpeedKph": 16.8,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.6639999999999999
+    },
+    {
+      "segmentId": "M11",
+      "source": "both",
+      "description": "Probe ratio 0.32 vs TomTom ratio 1.00 (disagree by 68%)",
+      "probeSpeedKph": 16.1,
+      "tomtomSpeedKph": 18,
+      "disagreement": 0.6779999999999999
+    },
+    {
+      "segmentId": "E4",
+      "source": "both",
+      "description": "Probe ratio 0.62 vs TomTom ratio 1.00 (disagree by 38%)",
+      "probeSpeedKph": 30.8,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.384
+    },
+    {
+      "segmentId": "4",
+      "source": "both",
+      "description": "Probe ratio 0.37 vs TomTom ratio 1.00 (disagree by 63%)",
+      "probeSpeedKph": 18.5,
+      "tomtomSpeedKph": 15,
+      "disagreement": 0.63
+    },
+    {
+      "segmentId": "5",
+      "source": "both",
+      "description": "Probe ratio 0.36 vs TomTom ratio 1.00 (disagree by 64%)",
+      "probeSpeedKph": 17.8,
+      "tomtomSpeedKph": 15,
+      "disagreement": 0.6439999999999999
+    },
+    {
+      "segmentId": "11",
+      "source": "both",
+      "description": "Probe ratio 0.31 vs TomTom ratio 1.00 (disagree by 69%)",
+      "probeSpeedKph": 15.4,
+      "tomtomSpeedKph": 18,
+      "disagreement": 0.692
+    },
+    {
+      "segmentId": "M14",
+      "source": "both",
+      "description": "Probe ratio 0.36 vs TomTom ratio 0.80 (disagree by 44%)",
+      "probeSpeedKph": 18.2,
+      "tomtomSpeedKph": 28,
+      "disagreement": 0.43599999999999994
+    },
+    {
+      "segmentId": "14",
+      "source": "both",
+      "description": "Probe ratio 0.30 vs TomTom ratio 1.00 (disagree by 70%)",
+      "probeSpeedKph": 14.9,
+      "tomtomSpeedKph": 32,
+      "disagreement": 0.702
+    },
+    {
+      "segmentId": "17",
+      "source": "both",
+      "description": "Probe ratio 0.29 vs TomTom ratio 1.00 (disagree by 71%)",
+      "probeSpeedKph": 14.7,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.706
+    },
+    {
+      "segmentId": "V1",
+      "source": "both",
+      "description": "Probe ratio 0.18 vs TomTom ratio 0.67 (disagree by 49%)",
+      "probeSpeedKph": 8.8,
+      "tomtomSpeedKph": 10,
+      "disagreement": 0.4909999999999999
+    },
+    {
+      "segmentId": "E6",
+      "source": "both",
+      "description": "Probe ratio 0.46 vs TomTom ratio 1.00 (disagree by 54%)",
+      "probeSpeedKph": 23,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.54
+    },
+    {
+      "segmentId": "32",
+      "source": "both",
+      "description": "Probe ratio 0.39 vs TomTom ratio 1.00 (disagree by 61%)",
+      "probeSpeedKph": 19.7,
+      "tomtomSpeedKph": 55,
+      "disagreement": 0.6060000000000001
+    },
+    {
+      "segmentId": "E4b",
+      "source": "both",
+      "description": "Probe ratio 0.54 vs TomTom ratio 0.80 (disagree by 26%)",
+      "probeSpeedKph": 27,
+      "tomtomSpeedKph": 28,
+      "disagreement": 0.2599999999999999
+    },
+    {
+      "segmentId": "M35",
+      "source": "both",
+      "description": "Probe ratio 0.49 vs TomTom ratio 1.00 (disagree by 51%)",
+      "probeSpeedKph": 24.6,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.508
+    },
+    {
+      "segmentId": "M43",
+      "source": "both",
+      "description": "Probe ratio 0.69 vs TomTom ratio 1.00 (disagree by 31%)",
+      "probeSpeedKph": 34.4,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.31200000000000006
+    },
+    {
+      "segmentId": "M49",
+      "source": "both",
+      "description": "Probe ratio 0.53 vs TomTom ratio 1.00 (disagree by 47%)",
+      "probeSpeedKph": 26.4,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.472
+    },
+    {
+      "segmentId": "28",
+      "source": "both",
+      "description": "Probe ratio 0.37 vs TomTom ratio 1.00 (disagree by 63%)",
+      "probeSpeedKph": 18.4,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.632
+    },
+    {
+      "segmentId": "M30",
+      "source": "both",
+      "description": "Probe ratio 0.46 vs TomTom ratio 1.00 (disagree by 54%)",
+      "probeSpeedKph": 23.1,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.538
+    },
+    {
+      "segmentId": "M27",
+      "source": "both",
+      "description": "Probe ratio 0.71 vs TomTom ratio 1.00 (disagree by 29%)",
+      "probeSpeedKph": 35.7,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.2859999999999999
+    },
+    {
+      "segmentId": "M41",
+      "source": "both",
+      "description": "Probe ratio 0.64 vs TomTom ratio 1.00 (disagree by 36%)",
+      "probeSpeedKph": 31.8,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.364
+    },
+    {
+      "segmentId": "M47",
+      "source": "both",
+      "description": "Probe ratio 0.79 vs TomTom ratio 1.00 (disagree by 21%)",
+      "probeSpeedKph": 39.5,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.20999999999999996
+    },
+    {
+      "segmentId": "M44",
+      "source": "both",
+      "description": "Probe ratio 0.72 vs TomTom ratio 1.00 (disagree by 28%)",
+      "probeSpeedKph": 36.2,
+      "tomtomSpeedKph": 30,
+      "disagreement": 0.2759999999999999
+    },
+    {
+      "segmentId": "M45",
+      "source": "both",
+      "description": "Probe ratio 0.42 vs TomTom ratio 1.00 (disagree by 58%)",
+      "probeSpeedKph": 21.1,
+      "tomtomSpeedKph": 46,
+      "disagreement": 0.578
+    }
+  ],
+  "byRegime": {
+    "free": 50,
+    "light": 21,
+    "heavy": 23,
+    "blocked": 29
+  },
+  "summary": {
+    "totalSegments": 123,
+    "anomalousSegments": 26,
+    "dominantRegime": "free",
+    "routesByRegime": {
+      "free": [
+        "M39",
+        "M50",
+        "tomtom-45.73791,21.20967",
+        "tomtom-45.73683,21.20950",
+        "tomtom-45.73559,21.20926",
+        "tomtom-45.73396,21.20897",
+        "tomtom-45.73466,21.22534",
+        "tomtom-45.73416,21.22402",
+        "tomtom-45.73724,21.23343",
+        "tomtom-45.73678,21.23194",
+        "tomtom-45.73999,21.20935",
+        "tomtom-45.74109,21.20860",
+        "tomtom-45.74218,21.20785",
+        "tomtom-45.74338,21.20700",
+        "tomtom-45.74815,21.23205",
+        "tomtom-45.74795,21.23060",
+        "tomtom-45.74781,21.22923",
+        "tomtom-45.74775,21.22788",
+        "tomtom-45.74916,21.19942",
+        "tomtom-45.74865,21.19674",
+        "tomtom-45.75169,21.21598",
+        "tomtom-45.75066,21.21656",
+        "tomtom-45.75048,21.22242",
+        "tomtom-45.75108,21.22362",
+        "tomtom-45.75761,21.19599",
+        "tomtom-45.75813,21.19790",
+        "tomtom-45.75855,21.20446",
+        "tomtom-45.75838,21.20591",
+        "tomtom-45.75815,21.20749",
+        "tomtom-45.75671,21.21483",
+        "tomtom-45.75660,21.21617",
+        "tomtom-45.75708,21.23223",
+        "tomtom-45.75607,21.23219",
+        "tomtom-45.76665,21.19564",
+        "tomtom-45.76629,21.19799",
+        "tomtom-45.76601,21.19929",
+        "tomtom-45.76521,21.20255",
+        "tomtom-45.76451,21.20519",
+        "tomtom-45.76417,21.20651",
+        "tomtom-45.76384,21.20772",
+        "tomtom-45.76101,21.21609",
+        "tomtom-45.76171,21.21430",
+        "tomtom-45.76289,21.22071",
+        "tomtom-45.76350,21.22182",
+        "tomtom-45.76388,21.22304",
+        "tomtom-45.76700,21.23037",
+        "tomtom-45.76606,21.23072",
+        "tomtom-45.76529,21.23150",
+        "tomtom-45.76451,21.23234",
+        "tomtom-45.76358,21.23299"
+      ],
+      "light": [
+        "M37",
+        "M48",
+        "M51",
+        "M43",
+        "M38",
+        "M27",
+        "M47",
+        "M44",
+        "tomtom-45.74927,21.20272",
+        "tomtom-45.74846,21.20329",
+        "tomtom-45.74749,21.20396",
+        "tomtom-45.74609,21.20495",
+        "tomtom-45.74487,21.20579",
+        "tomtom-45.74299,21.21300",
+        "tomtom-45.74385,21.21373",
+        "tomtom-45.74827,21.22344",
+        "tomtom-45.74784,21.22556",
+        "tomtom-45.75902,21.22086",
+        "tomtom-45.75860,21.22218",
+        "tomtom-45.75818,21.22354",
+        "tomtom-45.75779,21.22479"
+      ],
+      "heavy": [
+        "33b",
+        "M22",
+        "E4",
+        "5b",
+        "E6",
+        "46",
+        "M23",
+        "M24",
+        "E4b",
+        "M35",
+        "M49",
+        "24",
+        "M30",
+        "M42",
+        "M46",
+        "M36",
+        "M41",
+        "M45",
+        "M29",
+        "tomtom-45.75138,21.23845",
+        "tomtom-45.75056,21.23779",
+        "tomtom-45.74925,21.23639",
+        "tomtom-45.74857,21.23456"
+      ],
+      "blocked": [
+        "33",
+        "E1",
+        "13",
+        "E3",
+        "E8",
+        "E7",
+        "40",
+        "M11",
+        "1",
+        "8",
+        "9",
+        "2",
+        "4",
+        "18",
+        "7",
+        "5",
+        "11",
+        "M14",
+        "16",
+        "15",
+        "14",
+        "17",
+        "V1",
+        "32",
+        "21",
+        "23",
+        "28",
+        "E2",
+        "tomtom-45.75000,21.20520"
+      ]
+    },
+    "cityCongestionIndex": 0.66
+  }
+}

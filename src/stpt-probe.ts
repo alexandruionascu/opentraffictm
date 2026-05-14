@@ -1,6 +1,4 @@
-import Database from "better-sqlite3";
-
-const DB_PATH = "data/stpt.db";
+const DB_PATH = "stpt.db";
 const NOMINAL_BUS_SPEED_KPH = 18;
 
 export interface ProbeSegment {
@@ -10,6 +8,7 @@ export interface ProbeSegment {
   distanceMeters: number;
   timeDeltaSeconds: number;
   delaySeconds: number;
+  serverTimestamp: number;
   geometry: [number, number][];
 }
 
@@ -47,19 +46,24 @@ function computeDelay(speedKph: number): number {
   return Math.max(0, NOMINAL_BUS_SPEED_KPH - speedKph) * 3.6;
 }
 
-function openDb(): Database {
-  return new Database(DB_PATH, { readonly: true });
+async function openDb() {
+  const { DatabaseSync } = await import("node:sqlite");
+  return new DatabaseSync(DB_PATH, { readonly: true });
 }
 
-export function queryProbeSegments(
-  db: Database,
-  route?: string,
-  windowSeconds = 300
-): ProbeSegment[] {
-  const cutoff = Date.now() - windowSeconds * 1000;
-  const cutoffDate = new Date(cutoff).toISOString();
+async function queryProbeSegmentsInternal(
+  db: { prepare<T>(sql: string): { all(...params: unknown[]): T[]; get(...params: unknown[]): T }; close(): void },
+  route: string | undefined,
+  windowSeconds: number | null
+): Promise<ProbeSegment[]> {
+  const timeFilter = windowSeconds !== null
+    ? "AND server_timestamp >= ?"
+    : "";
+  const params = windowSeconds !== null
+    ? [String(Date.now() - windowSeconds * 1000), ...(route ? [route] : [])]
+    : route ? [route] : [];
 
-  let sql = `
+  const sql = `
     WITH paired AS (
       SELECT
         id, route, lat, lng, speed, server_timestamp,
@@ -67,9 +71,9 @@ export function queryProbeSegments(
         LAG(lng)    OVER (PARTITION BY id ORDER BY server_timestamp) as prev_lng,
         LAG(server_timestamp) OVER (PARTITION BY id ORDER BY server_timestamp) as prev_ts
       FROM vehicle_positions
-      WHERE recorded_at >= ?
-        AND server_timestamp IS NOT NULL
+      WHERE server_timestamp IS NOT NULL
         AND lat IS NOT NULL AND lng IS NOT NULL
+        ${timeFilter}
         ${route ? "AND route = ?" : ""}
     )
     SELECT
@@ -90,8 +94,7 @@ export function queryProbeSegments(
       AND time_delta_sec < 60
   `;
 
-  const params = route ? [cutoffDate, route] : [cutoffDate];
-  const rows = db.prepare(sql).all(...params) as Array<{
+  const rows = (route ? db.prepare(sql).all(...params) : db.prepare(sql).all(...params)) as Array<{
     id: string;
     route: string;
     lat: string;
@@ -121,6 +124,7 @@ export function queryProbeSegments(
         distanceMeters: dist,
         timeDeltaSeconds: timeDelta,
         delaySeconds: computeDelay(speedKph),
+        serverTimestamp: row.server_timestamp,
         geometry: [
           [prevLng, prevLat],
           [lng, lat],
@@ -130,11 +134,35 @@ export function queryProbeSegments(
     .filter((s) => s.distanceMeters > 1);
 }
 
-export function queryRouteStats(
-  db: Database,
+export async function queryProbeSegments(
+  route?: string,
   windowSeconds = 300
-): ProbeRouteStats[] {
-  const segments = queryProbeSegments(db, undefined, windowSeconds);
+): Promise<ProbeSegment[]> {
+  if (typeof window !== "undefined") return [];
+  const db = await openDb();
+  try {
+    return queryProbeSegmentsInternal(db, route, windowSeconds);
+  } finally {
+    db.close();
+  }
+}
+
+export async function queryAllProbeSegments(
+  route?: string
+): Promise<ProbeSegment[]> {
+  if (typeof window !== "undefined") return [];
+  const db = await openDb();
+  try {
+    return queryProbeSegmentsInternal(db, route, null);
+  } finally {
+    db.close();
+  }
+}
+
+export async function queryRouteStats(
+  windowSeconds = 300
+): Promise<ProbeRouteStats[]> {
+  const segments = await queryProbeSegments(undefined, windowSeconds);
   const byRoute = new Map<string, ProbeSegment[]>();
   for (const seg of segments) {
     const list = byRoute.get(seg.route) ?? [];
@@ -160,23 +188,21 @@ export function queryRouteStats(
     .sort((a, b) => b.sampleCount - a.sampleCount);
 }
 
-export function getRecentProbeStats(windowSeconds = 300): ProbeRouteStats[] {
-  const db = openDb();
-  try {
-    return queryRouteStats(db, windowSeconds);
-  } finally {
-    db.close();
-  }
-}
-
-export function getRecentProbeSegments(
+export async function getRecentProbeSegments(
   route?: string,
   windowSeconds = 300
-): ProbeSegment[] {
-  const db = openDb();
-  try {
-    return queryProbeSegments(db, route, windowSeconds);
-  } finally {
-    db.close();
-  }
+): Promise<ProbeSegment[]> {
+  return queryProbeSegments(route, windowSeconds);
+}
+
+export async function getAllProbeSegments(
+  route?: string
+): Promise<ProbeSegment[]> {
+  return queryAllProbeSegments(route);
+}
+
+export async function getRecentProbeStats(
+  windowSeconds = 300
+): Promise<ProbeRouteStats[]> {
+  return queryRouteStats(windowSeconds);
 }
