@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-05-12T12:31:51.306Z",
+  "generatedAt": "2026-05-14T19:57:47.963Z",
   "baseUrl": "https://live.stpt.ro",
   "routesDiscovered": 75,
-  "latestVehicleCount": 141,
+  "latestVehicleCount": 80,
   "latestJson": "data/sources/stpt-live/latest-vehicles.json",
   "latestGeoJson": "data/sources/stpt-live/latest-vehicles.geojson",
   "archiveDir": "data/sources/stpt-live/archive",

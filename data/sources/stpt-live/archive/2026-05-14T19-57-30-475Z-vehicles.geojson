@@ -1,0 +1,1685 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3519",
+        "route": "1",
+        "bearing": 179.7797088623047,
+        "speed": 16,
+        "directionId": "1",
+        "headsign": "Gara de Nord",
+        "stop": "Piața V. Economu (Modern)",
+        "timestamp": 1778788644000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.260520935058594,
+          45.76530075073242
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1008",
+        "route": "1",
+        "bearing": 258.3577880859375,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Gara de Nord",
+        "stop": "Gara de Nord",
+        "timestamp": 1778788642000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.207799911499023,
+          45.75040817260742
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1005",
+        "route": "1",
+        "bearing": 356.9434814453125,
+        "speed": 24,
+        "directionId": "0",
+        "headsign": "Gara de Est",
+        "stop": "Spitalul Victor Babeș",
+        "timestamp": 1778788643000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.260379791259766,
+          45.76993179321289
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1030",
+        "route": "1",
+        "bearing": 273.78564453125,
+        "speed": 46,
+        "directionId": "1",
+        "headsign": "Gara de Nord",
+        "stop": "Piața Libertății",
+        "timestamp": 1778788645000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.23073959350586,
+          45.75579071044922
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1026",
+        "route": "1",
+        "bearing": 92.36746978759766,
+        "speed": 10,
+        "directionId": "0",
+        "headsign": "Gara de Est",
+        "stop": "Hotel Continental (Bega)",
+        "timestamp": 1778788643000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.22846031188965,
+          45.75587844848633
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1018",
+        "route": "2",
+        "bearing": 266.2350769042969,
+        "speed": 29,
+        "directionId": "0",
+        "headsign": "Gara de Est",
+        "stop": "U.M.T.",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.256959915161133,
+          45.77183151245117
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1015",
+        "route": "2",
+        "bearing": 234.48626708984375,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Shopping City",
+        "stop": "Dâmbovița (Ion Barac)",
+        "timestamp": 1778788630000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.19610023498535,
+          45.74011993408203
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1014",
+        "route": "2",
+        "bearing": 178.01004028320312,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Shopping City",
+        "stop": "Piața V. Economu (Modern)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.260549545288086,
+          45.76591110229492
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1038",
+        "route": "2",
+        "bearing": 275.587158203125,
+        "speed": 9,
+        "directionId": "1",
+        "headsign": "Shopping City",
+        "stop": "Piața Libertății",
+        "timestamp": 1778788630000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.226390838623047,
+          45.75603103637695
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1007",
+        "route": "4",
+        "bearing": 63.4046516418457,
+        "speed": 7,
+        "directionId": "0",
+        "headsign": "Piața Gh. Domășneanu",
+        "stop": "Strada Cluj (1 Decembrie 1918)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.23590087890625,
+          45.74338150024414
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1019",
+        "route": "4",
+        "bearing": 45.651283264160156,
+        "speed": 26,
+        "directionId": "1",
+        "headsign": "Calea Torontalului (Ciocanul)",
+        "stop": "Amforei (Cetății)",
+        "timestamp": 1778788623000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.213369369506836,
+          45.765480041503906
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1012",
+        "route": "4",
+        "bearing": 107.25180053710938,
+        "speed": 32,
+        "directionId": "0",
+        "headsign": "Piața Gh. Domășneanu",
+        "stop": "Mendeleev",
+        "timestamp": 1778788623000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.21240997314453,
+          45.757198333740234
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1029",
+        "route": "4",
+        "bearing": 324.6793518066406,
+        "speed": 8,
+        "directionId": "1",
+        "headsign": "Calea Torontalului (Ciocanul)",
+        "stop": "Parcul C. Sylva (Parc Doina)",
+        "timestamp": 1778788632000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.22216033935547,
+          45.7446403503418
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1035",
+        "route": "4",
+        "bearing": 345.1626281738281,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Calea Torontalului (Ciocanul)",
+        "stop": "Fabrica de Detergenți",
+        "timestamp": 1778788625000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.255830764770508,
+          45.74201965332031
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1034",
+        "route": "4",
+        "bearing": 165.05120849609375,
+        "speed": 44,
+        "directionId": "0",
+        "headsign": "Piața Gh. Domășneanu",
+        "stop": "AEM (Dräxlmaier)",
+        "timestamp": 1778788628000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.25827980041504,
+          45.73566818237305
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1028",
+        "route": "5",
+        "bearing": 283.18402099609375,
+        "speed": 27,
+        "directionId": "1",
+        "headsign": "Ronaț",
+        "stop": "Balta Verde (Cetății)",
+        "timestamp": 1778788623000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.212690353393555,
+          45.75720977783203
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1024",
+        "route": "5",
+        "bearing": 89.20343017578125,
+        "speed": 36,
+        "directionId": "0",
+        "headsign": "Gara de Est",
+        "stop": "Prefectura",
+        "timestamp": 1778788630000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.235870361328125,
+          45.75550079345703
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1040",
+        "route": "5",
+        "bearing": 233.93350219726562,
+        "speed": 31,
+        "directionId": "0",
+        "headsign": "Gara de Est",
+        "stop": "Gara de Est",
+        "timestamp": 1778788628000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.247730255126953,
+          45.76803970336914
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1039",
+        "route": "5",
+        "bearing": 265.56146240234375,
+        "speed": 4,
+        "directionId": "1",
+        "headsign": "Ronaț",
+        "stop": "Prefectura",
+        "timestamp": 1778788616000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.238529205322266,
+          45.75569152832031
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "TDH",
+        "route": "5b",
+        "bearing": 242.08364868164062,
+        "speed": 22,
+        "directionId": "1",
+        "headsign": "Regele Carol",
+        "stop": "Grigore Alexandrescu",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.19577980041504,
+          45.7577018737793
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3516",
+        "route": "7",
+        "bearing": 286.7875671386719,
+        "speed": 28,
+        "directionId": "1",
+        "headsign": "Bulevardul Dâmbovița",
+        "stop": "Izlaz (Victor Hugo)",
+        "timestamp": 1778788623000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.215049743652344,
+          45.725059509277344
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3543",
+        "route": "7",
+        "bearing": 307.6191711425781,
+        "speed": 31,
+        "directionId": "0",
+        "headsign": "Calea Torontalului (Ciocanul)",
+        "stop": "Spitalul de Copii (Nemoianu)",
+        "timestamp": 1778788629000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.22273063659668,
+          45.75205993652344
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3553",
+        "route": "7",
+        "bearing": 144.04266357421875,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Bulevardul Dâmbovița",
+        "stop": "Piața N. Bălcescu (Gheorghe Doja)",
+        "timestamp": 1778788629000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.22509002685547,
+          45.74203109741211
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3527",
+        "route": "8",
+        "bearing": 243.32086181640625,
+        "speed": 14,
+        "directionId": "1",
+        "headsign": "Gara de Nord",
+        "stop": "Sala C. Jude (Olimpia)",
+        "timestamp": 1778788629000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.241619110107422,
+          45.74531936645508
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3540",
+        "route": "8",
+        "bearing": 257,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Piața Gh. Domășneanu",
+        "stop": "Gara de Nord",
+        "timestamp": 1778788630000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.20561981201172,
+          45.75019073486328
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1025",
+        "route": "8",
+        "bearing": 63.372222900390625,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Piața Gh. Domășneanu",
+        "stop": "Strada Cluj (1 Decembrie 1918)",
+        "timestamp": 1778788628000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.236740112304688,
+          45.74359893798828
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3476",
+        "route": "8",
+        "bearing": 143.8291778564453,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Piața Gh. Domășneanu",
+        "stop": "Parcul C. Sylva (Parc Doina)",
+        "timestamp": 1778788629000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.222110748291016,
+          45.74467086791992
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3521",
+        "route": "9",
+        "bearing": 99.68325805664062,
+        "speed": 5,
+        "directionId": "0",
+        "headsign": "Piața Gh. Domășneanu",
+        "stop": "Spitalul Județean (Liviu Rebreanu)",
+        "timestamp": 1778788629000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.24047088623047,
+          45.738460540771484
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1010",
+        "route": "9",
+        "bearing": 153.2696533203125,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Piața Gh. Domășneanu",
+        "stop": "Banatul",
+        "timestamp": 1778788624000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.197519302368164,
+          45.737060546875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3547",
+        "route": "9",
+        "bearing": 63.22439956665039,
+        "speed": 21,
+        "directionId": "1",
+        "headsign": "Gara de Nord",
+        "stop": "Crizantemelor",
+        "timestamp": 1778788630000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.201520919799805,
+          45.741859436035156
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1003",
+        "route": "9",
+        "bearing": 264.24932861328125,
+        "speed": 34,
+        "directionId": "1",
+        "headsign": "Gara de Nord",
+        "stop": "Gheorghe Ranetti (Liviu Rebreanu)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.218019485473633,
+          45.73289108276367
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1032",
+        "route": "9",
+        "bearing": 307.6221008300781,
+        "speed": 17,
+        "directionId": "1",
+        "headsign": "Gara de Nord",
+        "stop": "Piața Gheorghe Domășneanu (Liviu Rebreanu - AEM)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.25782012939453,
+          45.7338981628418
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1810",
+        "route": "11",
+        "bearing": 77.15863800048828,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Arena Aqua (Ștrandul Tineretului)",
+        "stop": "Pasaj Jiul",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.21541976928711,
+          45.751590728759766
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3030",
+        "route": "11",
+        "bearing": 231.23550415039062,
+        "speed": 7,
+        "directionId": "1",
+        "headsign": "Gheorghe Barițiu",
+        "stop": "Spitalul Municipal (Parcul Botanic)",
+        "timestamp": 1778788630000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.225509643554688,
+          45.758338928222656
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "44 PMT",
+        "route": "13",
+        "bearing": 73.3182144165039,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Piața 700 (Spitalul Militar)",
+        "stop": "Pasaj C.F. (Ovidiu Balea)",
+        "timestamp": 1778788628000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.181520462036133,
+          45.76369094848633
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1809",
+        "route": "14",
+        "bearing": 276.0111999511719,
+        "speed": 17.6,
+        "directionId": "1",
+        "headsign": "Gheorghe Barițiu",
+        "stop": "Cimitirul Eroilor",
+        "timestamp": 1778788630000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.225830078125,
+          45.76826858520508
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1803",
+        "route": "14",
+        "bearing": 77.15863800048828,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "I. Ionescu de la Brad",
+        "stop": "Pasaj Jiul",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.215669631958008,
+          45.751651763916016
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1811",
+        "route": "14",
+        "bearing": 257.70758056640625,
+        "speed": 11.5,
+        "directionId": "1",
+        "headsign": "Gheorghe Barițiu",
+        "stop": "Pop de Băsești (Gării)",
+        "timestamp": 1778788630000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.203189849853516,
+          45.74980163574219
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3010",
+        "route": "14",
+        "bearing": 342.513916015625,
+        "speed": 13,
+        "directionId": "0",
+        "headsign": "I. Ionescu de la Brad",
+        "stop": "Ion Ionescu de la Brad",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.234989166259766,
+          45.78059005737305
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1804",
+        "route": "16",
+        "bearing": 128.22198486328125,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Girație Sudului",
+        "stop": "Traian Grozăvescu (Poșta Mare)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.234079360961914,
+          45.754398345947266
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1813",
+        "route": "16",
+        "bearing": 4.671895503997803,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "T. Grozăvescu (Poșta Mare)",
+        "stop": "Calea Martirilor (Liviu Rebreanu)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.238269805908203,
+          45.73902130126953
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1807",
+        "route": "17",
+        "bearing": 338.8878479003906,
+        "speed": 30.8,
+        "directionId": "1",
+        "headsign": "Universitatea de Științele Vieții",
+        "stop": "Piața Consiliul Europei (Iulius Mall)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.227479934692383,
+          45.76034927368164
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1802",
+        "route": "17",
+        "bearing": 70.34354400634766,
+        "speed": 36.5,
+        "directionId": "0",
+        "headsign": "Arena Aqua (Ștrandul Tineretului)",
+        "stop": "Piața V. Economu (Calea Dorobanților)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.258699417114258,
+          45.76448059082031
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1814",
+        "route": "17",
+        "bearing": 169.1123046875,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Arena Aqua (Ștrandul Tineretului)",
+        "stop": "Liege (Calea Aradului)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.221309661865234,
+          45.774940490722656
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1808",
+        "route": "18",
+        "bearing": 143.8572235107422,
+        "speed": 12.6,
+        "directionId": "1",
+        "headsign": "Gheorghe Barițiu",
+        "stop": "Miresei (Calea Torontalului)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.220699310302734,
+          45.768470764160156
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1806",
+        "route": "18",
+        "bearing": 77.71485137939453,
+        "speed": 16.6,
+        "directionId": "0",
+        "headsign": "Universitatea de Științele Vieții",
+        "stop": "Pop de Băsești (Gării)",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.200960159301758,
+          45.749420166015625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1812",
+        "route": "18",
+        "bearing": 359.7103271484375,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Universitatea de Științele Vieții",
+        "stop": "Gheorghe Barițiu",
+        "timestamp": 1778788629000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.19948959350586,
+          45.74892044067383
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "15 STT",
+        "route": "33",
+        "bearing": 217.8960418701172,
+        "speed": 41,
+        "directionId": "0",
+        "headsign": "Pod Calea Șagului",
+        "stop": "Piața Veteranilor (Calea Șagului)",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.206329345703125,
+          45.72951889038086
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "01 JIY",
+        "route": "33",
+        "bearing": 209.84970092773438,
+        "speed": 13,
+        "directionId": "0",
+        "headsign": "Pod Calea Șagului",
+        "stop": "Pod Calea Șagului",
+        "timestamp": 1778788641000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.202800750732422,
+          45.725250244140625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "01 VYI",
+        "route": "33",
+        "bearing": 96.70782470703125,
+        "speed": 23,
+        "directionId": "1",
+        "headsign": "Catedrala Mitropolitană",
+        "stop": "Catedrala Mitropolitană",
+        "timestamp": 1778788632000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.224550247192383,
+          45.7512092590332
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GVL",
+        "route": "33b",
+        "bearing": 94.37699890136719,
+        "speed": 18,
+        "directionId": "0",
+        "headsign": "Incontro",
+        "stop": "Auchan (Calea Șagului)",
+        "timestamp": 1778788645000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.189510345458984,
+          45.70310974121094
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "NMB",
+        "route": "40",
+        "bearing": 309.46142578125,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Stuparilor",
+        "stop": "Traian Grozăvescu (Poșta Mare)",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.233610153198242,
+          45.75471115112305
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "01 XYU",
+        "route": "40",
+        "bearing": 318.6877746582031,
+        "speed": 31,
+        "directionId": "0",
+        "headsign": "Stuparilor",
+        "stop": "Stuparilor",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.247350692749023,
+          45.771820068359375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GLJ",
+        "route": "46",
+        "bearing": 150.10812377929688,
+        "speed": 29,
+        "directionId": "1",
+        "headsign": "Bastion",
+        "stop": "Muzeul Satului (Măcin)",
+        "timestamp": 1778788644000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.25857925415039,
+          45.78126907348633
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "57 EWM",
+        "route": "E1",
+        "bearing": 144.2845001220703,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Pod Calea Șagului",
+        "stop": "Piața Consiliul Europei (Calea Torontalului)",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.224529266357422,
+          45.76490020751953
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "02 XSA",
+        "route": "E1",
+        "bearing": 335.56646728515625,
+        "speed": 4,
+        "directionId": "0",
+        "headsign": "Tristan Tzara",
+        "stop": "Gara de Nord",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.208200454711914,
+          45.749969482421875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GNU",
+        "route": "E2",
+        "bearing": 112.7411880493164,
+        "speed": 21,
+        "directionId": "0",
+        "headsign": "Holdelor",
+        "stop": "Sf. Apostoli Petru și Pavel",
+        "timestamp": 1778788636000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.234399795532227,
+          45.77656936645508
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GPY",
+        "route": "E2",
+        "bearing": 201.95477294921875,
+        "speed": 14,
+        "directionId": "1",
+        "headsign": "Aumovio (Continental)",
+        "stop": "Parc Bulevardul Sudului",
+        "timestamp": 1778788643000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.248369216918945,
+          45.733829498291016
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "NAP",
+        "route": "E2",
+        "bearing": 166.2076416015625,
+        "speed": 19,
+        "directionId": "1",
+        "headsign": "Aumovio (Continental)",
+        "stop": "Dacia Service",
+        "timestamp": 1778788643000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.22323989868164,
+          45.76961898803711
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MTK",
+        "route": "E2",
+        "bearing": 346.8294372558594,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Holdelor",
+        "stop": "Aumovio (Continental)",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.265380859375,
+          45.73630905151367
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "01 ZYI",
+        "route": "E3",
+        "bearing": 348.9845275878906,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "ELBA",
+        "stop": "Apicultorilor",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.236780166625977,
+          45.72126007080078
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "01 XZK",
+        "route": "E4",
+        "bearing": 63.36191177368164,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Aeroport",
+        "stop": "Aeroport (Terminal Schengen)",
+        "timestamp": 1778788643000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.321569442749023,
+          45.809349060058594
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GNT",
+        "route": "E4b",
+        "bearing": 356,
+        "speed": 7,
+        "directionId": "0",
+        "headsign": "Aeroport",
+        "stop": "Gheorghe Barițiu",
+        "timestamp": 1778788645000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.199750900268555,
+          45.749061584472656
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GPL",
+        "route": "E6",
+        "bearing": 144.21031188964844,
+        "speed": 36,
+        "directionId": "1",
+        "headsign": "Oituz",
+        "stop": "Piața Consiliul Europei (Poligrafie)",
+        "timestamp": 1778788643000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.223609924316406,
+          45.76559066772461
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "NGV",
+        "route": "E7",
+        "bearing": 350.5819091796875,
+        "speed": 35,
+        "directionId": "1",
+        "headsign": "T. Grozăvescu (Poșta Mare)",
+        "stop": "Traian Grozăvescu (Poșta Mare)",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.232559204101562,
+          45.75312042236328
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "NGX",
+        "route": "E7",
+        "bearing": 46.92922592163086,
+        "speed": 21,
+        "directionId": "0",
+        "headsign": "Comtim",
+        "stop": "Fabrica de Zahăr",
+        "timestamp": 1778788645000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.164140701293945,
+          45.72195053100586
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GOB",
+        "route": "E8",
+        "bearing": 292.401123046875,
+        "speed": 20,
+        "directionId": "1",
+        "headsign": "Pod Calea Șagului",
+        "stop": "Rudolf Walter",
+        "timestamp": 1778788643000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.274639129638672,
+          45.75503921508789
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "01 XSP",
+        "route": "E8",
+        "bearing": 98.38572692871094,
+        "speed": 13,
+        "directionId": "0",
+        "headsign": "Albăstrelelor (Plopi)",
+        "stop": "Facultatea de Electrotehnică",
+        "timestamp": 1778788645000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.226089477539062,
+          45.74776840209961
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1202",
+        "route": "M11",
+        "bearing": 257.87359619140625,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Gheorghe Barițiu",
+        "stop": "Jiul (Ghiroda)",
+        "timestamp": 1778788648000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.303529739379883,
+          45.7658805847168
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3019",
+        "route": "M14",
+        "bearing": 359.33074951171875,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Dumbrăvița (Girație centură)",
+        "stop": "Gheorghe Barițiu",
+        "timestamp": 1778787734000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.20085906982422,
+          45.749149322509766
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1208",
+        "route": "M14",
+        "bearing": 37.71464157104492,
+        "speed": 46.9,
+        "directionId": "0",
+        "headsign": "Dumbrăvița (Girație centură)",
+        "stop": "Belvedere (Dumbrăvița)",
+        "timestamp": 1778788648000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.259510040283203,
+          45.810791015625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "01 XZI",
+        "route": "M22",
+        "bearing": 284.1577453613281,
+        "speed": 30,
+        "directionId": "1",
+        "headsign": "Timișoara (Girație Sudului)",
+        "stop": "Hornbach (Buziașului)",
+        "timestamp": 1778788644000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.28799057006836,
+          45.725040435791016
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GOK",
+        "route": "M24",
+        "bearing": 293.7716369628906,
+        "speed": 35,
+        "directionId": "1",
+        "headsign": "Timișoara (Parc Bulevardul Sudului)",
+        "stop": "Ciarda Roșie (Calea Buziașului)",
+        "timestamp": 1778788642000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.268600463867188,
+          45.72941970825195
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GLT",
+        "route": "M35",
+        "bearing": 133.6119384765625,
+        "speed": 30,
+        "directionId": "0",
+        "headsign": "Giarmata Vii",
+        "stop": "Cimitir (Giarmata Vii)",
+        "timestamp": 1778788643000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.305509567260742,
+          45.798709869384766
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "NKB",
+        "route": "M36",
+        "bearing": 34.269691467285156,
+        "speed": 0,
+        "directionId": "1",
+        "headsign": "Timișoara (Mocioni)",
+        "stop": "Piața A. Mocioni (Sinaia - 16 Decembrie 1989)",
+        "timestamp": 1778788643000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.215999603271484,
+          45.74610137939453
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "GOX",
+        "route": "M37",
+        "bearing": 210.31838989257812,
+        "speed": 34,
+        "directionId": "0",
+        "headsign": "Parța",
+        "stop": "Ovidiu Cotruș",
+        "timestamp": 1778788643000,
+        "isAccessible": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.191789627075195,
+          45.71240997314453
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "NKA",
+        "route": "M41",
+        "bearing": 0,
+        "speed": 0,
+        "directionId": "0",
+        "headsign": "Carani",
+        "stop": "Bastion (Piața Ionel I. C. Brătianu)",
+        "timestamp": 1778788614000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.25334930419922,
+          45.748050689697266
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "TCZ",
+        "route": "M45",
+        "bearing": 222.71473693847656,
+        "speed": 36,
+        "directionId": "1",
+        "headsign": "Timișoara (Oituz)",
+        "stop": "Țarcului (Dumbrăvița)",
+        "timestamp": 1778788646000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.24213981628418,
+          45.80162811279297
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "NKE",
+        "route": "M46",
+        "bearing": 97.9526138305664,
+        "speed": 13,
+        "directionId": "1",
+        "headsign": "Timișoara (Veteranilor)",
+        "stop": "Primărie (Șag)",
+        "timestamp": 1778788643000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.162839889526367,
+          45.65230178833008
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MSW",
+        "route": "M49",
+        "bearing": 41.19811248779297,
+        "speed": 48,
+        "directionId": "0",
+        "headsign": "Giarmata",
+        "stop": "Bodoni (Cerneteaz)",
+        "timestamp": 1778788643000,
+        "isAccessible": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.29014015197754,
+          45.835350036621094
+        ]
+      }
+    }
+  ]
+}
