@@ -162,6 +162,17 @@ async function fetchFlowPoint(apiKey, point, relative) {
   return fetchJsonWithRetry(url.toString());
 }
 
+function parseIncidentCoords(item) {
+  const rawCoords = item?.geometry?.coordinates;
+  if (!rawCoords) return { lat: null, lng: null };
+  if (Array.isArray(rawCoords[0])) {
+    // LineString: [[lng, lat], ...]
+    return { lng: rawCoords[0][0] ?? null, lat: rawCoords[0][1] ?? null };
+  }
+  // Point: [lng, lat]
+  return { lng: rawCoords[0] ?? null, lat: rawCoords[1] ?? null };
+}
+
 async function fetchIncidents(apiKey) {
   const url = new URL("https://api.tomtom.com/traffic/services/5/incidentDetails");
   url.searchParams.set("key", apiKey);
@@ -243,17 +254,23 @@ async function main() {
     txUsed += 1;
     const items = incidentData?.incidents ?? [];
     allIncidents.push(
-      ...items.map((item, idx) => ({
-        collectedAt: collectedAt.toISOString(),
-        timeSlot: "all",
-        incidentId: item?.id ?? `inc-${idx}`,
-        type: item?.properties?.iconCategory ?? item?.type ?? "unknown",
-        severity: item?.properties?.magnitudeOfDelay ?? null,
-        lat: item?.geometry?.coordinates?.[0]?.[1] ?? null,
-        lng: item?.geometry?.coordinates?.[0]?.[0] ?? null,
-      }))
+      ...items.map((item, idx) => {
+        const coords = parseIncidentCoords(item);
+        return {
+          collectedAt: collectedAt.toISOString(),
+          timeSlot: "all",
+          incidentId: item?.id ?? `inc-${idx}`,
+          type: item?.properties?.iconCategory ?? item?.type ?? "unknown",
+          severity: item?.properties?.magnitudeOfDelay ?? null,
+          lat: coords.lat,
+          lng: coords.lng,
+        };
+      })
     );
-    console.log(`\nIncidents: ${allIncidents.length} collected`);
+    const validIncidents = allIncidents.filter((inc) => inc.lat != null && inc.lng != null);
+    console.log(`\nIncidents: ${validIncidents.length}/${allIncidents.length} with valid coordinates`);
+    allIncidents.length = 0;
+    allIncidents.push(...validIncidents);
   } catch (err) {
     console.error(`Incident fetch failed: ${err.message}`);
   }
@@ -306,8 +323,12 @@ async function main() {
 }
 
 function buildSummary(records, timeSlots) {
-  return timeSlots.map((slot) => {
-    const slotRecords = records.filter((r) => r.slotHour === slot.hour);
+  // TomTom Flow API returns current-state data regardless of slot hour.
+  // Slots with no matching records are omitted from output.
+  return timeSlots
+    .map((slot) => {
+      const slotRecords = records.filter((r) => r.slotHour === slot.hour);
+      if (slotRecords.length === 0) return null;
 
     const speeds = slotRecords.map((r) => r.currentSpeedKph).filter((v) => v != null);
     const freeSpeeds = slotRecords.map((r) => r.freeFlowSpeedKph).filter((v) => v != null);
@@ -333,7 +354,8 @@ function buildSummary(records, timeSlots) {
       moderateCount: congestionCounts.moderate ?? 0,
       lowCount: congestionCounts.low ?? 0,
     };
-  });
+    })
+    .filter(Boolean);
 }
 
 function toCSV(records) {

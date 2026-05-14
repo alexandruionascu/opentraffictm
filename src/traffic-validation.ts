@@ -1,3 +1,6 @@
+import type { SimulationFrame } from "./simulation";
+import { getRecentProbeSegments } from "./stpt-probe";
+
 export type TrafficProvider = "google" | "here" | "tomtom" | "timisoara-stpt" | "timisoara-closures";
 
 export interface TrafficValidationRequest {
@@ -88,6 +91,62 @@ export function normalizeSnapshot(input: TrafficSnapshot): TrafficSnapshot {
       geometry: incident.geometry?.map(([lng, lat]) => [Number(lng), Number(lat)]),
     })),
   };
+}
+
+function mean(values: number[]): number {
+  if (values.length === 0) return 0;
+  return values.reduce((a, b) => a + b, 0) / values.length;
+}
+
+export function computeValidationMetrics(
+  simulationFrames: SimulationFrame[],
+  snapshot: TrafficSnapshot,
+): ValidationMetric[] {
+  const simSpeeds = mean(simulationFrames.map((f) => f.metrics.averageSpeedKmh));
+  const snapSpeeds = mean(
+    snapshot.segments.filter((s) => s.speedKph != null).map((s) => s.speedKph!),
+  );
+
+  const simWaits = mean(simulationFrames.map((f) => f.metrics.waitingActors));
+  const snapDelays = mean(
+    snapshot.segments.filter((s) => s.delaySeconds != null).map((s) => s.delaySeconds!),
+  );
+
+  const metrics: ValidationMetric[] = [];
+
+  if (snapSpeeds > 0) {
+    metrics.push({
+      name: "avgSpeedKph",
+      expected: snapSpeeds,
+      observed: simSpeeds,
+      delta: (simSpeeds - snapSpeeds) / snapSpeeds,
+    });
+  }
+
+  if (snapDelays > 0) {
+    metrics.push({
+      name: "delaySeconds",
+      expected: snapDelays,
+      observed: simWaits * 6.5,
+      delta: (simWaits * 6.5 - snapDelays) / snapDelays,
+    });
+  }
+
+  const simQueue = mean(simulationFrames.map((f) => f.metrics.queueLength));
+  const snapCongestion = snapshot.segments.filter(
+    (s) => s.congestionLevel === "heavy" || s.congestionLevel === "severe",
+  ).length;
+  if (snapshot.segments.length > 0) {
+    const congestionRatio = snapCongestion / snapshot.segments.length;
+    metrics.push({
+      name: "queueLength",
+      expected: congestionRatio * 10,
+      observed: simQueue,
+      delta: simQueue - congestionRatio * 10,
+    });
+  }
+
+  return metrics;
 }
 
 export function buildValidationResult(
@@ -192,7 +251,30 @@ export function createTimisoaraStptAdapter(): TrafficProviderAdapter {
         vehicles: StptLiveVehicle[];
       }>("/data/sources/stpt-live/latest-vehicles.json");
 
+      const probeSegments = getRecentProbeSegments(undefined, 300);
+      const useRealProbes = probeSegments.length >= 3;
+
       const segments = latest.vehicles.slice(0, 25).map((vehicle, index) => {
+        if (useRealProbes) {
+          const routeSegs = probeSegments.filter((s) => s.route === vehicle.route);
+          if (routeSegs.length > 0) {
+            const avgSpeed = routeSegs.reduce((a, s) => a + s.speedKph, 0) / routeSegs.length;
+            const avgDelay = routeSegs.reduce((a, s) => a + s.delaySeconds, 0) / routeSegs.length;
+            const congestionLevel: TrafficSegmentSnapshot["congestionLevel"] =
+              avgSpeed === 0 ? "severe" : avgSpeed < 10 ? "heavy" : avgSpeed < 20 ? "moderate" : "low";
+            return {
+              segmentId: `stpt-${vehicle.id}-${index}`,
+              roadName: vehicle.headsign ?? vehicle.route,
+              geometry: routeSegs[0].geometry,
+              speedKph: Math.round(avgSpeed * 10) / 10,
+              travelTimeSeconds: avgSpeed > 0 ? Math.round(1800 / avgSpeed) : undefined,
+              delaySeconds: Math.round(avgDelay),
+              congestionLevel,
+              confidence: 0.82,
+            };
+          }
+        }
+
         const speed = vehicle.speed ?? 0;
         const congestionLevel: TrafficSegmentSnapshot["congestionLevel"] =
           speed === 0 ? "severe" : speed < 10 ? "heavy" : speed < 20 ? "moderate" : "low";
@@ -208,7 +290,7 @@ export function createTimisoaraStptAdapter(): TrafficProviderAdapter {
           travelTimeSeconds: speed > 0 ? Math.round(1800 / speed) : undefined,
           delaySeconds: speed === 0 ? 60 : Math.max(0, 30 - speed),
           congestionLevel,
-          confidence: 0.72,
+          confidence: useRealProbes ? 0.85 : 0.72,
         };
       });
 

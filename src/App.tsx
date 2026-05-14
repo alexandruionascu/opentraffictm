@@ -672,12 +672,7 @@ function AnalysisChart({ candidate }: { candidate?: TrafficLightIntersectionAnal
 }
 
 function TomTomTrafficPage() {
-  const [roadData, setRoadData] = useState<{
-    features: Array<{
-      properties: { roadId: string; speed: number; freeFlow: number; congestionLevel: string; delaySeconds: string | number; frc: string; roadClosure: boolean };
-      geometry: { coordinates: [number, number][] };
-    }>;
-  } | null>(null);
+  const [roadData, setRoadData] = useState<GeoJSON.FeatureCollection<GeoJSON.Geometry> | null>(null);
   const [osmData, setOsmData] = useState<{
     roads: any[]; controls: any[];
   } | null>(null);

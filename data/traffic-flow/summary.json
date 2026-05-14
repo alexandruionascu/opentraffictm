@@ -410,18 +410,6 @@
       "lng": 21.2329820919
     },
     {
-      "id": "inc-19",
-      "type": "incident",
-      "lat": null,
-      "lng": null
-    },
-    {
-      "id": "inc-20",
-      "type": "incident",
-      "lat": null,
-      "lng": null
-    },
-    {
       "id": "inc-21",
       "type": "roadwork",
       "lat": 45.7531938478,
@@ -446,18 +434,6 @@
       "lng": 21.2328265238
     },
     {
-      "id": "inc-25",
-      "type": "incident",
-      "lat": null,
-      "lng": null
-    },
-    {
-      "id": "inc-26",
-      "type": "incident",
-      "lat": null,
-      "lng": null
-    },
-    {
       "id": "inc-27",
       "type": "roadwork",
       "lat": 45.7408194374,
@@ -479,6 +455,6 @@
       45.77
     ],
     "flowRecordCount": 3898,
-    "incidentCount": 29
+    "incidentCount": 25
   }
 }
