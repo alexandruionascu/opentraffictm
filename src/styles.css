@@ -79,7 +79,7 @@ a {
 .brand {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   color: var(--text);
   cursor: pointer;
   font-family: var(--serif);
@@ -93,7 +93,7 @@ nav {
   background: rgba(3, 7, 13, 0.54);
   backdrop-filter: blur(18px);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -103,7 +103,7 @@ nav {
 nav button {
   background: transparent;
   border: 0;
-  border-radius: 999px;
+  border-radius: 6px;
   color: var(--muted);
   cursor: pointer;
   font-size: 13px;
@@ -684,7 +684,7 @@ p {
 .sim-panel select {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   color: var(--text);
   min-width: 280px;
   padding: 0 14px;
@@ -698,7 +698,7 @@ p {
   align-items: center;
   background: rgba(255, 255, 255, 0.045);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   display: inline-flex;
   gap: 10px;
   padding: 8px 12px;
@@ -782,7 +782,7 @@ p {
 .mini-badge {
   background: rgba(3, 7, 13, 0.78);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   bottom: 18px;
   color: var(--accent2);
   font-size: 12px;
@@ -831,7 +831,7 @@ p {
 
 .btn {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
   font-weight: 900;
@@ -986,7 +986,7 @@ p {
 
 .fallback-road {
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-  border-radius: 999px;
+  border-radius: 6px;
   box-shadow: 0 0 24px rgba(101, 214, 255, 0.22);
   height: 6px;
   opacity: 0.85;
@@ -1019,7 +1019,7 @@ p {
 
 .road {
   background: linear-gradient(90deg, transparent, rgba(101, 214, 255, 0.92), rgba(124, 255, 178, 0.76), transparent);
-  border-radius: 999px;
+  border-radius: 6px;
   box-shadow: 0 0 32px rgba(101, 214, 255, 0.28);
   height: 7px;
   position: absolute;
@@ -1256,7 +1256,7 @@ p {
 
 .sim-panel::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
+  border-radius: 6px;
 }
 
 .timeline {
@@ -1264,7 +1264,7 @@ p {
   background: rgba(3, 7, 13, 0.72);
   backdrop-filter: blur(18px);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   bottom: 22px;
   display: flex;
   gap: 18px;
@@ -1350,7 +1350,7 @@ p {
   align-items: center;
   background: rgba(3, 7, 13, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 999px;
+  border-radius: 6px;
   color: var(--muted);
   display: inline-flex;
   font-size: 12px;
@@ -1430,7 +1430,7 @@ p {
   align-items: center;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
+  border-radius: 6px;
   color: var(--text);
   display: inline-flex;
   gap: 10px;
@@ -1439,7 +1439,7 @@ p {
 
 .sheet-tab span {
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
+  border-radius: 6px;
   color: var(--muted);
   font-size: 12px;
   min-width: 22px;
@@ -1628,7 +1628,7 @@ p {
   align-items: center;
   background: rgba(3, 7, 13, 0.72);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   display: inline-flex;
   font-size: 12px;
   gap: 7px;
@@ -1804,7 +1804,7 @@ p {
 .traffic-light-map .leaflet-tooltip {
   background: rgba(4, 10, 18, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
+  border-radius: 6px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
   color: #e6f7ff;
   font-size: 12px;
@@ -1870,7 +1870,7 @@ p {
 
 .traffic-light-panel::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
+  border-radius: 6px;
 }
 
 .traffic-light-panel-head h1 {
@@ -1944,7 +1944,7 @@ p {
 
 .traffic-light-rank-state {
   align-self: center;
-  border-radius: 999px;
+  border-radius: 6px;
   font-size: 11px;
   font-weight: 900;
   padding: 7px 10px;
@@ -2016,7 +2016,7 @@ p {
 }
 
 .traffic-light-state-badge {
-  border-radius: 999px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 900;
   padding: 8px 12px;
@@ -2079,7 +2079,7 @@ p {
 .traffic-light-evidence span {
   background: rgba(101, 214, 255, 0.1);
   border: 1px solid rgba(101, 214, 255, 0.18);
-  border-radius: 999px;
+  border-radius: 6px;
   color: #d8f3ff;
   font-size: 12px;
   font-weight: 700;
@@ -2142,7 +2142,7 @@ p {
 
 .traffic-light-distribution-grid i {
   background: linear-gradient(90deg, rgba(101, 214, 255, 0.86), rgba(124, 255, 178, 0.72));
-  border-radius: 999px;
+  border-radius: 6px;
   display: block;
   height: 7px;
 }
@@ -2233,7 +2233,7 @@ p {
 
 .traffic-light-hourly-bar {
   align-items: center;
-  border-radius: 999px;
+  border-radius: 6px;
   display: flex;
   height: 10px;
   overflow: hidden;
@@ -2703,8 +2703,8 @@ p {
 }
 
 .wizard-intro-hero h2 {
-  font-size: 40px;
-  margin-bottom: 16px;
+  font-size: 22px;
+  margin-bottom: 12px;
 }
 
 .wizard-intro-hero p {
@@ -3540,7 +3540,7 @@ p {
   width: 200px;
   background: linear-gradient(135deg, rgba(5, 12, 21, 0.97), rgba(3, 8, 15, 0.99));
   border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: 20px;
+  border-radius: 20px 4px 4px 20px;
   backdrop-filter: blur(24px);
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
   display: flex;
@@ -3591,7 +3591,7 @@ p {
 
 .traffic-left-nav-steps::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
+  border-radius: 6px;
 }
 
 .traffic-left-nav-item {
@@ -3686,7 +3686,7 @@ p {
   position: absolute;
   left: 232px;
   top: 16px;
-  right: 16px;
+  right: 466px;
   bottom: 16px;
   border-radius: 20px;
   overflow: hidden;
@@ -3703,19 +3703,7 @@ p {
 }
 
 .traffic-map-explainer-panel {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 300px;
-  background: linear-gradient(135deg, rgba(5, 12, 21, 0.96), rgba(3, 8, 15, 0.98));
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 20px;
-  padding: 16px 18px;
-  max-height: calc(100vh - 28px);
-  overflow-y: auto;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  z-index: 20;
+  display: none;
 }
 
 .traffic-map-explainer-panel::-webkit-scrollbar {
@@ -3724,7 +3712,7 @@ p {
 
 .traffic-map-explainer-panel::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
+  border-radius: 6px;
 }
 
 .explainer-step-badge {
@@ -3804,20 +3792,22 @@ p {
   color: var(--muted);
 }
 
-/* Inner content area for wizard step details - shown as overlay panel */
+.traffic-wizard-overlay-inner {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Inner content area for wizard step details - shown as floating panel on right */
 .traffic-wizard-overlay {
-  position: absolute;
+  position: fixed;
+  top: 76px;
+  right: 14px;
   bottom: 14px;
-  left: 14px;
-  right: 330px;
-  max-height: 340px;
+  width: 450px;
   background: linear-gradient(135deg, rgba(5, 12, 21, 0.97), rgba(3, 8, 15, 0.99));
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: 20px;
-  backdrop-filter: blur(24px);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  border-left: 1px solid rgba(148, 163, 184, 0.14);
   overflow-y: auto;
-  z-index: 15;
+  z-index: 50;
 }
 
 .traffic-wizard-overlay::-webkit-scrollbar {
@@ -3826,7 +3816,7 @@ p {
 
 .traffic-wizard-overlay::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
+  border-radius: 6px;
 }
 
 .wizard-overlay-header {
@@ -3926,7 +3916,7 @@ p {
 
 .traffic-light-fullscreen-sidebar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
+  border-radius: 6px;
 }
 
 .fullscreen-sidebar-header {
@@ -3951,7 +3941,7 @@ p {
 }
 
 .fullscreen-state-badge {
-  border-radius: 999px;
+  border-radius: 6px;
   display: inline-block;
   font-size: 11px;
   font-weight: 800;
@@ -4128,7 +4118,7 @@ p {
 }
 
 .badge {
-  border-radius: 999px;
+  border-radius: 6px;
   color: white;
   display: inline-block;
   font-size: 12px;
