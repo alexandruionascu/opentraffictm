@@ -176,4 +176,14 @@ Example: TransitLens (Agent) scored **97.4**, Browser Native IDM Baseline scored
 
 ## License
 
-Private and proprietary. Traffic data sources are subject to respective terms of service.
+**MIT License** — Permissive open-source license for code and software components.
+
+**Data Liability Disclaimer** — Traffic data from third-party sources is provided as-is:
+- **STPT**: Public transport data, subject to STPT terms of service
+- **TomTom**: Traffic flow data, subject to TomTom terms of service
+- **HERE**: Traffic data, subject to HERE licensing terms
+- **Google Maps**: Traffic data, subject to Google Maps Platform terms
+- **OpenStreetMap**: Road geometry under ODbL license
+- **Timișoara Open Data**: Municipal data under local government terms
+
+The maintainers make no warranties about data accuracy, completeness, or fitness for any purpose. Traffic conditions change rapidly; data reflects the time of collection only. Users are responsible for compliance with applicable data usage terms.
