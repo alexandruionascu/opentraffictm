@@ -732,6 +732,7 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
   const greenPassCount = usable.filter((pass) => pass.passState === "green").length;
   const redPassCount = usable.filter((pass) => pass.passState === "red").length;
   const greenStartCount = usable.filter((pass) => pass.greenStartTimestamp !== undefined).length;
+  const passCount = usable.length;
   const { cycleLengthSeconds, anchorTimestamp, cycleConfidence, distribution: cycleLengthDistribution } = estimateCycleLength(usable);
   const samples = buildPhaseSamples(usable, cycleLengthSeconds, anchorTimestamp);
   const bayesian = estimateBayesianPosterior(samples, cycleLengthSeconds);
@@ -801,6 +802,16 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
     particle.confidence * 0.08 +
     kalman.confidence * 0.06 +
     methodAgreementScore * 0.1;
+  const consensusStrength = Math.max(
+    0.1,
+    Math.min(
+      1,
+      cycleConfidence * 0.28 +
+        routeAlignment.alignmentScore * 0.28 +
+        methodAgreementScore * 0.24 +
+        Math.min(1, greenStartCount / Math.max(4, passCount * 0.16)) * 0.2,
+    ),
+  );
   const rawConfidence = Math.max(
     0.1,
     Math.min(
@@ -811,17 +822,34 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
         posteriorQuality * 0.52 +
         dailyProfile.temporalStabilityScore * 0.04 +
         stopScore * 0.08 +
+        consensusStrength * 0.06 +
         (hasStateContrast ? 0.08 : 0) -
         Math.min(0.12, offsetSpread / Math.max(12, cycleLengthSeconds * 0.24)) +
         (hasStateContrast ? Math.abs(greenShare - 0.5) * 0.02 : 0),
     ),
   );
+  const strongConsensus =
+    passCount >= 24 &&
+    routeCount >= 3 &&
+    greenStartCount >= 8 &&
+    cycleConfidence >= 0.6 &&
+    methodAgreementScore >= 0.8;
+  const solidConsensus =
+    passCount >= 12 &&
+    routeCount >= 2 &&
+    greenStartCount >= 4 &&
+    cycleConfidence >= 0.4 &&
+    methodAgreementScore >= 0.7;
   const confidenceCap = hasStateContrast
-    ? greenStartCount >= 3 && cycleConfidence >= 0.32 && bayesian.confidence >= 0.22
-      ? 0.9
-      : 0.78
+    ? strongConsensus
+      ? 0.94
+      : solidConsensus
+        ? 0.88
+        : greenStartCount >= 3 && cycleConfidence >= 0.32 && (bayesian.confidence >= 0.22 || methodAgreementScore >= 0.75)
+          ? 0.82
+          : 0.76
     : greenStartCount > 0
-      ? 0.58
+      ? 0.6
       : 0.42;
   const confidence = Math.min(rawConfidence, confidenceCap);
 
@@ -851,7 +879,7 @@ export function estimateTrafficLightPhases(light: TrafficLightLocation, passes: 
     stopPassCount,
     greenStartCount,
     cycleConfidence,
-    phaseSeparationScore: Math.max(hmm.confidence, bayesian.confidence),
+    phaseSeparationScore: Math.max(hmm.confidence, bayesian.confidence, routeAlignment.alignmentScore),
     cycleLengthDistribution,
     phaseOffsetDistribution,
     neighborSupportCount: 0,

@@ -46,6 +46,8 @@ type Manifest = {
 const repoRoot = process.cwd();
 const analysisDir = path.join(repoRoot, "data/traffic-lights/analysis");
 const outputFile = path.join(analysisDir, "inference.json");
+const passesFile = path.join(analysisDir, "passes.json");
+const estimatesFile = path.join(analysisDir, "estimates.json");
 
 function parseCsvLine(line: string) {
   const cells: string[] = [];
@@ -343,10 +345,33 @@ export function buildTrafficLightInference() {
     return counts;
   }, {});
   const evidencePathsByLightId = buildEvidencePaths(passes, lights, inferenceTraces);
+  const generatedAt = new Date().toISOString();
+  const sourceFiles = manifest.files.map((entry) => entry.file);
+  const passesDataset = {
+    loadedAt: generatedAt,
+    generatedAt,
+    sourceFiles,
+    lights,
+    busStops,
+    passCount: passes.length,
+    passCountsByLightId,
+    passes,
+  };
+  const estimatesDataset = {
+    loadedAt: generatedAt,
+    generatedAt,
+    sourceFiles,
+    lights,
+    traces,
+    busStops,
+    estimates,
+    passCount: passes.length,
+    passCountsByLightId,
+  };
   const dataset = {
-    loadedAt: new Date().toISOString(),
-    generatedAt: new Date().toISOString(),
-    sourceFiles: manifest.files.map((entry) => entry.file),
+    loadedAt: generatedAt,
+    generatedAt,
+    sourceFiles,
     lights,
     traces,
     busStops,
@@ -356,9 +381,13 @@ export function buildTrafficLightInference() {
     evidencePathsByLightId,
   } satisfies PrecomputedTrafficLightDataset & Pick<TrafficLightDataset, "loadedAt"> & { generatedAt: string };
 
+  fs.writeFileSync(passesFile, `${JSON.stringify(passesDataset)}\n`);
+  fs.writeFileSync(estimatesFile, `${JSON.stringify(estimatesDataset)}\n`);
   fs.writeFileSync(outputFile, `${JSON.stringify(dataset)}\n`);
   return {
     outputFile,
+    passesFile,
+    estimatesFile,
     observations: observations.length,
     traces: traces.length,
     inferenceTraces: inferenceTraces.length,
