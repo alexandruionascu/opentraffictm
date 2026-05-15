@@ -69,6 +69,11 @@ export function circularConcentration(values: number[], period: number) {
   return Math.sqrt(x * x + y * y) / values.length;
 }
 
+export function circularDistance(a: number, b: number, period: number) {
+  const raw = Math.abs(modulo(a, period) - modulo(b, period));
+  return Math.min(raw, period - raw);
+}
+
 export function getTraceBounds(points: Array<{ lng: number; lat: number }>) {
   if (!points.length) {
     return null;

@@ -24,6 +24,7 @@ The platform integrates live vehicle GPS streams from STPT, TomTom Traffic Flow 
 | **Probe Analysis Pipeline** | 5-phase pipeline extracting speed profiles, calibrating IDM car-following models, and classifying congestion regimes |
 | **Multi-Source Validation** | Provider adapters for Google, HERE, TomTom, STPT, and municipal closure data |
 | **Traffic Light Inference** | 24-hour phase estimation, stop detection, pass extraction, and map matching |
+| **Uncertainty-Aware Framework** | Bayesian cycle posteriors, statistical adaptive/fixed classification, phase entropy, confidence scoring, and citizen-facing narratives |
 | **Benchmark System** | 5-track leaderboard (Human, Agent, Browser Native, SUMO, SOTA) with scenario-based scoring |
 
 ---
@@ -196,6 +197,9 @@ node src/traffic-light/greedyOffsetOptimizer.mjs
 
 # Benchmark all strategies
 node src/traffic-light/benchmark.mjs
+
+# Run uncertainty-aware inference framework
+npx tsx src/traffic-light/runFrameworkAnalysis.ts
 ```
 
 ### Outputs
@@ -206,6 +210,113 @@ node src/traffic-light/benchmark.mjs
 | `data/derived/tactics-results.json` | Per-signal TACTICS decisions × 6 hours |
 | `data/derived/greedy-optimization.json` | Best offset per signal per slot |
 | `data/derived/benchmark-results.json` | Cross-strategy comparison against ground truth |
+| `data/traffic-lights/analysis/framework-results.json` | Full uncertainty-aware inference results |
+
+---
+
+## Uncertainty-Aware Traffic Light Inference Framework
+
+A new research layer that applies statistically rigorous, uncertainty-quantified inference to the traffic light behavior question — separating **observable external behavior** (what we can detect from probe data) from **inferred internal controller logic** (what we cannot detect without direct controller access).
+
+### Research Question
+
+Without access to proprietary traffic controller systems (SWARCO / UTOPIA / SCOOT / SCATS), can we scientifically infer intersection behavior from public GPS probe data alone? What can and cannot be claimed with statistical confidence?
+
+### Modeling Space: What Is and Is Not Inferable
+
+**Observable from probe data:**
+- Stop duration distributions at each signal (red light wait times)
+- Travel time distributions per approach per time-of-day slot
+- Queue formation signatures (speed collapse upstream of a light)
+- Green window detection (prolonged high-speed passage)
+- Phase offset evidence (differential arrival timing along a corridor)
+- Variance structure of phase durations across congestion levels
+
+**NOT observable without direct controller access:**
+- Internal controller state machine transitions
+- Loop detector states (magnetic, video, microwave)
+- SCOOT/SPaT proprietary encoding
+- Detector-to-phase mapping
+- Time-of-day schedule structure
+- Priority request logic (public transport, emergency vehicles)
+- Base cycle length versus adaptive overlay separation
+
+### Methodology
+
+The framework operates in five layers:
+
+| Layer | Method | Output |
+|-------|--------|--------|
+| **Cycle estimation** | Bayesian posterior over 40–200s candidates + von Mises concentration κ | Cycle length MAP + 95% CI |
+| **Phase inference** | HMM forward-backward with entropy per timestep | P(green\|observations) + entropy bits |
+| **Adaptive classification** | ADF, KPSS, Levene's test, ANOVA F-test | Fixed / Semi-Adaptive / Adaptive / Uncertain |
+| **Confidence scoring** | n-observations + κ + entropy + tests passed | High / Medium / Low / Insufficient |
+| **Corridor analysis** | Offset coherence + advance pattern matching | Green wave coherence score |
+
+**Confidence tiers:**
+- **High:** n ≥ 50, κ > 0.6, entropy < 0.5 bits — robust inference
+- **Medium:** 10 ≤ n < 50, or κ > 0.3 — statistical tests applicable
+- **Low:** n < 10, or high variance — heuristic only
+- **Insufficient:** n < 5 — no statistically meaningful conclusion
+
+### City-Wide Findings (796 intersections, 21.6 hours of probe data)
+
+```
+Adaptive Category Distribution:
+  highly-adaptive:  49 (6.2%)   — significant variance structure in wait times
+  fixed-cycle:       0 (0.0%)   — no intersection passed both ADF + KPSS tests
+  semi-adaptive:      0 (0.0%)
+  uncertain:        747 (93.8%)  — mixed statistical signals
+
+Confidence Distribution:
+  high:        22 (2.8%)
+  medium:     753 (94.6%)
+  low:         21 (2.6%)
+
+Cycle Length: mean=107s, min=56s, max=184s
+  — Distribution clusters at 60s, 90s, 120s (standard European fixed-cycle base lengths)
+```
+
+**Key interpretation:** The 93.8% "uncertain" rate is the **correct scientific answer**, not a failure. With only 21 hours of probe data (a single day's snapshot), most intersections lack the time-series depth required for proper stationarity tests. More critically, the city's pervasive heavy congestion (83% of approaches in heavy/blocked regime) creates a fundamental identifiability problem: you cannot distinguish "adaptive extension due to demand" from "always saturated, always maximum red" — both produce long waits regardless of internal controller logic.
+
+### Scientifically Defensible vs Misleading Claims
+
+**Defensible:**
+- ✅ "Intersection X shows statistically stable cycles consistent with fixed-cycle timing (ADF p=0.003)"
+- ✅ "Intersection Y shows phase duration variation correlated with congestion (Levene p=0.02)"
+- ✅ "We cannot determine controller brand or algorithm without direct access"
+- ✅ "The average cycle length is ~107s, clustering around 60/90/120s"
+- ✅ "Bus priority events cannot be reliably detected from probe data alone"
+
+**Misleading if unqualified:**
+- ❌ "Intersection X uses adaptive control" — we see behavior signatures, not confirmed algorithm type
+- ❌ "The city is incompetent because a bus stopped" — saturation alone produces long waits even with a perfectly functioning controller
+- ❌ "This corridor has green wave coordination" — offset coherence scores of ~0.20 show no clear pattern in current data
+- ❌ "We know the exact SPaT with per-second accuracy" — GPS probes at 5–10s intervals are too sparse relative to ~90s cycle
+
+### Research Context: AI and Citizen-Led Traffic Audit
+
+Modern AI makes probe-based traffic analysis dramatically more accessible. Where once this required institutional research teams and specialized hardware, a modern laptop + probe dataset can now:
+- Process millions of probe observations at low cost
+- Build reasonable approximations of traffic behavior from public data
+- Generate testable hypotheses about traffic system performance
+- Produce citizen-readable summaries of complex traffic engineering
+
+**The fundamental asymmetry:** We can only ever prove something is NOT fixed-cycle (by demonstrating demand-responsive behavior). Proving adaptive requires showing the controller responds to demand in ways a fixed schedule cannot replicate — which is harder to establish from probe data alone.
+
+**What would make the analysis definitive:**
+- Multiple days of data → proper time-series stationarity tests
+- Cross-vehicle validation → confirm estimates are consistent across different probes
+- Direct controller access → would resolve all "uncertain" classifications immediately
+
+### Scripts
+
+```bash
+# Run full uncertainty-aware inference framework analysis
+npx tsx src/traffic-light/runFrameworkAnalysis.ts
+```
+
+The framework is implemented in `src/traffic-light/inferenceFramework.ts` (~900 lines) and the analysis runner is `src/traffic-light/runFrameworkAnalysis.ts`. Results are saved to `data/traffic-lights/analysis/framework-results.json`.
 
 ---
 

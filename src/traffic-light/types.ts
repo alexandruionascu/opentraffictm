@@ -1,5 +1,7 @@
 export type TrafficPhaseState = "green" | "red" | "unknown";
 
+export type ConfidenceLevel = "high" | "medium" | "low" | "insufficient";
+
 export interface TrafficLightLocation {
   id: string;
   name: string;
