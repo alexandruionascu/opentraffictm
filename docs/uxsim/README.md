@@ -77,30 +77,26 @@ avgDelay ≥ 25s → flow = 0.040 (capped)
 ## Results
 
 ```
-UXsim Validation Results:
+UXsim Validation Results (current state):
 Scenario     Ground Truth    UXsim Delay    Error    Nodes    Links    Status
 ----------------------------------------------------------------------------
-TM-01              11.2s          24.9s      13.7s       5        4    Network issue
-TM-02               8.7s          24.3s      15.6s       5        4    Network issue
-TM-03              13.4s          13.4s       0.0s       4        3    Validated
-TM-04               9.6s           0.0s       9.6s       6        5    Network issue
+TM-01              11.2s          35.0s      23.8s       4        3    Topology + calibration
+TM-02               8.7s           0.4s       8.3s       2        1    Topology collapse
+TM-03              13.4s           2.3s      11.1s       2        1    Topology collapse
+TM-04               9.6s          19.9s      10.3s       4        3    Topology + calibration
 
-Interpretation:
-- TM-03: Perfect match validates the probe → UXsim pipeline
-- TM-01/02/04: Keyword-based signal matching produces disconnected clusters
-  (signals from parallel roads, not the actual corridor). Requires explicit
-  signalIds in scenarios.json for correct topology.
+All 4 scenarios show errors > 8s due to two compounding issues:
+1. The 30m link filter drops valid consecutive signals, collapsing corridors
+2. Demand calibration curve was fitted for a single corridor length
+
+Prior versions claiming "TM-03 validated at 0.0s error" were incorrect —
+that result came from a smaller signal cluster no longer present after
+proper corridor reconstruction.
 ```
 
-### What "0.0s error" Means
+### What the Errors Tell Us
 
-TM-03 (Calea Șagului) achieved a perfect match between probe-observed delay and UXsim-computed delay. This confirms:
-
-1. **Probe → simulation pipeline is sound.** Arrival distributions from STPT GPS segments correctly parameterize UXsim demand.
-
-2. **UXsim's queue model matches Timișoara's saturated conditions.** At 0.52x speed ratio, the corridor operates at the queue model's transition zone — demand slightly exceeds capacity, producing meaningful delay.
-
-3. **Signal chain topology is correct.** Calea Șagului's 4 signals form a spatially coherent corridor with no gaps.
+The topology collapse (TM-02/03 reduced to 2 nodes) and calibration failures (TM-01/04 off by 20+s) reveal that the signal chain construction and demand calibration are both research artifacts, not production-ready components. The TACTICS fuzzy controller (0.4s error across all 4 scenarios) is the more reliable result.
 
 ---
 
@@ -146,13 +142,15 @@ pip install uxsim pandas
 
 ## Limitations
 
-1. **Single demand entry** — current adapter uses one demand entry per slot (origin=first signal, dest=last signal). Multi-origin demand may produce different delay patterns.
+1. **The `dist_m < 30` link filter is too aggressive** — it drops valid consecutive signals at urban intersections where carriageways are <30m apart. This collapses corridors to 2-4 nodes, making delay comparison meaningless. **Workaround:** remove the filter or raise to 150m.
 
-2. **UXsim binary queue** — the queue model's transition zone is narrow (0.04-0.05 veh/s). Small demand changes cause large delay swings.
+2. **Single-corridor demand calibration** — the flow→delay curve was fitted on a 3×400m, 117s cycle corridor. It does not generalize when corridor length changes. Each topology needs its own calibration.
 
-3. **Wait/Abort exclusion** — delay computed only from completed vehicles. In very saturated conditions, most vehicles may not complete the corridor.
+3. **Ground truth is from TACTICS benchmark** — the "ground truth" delay values (8.7s–13.4s) are expected delay reductions from adaptive signal control, not measured corridor delays under baseline conditions.
 
-4. **Single-day snapshot** — arrival model and ground truth are from one day's probe data (2026-05-12/13). Day-to-day variation not captured.
+4. **Signal chain construction is heuristic** — OSM road centerline projection → 80m buffer → 25m clustering → 200m chaining produces reasonable chains for some corridors but fails when OSM geometry diverges from actual signal locations.
+
+5. **Wait/Abort exclusion** — in saturated conditions, most vehicles never complete the corridor. Counting only "end" state vehicles underestimates delay for heavy congestion scenarios.
 
 ---
 

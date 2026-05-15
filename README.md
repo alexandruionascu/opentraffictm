@@ -641,20 +641,34 @@ The integration pipeline has three stages:
 - Delay = actual_travel_time − free_flow_travel_time (distance / 8.06 m/s)
 - WAIT/ABORT vehicles excluded from delay (extreme saturation, not normal operating conditions)
 
+### Known Issues and Limitations
+
+**The `dist_m < 30` link filter is too aggressive.** It drops valid consecutive signals on the same road corridor when they're closer than 30m apart — which is common at urban intersections with dual carriageways. This collapses otherwise valid signal chains, reducing the effective network to 2-4 nodes and distorting delay computation. Raise this threshold or remove it for production use.
+
+**Demand calibration is single-corridor-specific.** The flow→delay calibration curve was fitted on a single 3-link corridor (400m links, 8.06 m/s free-flow, 117s cycle). It does not generalize correctly when corridor length changes. The demand calibration needs re-fitting against each specific corridor topology.
+
+**Ground truth delay figures require clarification.** The "ground truth" values (8.7s–13.4s) derive from the TACTICS fuzzy controller benchmark against `data/scenarios.json`, not from physical in-field measurement. They represent the expected delay reduction from adaptive signal control, not the absolute corridor delay under baseline conditions.
+
+**Signal chain construction is a research topic, not a solved problem.** The current approach (OSM road centerline projection → signals within 80m → cluster within 25m → chain with 200m gap threshold) works for some corridors but fails for others due to:
+- OSM road geometry not matching actual signalized intersection locations
+- Boulevard dual-carriageway signal clustering (two signals per intersection)
+- Gaps in signal coverage along corridors (unsignalized mid-block links)
+
 ### Results
 
 ```
-UXsim Validation (probe-observed vs UXsim-computed delay):
+UXsim Validation (current state — with known topology issues):
 Scenario     Ground Truth    UXsim Delay    Error    Nodes    Status
 ----------------------------------------------------------------------
-TM-01              11.2s          24.9s      13.7s       5    Network issue
-TM-02               8.7s          24.3s      15.6s       5    Network issue
-TM-03              13.4s          13.4s   0.038s       4    ✓ Validated
-TM-04               9.6s           0.0s       9.6s       6    Network issue
+TM-01              11.2s          35.0s      23.8s       4    Topology + calibration
+TM-02               8.7s           0.4s       8.3s       2    Topology collapse
+TM-03              13.4s           2.3s      11.1s       2    Topology collapse
+TM-04               9.6s          19.9s      10.3s       4    Topology + calibration
 
-TM-03: 0.038s error (rounded to 0.0s) — perfect match validates the probe → UXsim pipeline.
-TM-01/02/04: Keyword-based signal matching produces disconnected clusters.
-             Requires explicit signalIds in scenarios.json for correct topology.
+The "validated" 0.0s error claim for TM-03 in prior versions was incorrect.
+That result came from a smaller signal cluster no longer present after
+proper corridor reconstruction. All 4 scenarios currently show errors
+>8s due to the issues documented above.
 ```
 
 ### Why UXsim?
@@ -691,11 +705,12 @@ python3 scripts/uxsim-adapter.py --hist
 
 ### What's Next
 
-1. **Fix TM-01/02/04 topology** — add correct `signalIds` arrays to `scenarios.json` for each corridor (same approach as TM-03)
-2. **Real-time loop** — STPT live vehicle positions → queue estimator → TACTICS → UXsim validation
-3. **SUMO co-simulation** — validate UXsim results against SUMO for the central Timișoara network
-4. **Multi-scenario calibration** — calibration curve fitted on TM-03 can be validated on other corridors
-5. **RL policy training** — UXsim + arrival model features → trained signal control agent
+1. **Fix the 30m link filter** — raise threshold to 150m or remove to preserve valid signal chains
+2. **Re-fit demand calibration per corridor** — the single-corridor calibration curve does not generalize; each corridor topology needs its own flow→delay mapping
+3. **Validate signalIds with aerial imagery** — manually verify correct signal chains per corridor against satellite view
+4. **Fix TM-01/02/04 topology** — apply the same signal chain methodology used for TM-03
+5. **SUMO co-simulation** — cross-validate UXsim results against SUMO for the central Timișoara network
+6. **RL policy training** — UXsim + arrival model → trained signal control agent
 
 ---
 

@@ -5,27 +5,52 @@
     "corridor": "Bulevardul Republicii",
     "task": "Estimate delay reduction after a signal timing change.",
     "groundTruth": 11.2,
-    "signalIds": ["signal-141", "signal-142", "signal-389", "signal-392", "signal-391", "signal-393", "signal-143", "signal-144", "signal-252", "signal-287", "signal-105", "signal-108"]
+    "signalIds": [
+      "signal-105",
+      "signal-107",
+      "signal-110",
+      "signal-106"
+    ]
   },
   {
     "id": "TM-02",
     "district": "North",
     "corridor": "Calea Aradului",
     "task": "Rank the best re-route option for commuter traffic.",
-    "groundTruth": 8.7
+    "groundTruth": 8.7,
+    "signalIds": [
+      "signal-62",
+      "signal-59",
+      "signal-64",
+      "signal-16"
+    ]
   },
   {
     "id": "TM-03",
     "district": "South",
     "corridor": "Calea Șagului",
     "task": "Predict the resilience of bus priority at peak hour.",
-    "groundTruth": 13.4
+    "groundTruth": 13.4,
+    "signalIds": [
+      "signal-775",
+      "signal-778",
+      "signal-774",
+      "signal-780",
+      "signal-779"
+    ]
   },
   {
     "id": "TM-04",
     "district": "East",
     "corridor": "Bulevardul Circumvalațiunii",
     "task": "Compare access impact for a temporary closure.",
-    "groundTruth": 9.6
+    "groundTruth": 9.6,
+    "signalIds": [
+      "signal-681",
+      "signal-617",
+      "signal-588",
+      "signal-484",
+      "signal-479"
+    ]
   }
 ]
