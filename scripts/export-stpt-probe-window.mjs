@@ -6,11 +6,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DB_FILE = path.join(__dirname, '../data/stpt.db');
+const DB_FILE = path.join(__dirname, '../stpt.db');
 const OUTPUT_DIR = path.join(__dirname, '../data/traffic-lights/analysis/raw');
 const MANIFEST_FILE = path.join(__dirname, '../data/traffic-lights/analysis/export-manifest.json');
 
-const WINDOW_DAYS = ['2026-05-12', '2026-05-13'];
+const WINDOW_DAYS = ['2026-05-12', '2026-05-13', '2026-05-14', '2026-05-15'];
 const PARTITION_ROW_LIMIT = 18000;
 
 function ensureDir(dir) {

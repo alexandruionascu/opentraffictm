@@ -111,17 +111,17 @@ See [docs/uxsim/README.md](docs/uxsim/README.md) for full methodology, calibrati
 
 ## Traffic Analysis Results
 
-From **21.6 hours** of STPT probe data (2026-05-12 17:13 → 2026-05-13 14:47):
+From **~67 hours** of STPT probe data (2026-05-12 20:13 → 2026-05-15 11:42, May 12–15, 2026):
 
 | Metric | Value |
 |--------|-------|
-| City-wide avg transit speed | **19.3 km/h** |
-| City-wide avg delay | **19.1 s** |
+| City-wide avg transit speed | **19.4 km/h** |
+| City-wide avg delay | **18.7 s** |
 | TomTom speed ratio | **0.921x** free-flow |
-| Congestion city index | **0.66** |
-| Probe segments analyzed | **290,727** |
-| Routes calibrated | **57** (8 high-quality) |
-| Anomaly routes detected | **26** |
+| Congestion city index | **0.64** |
+| Probe segments analyzed | **897,748** |
+| Routes calibrated | **57** (11 high-quality) |
+| Anomaly routes detected | **23** |
 
 ### IDM Calibration Defaults
 
@@ -282,25 +282,26 @@ The framework operates in five layers:
 - **Low:** n < 10, or high variance — heuristic only
 - **Insufficient:** n < 5 — no statistically meaningful conclusion
 
-### City-Wide Findings (796 intersections, 21.6 hours of probe data)
+### City-Wide Findings (960 intersections, ~67 hours of probe data — May 12–15, 2026)
 
 ```
 Adaptive Category Distribution:
-  highly-adaptive:  49 (6.2%)   — significant variance structure in wait times
+  highly-adaptive: 153 (15.9%)  — significant variance structure in wait times
   fixed-cycle:       0 (0.0%)   — no intersection passed both ADF + KPSS tests
   semi-adaptive:      0 (0.0%)
-  uncertain:        747 (93.8%)  — mixed statistical signals
+  uncertain:        807 (84.1%)  — mixed statistical signals
 
 Confidence Distribution:
-  high:        22 (2.8%)
-  medium:     753 (94.6%)
-  low:         21 (2.6%)
+  high:        71 (7.4%)
+  medium:     873 (90.9%)
+  low:         15 (1.6%)
+  insufficient:  1 (0.1%)
 
-Cycle Length: mean=107s, min=56s, max=184s
+Cycle Length: mean=105.5s, min=45s, max=184s
   — Distribution clusters at 60s, 90s, 120s (standard European fixed-cycle base lengths)
 ```
 
-**Key interpretation:** The 93.8% "uncertain" rate is the **correct scientific answer**, not a failure. With only 21 hours of probe data (a single day's snapshot), most intersections lack the time-series depth required for proper stationarity tests. More critically, the city's pervasive heavy congestion (83% of approaches in heavy/blocked regime) creates a fundamental identifiability problem: you cannot distinguish "adaptive extension due to demand" from "always saturated, always maximum red" — both produce long waits regardless of internal controller logic.
+**Key interpretation:** The 84.1% "uncertain" rate is the **correct scientific answer**, not a failure. With 4 days of probe data (spanning Tue–Fri), we observe more time-of-day patterns, but the city's pervasive heavy congestion (83% of approaches in heavy/blocked regime) creates a fundamental identifiability problem: you cannot distinguish "adaptive extension due to demand" from "always saturated, always maximum red" — both produce long waits regardless of internal controller logic. Extending data collection to full weeks would enable weekday/weekend discrimination and stronger adaptive classification.
 
 ### Scientifically Defensible vs Misleading Claims
 
