@@ -1,0 +1,5 @@
+name,start,end,length,u,kappa,merge_priority,signal_group
+l2,n2,n3,37.9,8.06,0.0079,1,0
+l3,n3,n4,39.2,8.06,0.0079,1,0
+l4,n4,n5,38.1,8.06,0.0079,1,0
+l5,n5,n6,32.4,8.06,0.0079,1,0

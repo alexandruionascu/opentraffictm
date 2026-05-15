@@ -1,0 +1,18 @@
+{
+  "scenario_id": "TM-04",
+  "corridor": "Bulevardul Circumvala\u021biunii",
+  "ground_truth_delay_s": 9.6,
+  "uxsim_delay_s": 0.0,
+  "error_s": 9.6,
+  "total_trips": 0,
+  "avg_travel_time_s": 0.0,
+  "total_delay_s": 0.0,
+  "nodes": 6,
+  "links": 5,
+  "demands": 2,
+  "csv_files": {
+    "nodes": "/Users/alexandruionascu/Workspace/opentraffictm/data/uxsim/TM-04/nodes.csv",
+    "links": "/Users/alexandruionascu/Workspace/opentraffictm/data/uxsim/TM-04/links.csv",
+    "demand": "/Users/alexandruionascu/Workspace/opentraffictm/data/uxsim/TM-04/demand.csv"
+  }
+}

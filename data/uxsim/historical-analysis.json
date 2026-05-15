@@ -1,0 +1,105 @@
+{
+  "snapshots": [],
+  "intra_day_variation": {
+    "by_hour": {
+      "7": {
+        "avgSpeedKph": 27.85,
+        "avgSpeedRatio": 0.71
+      },
+      "10": {
+        "avgSpeedKph": 30.8,
+        "avgSpeedRatio": 0.784
+      },
+      "12": {
+        "avgSpeedKph": 30.75,
+        "avgSpeedRatio": 0.784
+      },
+      "17": {
+        "avgSpeedKph": 30.05,
+        "avgSpeedRatio": 0.77
+      },
+      "19": {
+        "avgSpeedKph": 27.65,
+        "avgSpeedRatio": 0.703
+      },
+      "22": {
+        "avgSpeedKph": 30.05,
+        "avgSpeedRatio": 0.77
+      }
+    }
+  },
+  "congestion_by_slot": {
+    "afternoon-rush": {
+      "avgSpeedKph": 30.05,
+      "avgSpeedRatio": 0.77,
+      "sampleCount": 1312,
+      "heavyCount": 308,
+      "severeCount": 116,
+      "moderateCount": 310,
+      "lowCount": 578
+    },
+    "evening": {
+      "avgSpeedKph": 27.65,
+      "avgSpeedRatio": 0.703,
+      "sampleCount": 2624,
+      "heavyCount": 756,
+      "severeCount": 324,
+      "moderateCount": 694,
+      "lowCount": 850
+    },
+    "mid-morning": {
+      "avgSpeedKph": 30.8,
+      "avgSpeedRatio": 0.784,
+      "sampleCount": 1312,
+      "heavyCount": 354,
+      "severeCount": 70,
+      "moderateCount": 236,
+      "lowCount": 652
+    },
+    "midday": {
+      "avgSpeedKph": 30.75,
+      "avgSpeedRatio": 0.784,
+      "sampleCount": 1312,
+      "heavyCount": 354,
+      "severeCount": 70,
+      "moderateCount": 236,
+      "lowCount": 652
+    },
+    "morning-rush": {
+      "avgSpeedKph": 27.85,
+      "avgSpeedRatio": 0.71,
+      "sampleCount": 2586,
+      "heavyCount": 802,
+      "severeCount": 278,
+      "moderateCount": 582,
+      "lowCount": 924
+    },
+    "night": {
+      "avgSpeedKph": 30.05,
+      "avgSpeedRatio": 0.77,
+      "sampleCount": 1312,
+      "heavyCount": 308,
+      "severeCount": 116,
+      "moderateCount": 310,
+      "lowCount": 578
+    }
+  },
+  "segment_variation": {
+    "tomtom-flow-2026-05-14T09-54-13-984Z.csv": {
+      "timestamp": "2026-05-14T04:30:00.000Z",
+      "n_segments": 25
+    },
+    "tomtom-flow-2026-05-14T09-55-30-270Z.csv": {
+      "timestamp": "2026-05-14T04:30:00.000Z",
+      "n_segments": 25
+    },
+    "tomtom-flow-2026-05-14T10-02-50-386Z.csv": {
+      "timestamp": "2026-05-14T04:30:00.000Z",
+      "n_segments": 25
+    },
+    "tomtom-flow-2026-05-14T20-04-08-570Z.csv": {
+      "timestamp": "2026-05-14T04:30:00.000Z",
+      "n_segments": 25
+    }
+  }
+}

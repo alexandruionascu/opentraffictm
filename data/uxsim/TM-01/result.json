@@ -1,0 +1,18 @@
+{
+  "scenario_id": "TM-01",
+  "corridor": "Bulevardul Republicii",
+  "ground_truth_delay_s": 11.2,
+  "uxsim_delay_s": 24.922639030798432,
+  "error_s": 13.722639030798433,
+  "total_trips": 17,
+  "avg_travel_time_s": 43.23529411764706,
+  "total_delay_s": 423.68486352357337,
+  "nodes": 5,
+  "links": 4,
+  "demands": 4,
+  "csv_files": {
+    "nodes": "/Users/alexandruionascu/Workspace/opentraffictm/data/uxsim/TM-01/nodes.csv",
+    "links": "/Users/alexandruionascu/Workspace/opentraffictm/data/uxsim/TM-01/links.csv",
+    "demand": "/Users/alexandruionascu/Workspace/opentraffictm/data/uxsim/TM-01/demand.csv"
+  }
+}
