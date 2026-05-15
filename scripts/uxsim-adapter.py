@@ -97,6 +97,11 @@ def load_framework_results() -> dict:
     with open(path) as f:
         return json.load(f)
 
+def load_real_ground_truth() -> dict:
+    path = REPO_ROOT / "data" / "uxsim" / "ground-truth-real.json"
+    with open(path) as f:
+        return json.load(f)
+
 # ─── Corridor geometry extraction ─────────────────────────────────────────────
 # For each scenario corridor we need to build a UXsim network.
 # UXsim uses (x=longitude, y=latitude) in degrees.
@@ -182,7 +187,8 @@ def _find_signals_fallback(signals_data: dict, corridor_keyword: str) -> list:
     return matches[:20]
 
 def build_corridor_network(scenario_id: str, signals_data: dict, framework_data: dict,
-                           arrival_data: dict, calibration_data: dict) -> dict:
+                           arrival_data: dict, calibration_data: dict,
+                           real_ground_truth_data: dict) -> dict:
     """
     Build a UXsim network definition for a corridor.
     Returns dict with nodes, links, demands, signals ready to write as CSVs.
@@ -192,7 +198,13 @@ def build_corridor_network(scenario_id: str, signals_data: dict, framework_data:
         raise ValueError(f"Unknown scenario {scenario_id}")
 
     corridor_name = scenario["corridor"]
-    ground_truth_delay = scenario["groundTruth"]
+
+    # Use probe-derived real ground truth; fall back to scenarios.json benchmark
+    real_gt = real_ground_truth_data.get("scenarios", {}).get(scenario_id, {})
+    ground_truth_delay = real_gt.get("consensus_delay_s")
+    if ground_truth_delay is None:
+        ground_truth_delay = scenario["groundTruth"]
+        print(f"  [WARN] {scenario_id}: no real ground truth, using benchmark {ground_truth_delay}s")
 
     # Use the exact signal IDs from the scenario (not keyword matching)
     signal_ids = scenario.get("signalIds", [])
@@ -320,10 +332,10 @@ def build_corridor_network(scenario_id: str, signals_data: dict, framework_data:
             (dlat * meters_per_deg_lat(avg_lat)) ** 2 +
             (dlng * meters_per_deg_lng(avg_lat)) ** 2
         )
-        # If nodes are too close (<30m), skip this link.
-        # This avoids creating near-zero-length links between very close signals.
-        # 30m is enough to skip duplicate/adjoining signals while keeping valid corridor links.
-        if dist_m < 30:
+        # If nodes are too close (<10m), skip this link.
+        # Urban carriageways can be 10-20m apart (opposite directions of same road).
+        # 10m minimum avoids near-zero-length links while preserving valid corridor topology.
+        if dist_m < 10:
             continue
 
         # free-flow speed from city defaults (convert kph → m/s)
@@ -824,11 +836,13 @@ def main():
     arrival_data = load_arrival_model()
     calibration_data = load_calibration()
     framework_data = load_framework_results()
+    real_ground_truth_data = load_real_ground_truth()
     print(f"  signals: {len(signals_data.get('programs', []))}")
     print(f"  scenarios: {len(scenarios_data)}")
     print(f"  arrival approaches: {len(arrival_data.get('approaches', []))}")
     print(f"  calibration: city defaults loaded")
     print(f"  framework: {len(framework_data.get('intersectionResults', []))} intersections")
+    print(f"  real ground truth: {len(real_ground_truth_data.get('scenarios', {}))} scenarios")
 
     # Determine which scenarios to run
     scenario_ids = [args.scenario] if args.scenario else [s["id"] for s in scenarios_data]
@@ -838,7 +852,8 @@ def main():
         print(f"\nProcessing {sid}...")
         try:
             network = build_corridor_network(sid, signals_data, framework_data,
-                                             arrival_data, calibration_data)
+                                             arrival_data, calibration_data,
+                                             real_ground_truth_data)
             print(f"  nodes={len(network['nodes'])}, links={len(network['links'])}, "
                   f"demands={len(network['demands'])}")
 

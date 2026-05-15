@@ -1,0 +1,15 @@
+{
+  "scenario_id": "TM-03",
+  "corridor": "Calea \u0218agului",
+  "ground_truth_delay_s": 14.5,
+  "uxsim_delay_s": 24.84,
+  "error_s": 10.34,
+  "total_trips": 14,
+  "avg_travel_time_s": 24.84,
+  "nodes": 5,
+  "links": 4,
+  "demands": 3,
+  "mode": "tactics-adaptive",
+  "wait_count": 0,
+  "abort_count": 0
+}

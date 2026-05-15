@@ -93,17 +93,28 @@ npm run fetch:timisoara-road-closures
 # Prerequisites
 pip install uxsim pandas
 
-# Run all 4 scenarios
+# STEP 1: Extract real ground truth from probes + TomTom FCD
+# This replaces the old circular TACTICS benchmark with real field data
+python3 scripts/ground-truth-from-probes.py
+
+# STEP 2: Run static UXsim (all 4 scenarios)
 python3 scripts/uxsim-adapter.py
 
-# Run specific scenario (TM-03 is the validated one: 0.038s error)
+# STEP 3: Run TACTICS-adaptive closed-loop UXsim (per-timestep fuzzy signal control)
+python3 scripts/tactics_uxsim_adapter.py
+
+# Run specific scenario
 python3 scripts/uxsim-adapter.py --scenario TM-03
+python3 scripts/tactics_uxsim_adapter.py --scenario TM-03
 
 # Historical time-series only
 python3 scripts/uxsim-adapter.py --hist
 ```
 
-**Results** are written to `data/uxsim/validation-results.json` with ground truth vs UXsim delay comparison.
+**Results** are written to:
+- `data/uxsim/validation-results.json` — ground truth vs static UXsim delay comparison
+- `data/uxsim/tactics-adaptive-results.json` — ground truth vs TACTICS-adaptive UXsim comparison
+- `data/uxsim/ground-truth-real.json` — real probe-derived ground truth (STPT + TomTom consensus)
 
 See [docs/uxsim/README.md](docs/uxsim/README.md) for full methodology, calibration curve, and reuse instructions.
 
@@ -432,6 +443,8 @@ Separate optimization: greedy search over 13 offset candidates [0..60s] per sign
 
 ### Benchmark Results
 
+**Note:** The benchmark results below use the old circular ground truth (TACTICS delay reductions from `scenarios.json`). They are kept for historical reference. The real ground truth (from `ground-truth-real.json`) is 14.5–25.7s as shown above. See the UXsim Integration section for current results against real probes.
+
 All 4 scenarios evaluated against ground-truth delay reductions from `data/scenarios.json`:
 
 | Scenario | Corridor | Ground Truth | TACTICS Error | Greedy Error |
@@ -442,6 +455,8 @@ All 4 scenarios evaluated against ground-truth delay reductions from `data/scena
 | TM-04 | Circumvalațiunii | 9.6s | **0.4s** | 1.4s |
 
 **TACTICS wins all 4 scenarios** — predicted delay reductions are within 0.4s of ground truth vs 1.0–1.4s for greedy offset optimization. This validates the fuzzy reactive approach against the probe-derived arrival model.
+
+**Why this matters for the current analysis:** The 0.4s TACTICS accuracy against *its own generated values* is expected. What matters now is that with real ground truth (23.8s, 25.7s, 14.5s, 20.1s), we have a proper baseline. The UXsim accuracy question is now: can the simulation reproduce these real delays? Current answers: TM-01 (3.5s ✓), TM-04 (2.2s ✓), TM-02 (8.4s ✗), TM-03 (10.4s ✗). The remaining gap for TM-02/TM-03 is in demand calibration, not signal timing.
 
 ### What This Tells Us
 
@@ -595,81 +610,80 @@ The framework is implemented in `src/traffic-light/inferenceFramework.ts` (~900 
 
 A new integration layer connects OpenTrafficTM's probe-calibrated arrival model to **UXsim**, a Python mesoscopic traffic simulator using Newell's simplified car-following model. This validates whether probe-observed delays are reproducible in simulation — and tests the fundamental assumption that bus probe data can predict traffic behavior at signalized intersections.
 
-### What This Tells Us: Interpretation
+### What Was Wrong With the Original Benchmark
 
-**TM-03 (Calea Șagului) achieved 0.0s error** — the UXsim-computed delay exactly matched the probe-observed ground truth delay (13.4s). What does this mean?
+**The "ground truth" in `scenarios.json` was not absolute delays — it was delay reductions from TACTICS adaptive control.** The values (8.7s–13.4s) represented the expected improvement from switching to adaptive signals, not the raw corridor delay under fixed-time baseline. Validating UXsim against these figures was circular: UXsim was being compared against the output of the same TACTICS fuzzy controller it was supposed to be independently testing.
 
-| Metric | Value | Interpretation |
-|-------|-------|----------------|
-| Ground truth delay | 13.4s | Probe-observed average delay reduction (TACTICS vs baseline) at this corridor |
-| UXsim delay | 13.4s | Average delay of vehicles that completed the corridor in simulation |
-| Error | 0.0s | Perfect reproduction of probe-observed dynamics in simulation |
+This was discovered during a May 2026 analysis session that identified three compounding problems:
 
-**"Perfect match" means three things:**
+1. **The 30m link filter collapsed real corridors.** Urban dual-carriageway intersections often have signals on opposite carriageways separated by 10–30m — well within the 30m minimum link threshold. This silently dropped valid signals, reducing TM-03 from 5 signals to 2, and TM-02/TM-04 from 4+ signals to 1–2.
+2. **Demand calibration was single-corridor-specific.** The flow→delay curve was fitted on one 3×400m corridor. When applied to corridors of different lengths or topologies, it produced wrong demand estimates (off by 2–5×).
+3. **TACTICS was embedded as ground truth everywhere.** The benchmark compared TACTICS vs greedy offset optimization — both evaluated against TACTICS-generated values. Neither strategy had real field validation.
 
-1. **The probe-to-simulation pipeline is sound.** Arrival distributions derived from STPT GPS segments (speed ratios → demand flow) correctly parameterize the UXsim queue model. The arrival model captures real-world arrival patterns.
+### Real Ground Truth: STPT Probes + TomTom Floating Car Data
 
-2. **UXsim's binary queue behavior matches Timișoara's saturated conditions.** At 0.52x speed ratio (heavily congested), the corridor sits at the transition where demand slightly exceeds capacity — exactly the operating range where UXsim's queue model produces meaningful delay estimates.
+New script `scripts/ground-truth-from-probes.py` replaces the circular benchmark with two independent real-world data sources:
 
-3. **The signal chain topology is correct.** Calea Șagului's 4 signals form a connected corridor with no spatial gaps. The network topology in simulation mirrors the physical road geometry.
+- **STPT arrival-model.json** — per-signal per-slot speed ratios and delays from ~67 hours of bus GPS probes (May 12–15, 2026), covering 7,639 signal approaches
+- **TomTom flow CSVs** — per-segment floating car data from May 14, 308 corridor segments with timestamped speed ratios and delays
 
-**Why other scenarios differ:** TM-01, TM-02, and TM-04 used keyword-based signal matching that produced disconnected signal clusters (signals from parallel roads, not the actual corridor). After topology filtering, these corridors collapsed to 4-6 nodes with different demand patterns than the full corridor. TM-03 succeeded because its signal chain happened to be spatially coherent.
+Results in `data/uxsim/ground-truth-real.json`:
 
-### Methodology
+| Scenario | Old "GT" (TACTICS) | Real STPT Delay | Real TomTom Delay | Consensus GT |
+|----------|-------------------|-----------------|-------------------|--------------|
+| TM-01 | 11.2s (reduction) | 23.8s | 107.9s | **23.8s** |
+| TM-02 | 8.7s (reduction) | 25.7s | 55.1s | **25.7s** |
+| TM-03 | 13.4s (reduction) | 14.5s | — (no TomTom segments) | **14.5s** |
+| TM-04 | 9.6s (reduction) | 20.1s | 12.1s | **20.1s** |
 
-The integration pipeline has three stages:
+**The real delays are 2–3× higher than the old benchmark figures.** This is expected — the old figures measured delay *reductions* from adaptive control, not absolute baseline delays. The STPT consensus values (14.5–25.7s) are the physically meaningful ones: they represent actual extra travel time through each corridor vs free-flow.
 
-**1. Network building (`build_corridor_network` in `uxsim-adapter.py`):**
-- Signals are matched to corridors using OSM road name proximity (80m radius)
-- Nodes are created at signal positions; links connect consecutive nodes
-- A connected-component filter removes isolated nodes (disconnected by >30m gaps)
-- Link length = haversine distance between signal positions
-- Jam density derived from IDM defaults: κ = 1 / (v_des × T_gap)
+### Current UXsim Accuracy (with real ground truth, 10m filter)
 
-**2. Demand calibration (`arrival model → UXsim flow`):**
-- Probe-observed avgDelay per signal × slot → UXsim demand flow via calibration curve
-- UXsim calibration (isolated 3-link corridor, 8 m/s free-flow, 117s signal cycle):
-  - flow=0.01 veh/s → ~10s delay
-  - flow=0.03 veh/s → ~16s delay
-  - flow=0.04 veh/s → ~11s delay (queue clears)
-  - flow≥0.05 veh/s → massive saturation (hundreds of seconds)
-- Formula: `flow = 0.005 + max(0, avgDelay - 5) × 0.001` for avgDelay 5-25s
-- Single demand entry per slot (origin=first signal, dest=last connected signal)
+After fixing the 30m link filter → 10m and loading real ground truth:
 
-**3. Delay computation:**
-- Only "end" state vehicles (completed corridor) count toward delay
-- Delay = actual_travel_time − free_flow_travel_time (distance / 8.06 m/s)
-- WAIT/ABORT vehicles excluded from delay (extreme saturation, not normal operating conditions)
+| Scenario | Real GT | Static UXsim | TACTICS-Adaptive | Error |
+|----------|---------|--------------|------------------|-------|
+| TM-01 | 23.8s | 20.3s | 20.3s | 3.5s ✓ |
+| TM-02 | 25.7s | 17.3s | 17.3s | 8.4s |
+| TM-03 | 14.5s | 24.9s | 24.8s | 10.4s |
+| TM-04 | 20.1s | 17.9s | 17.8s | 2.2s ✓ |
 
-### Known Issues and Limitations
+Two scenarios (TM-01, TM-04) achieve <3.5s error. Two (TM-02, TM-03) remain poor. The TACTICS-adaptive version produces virtually identical results to static — the adaptation logic runs each timestep but does not materially change delay outcomes. This tells us the demand calibration is the bottleneck, not the signal timing logic.
 
-**The `dist_m < 30` link filter is too aggressive.** It drops valid consecutive signals on the same road corridor when they're closer than 30m apart — which is common at urban intersections with dual carriageways. This collapses otherwise valid signal chains, reducing the effective network to 2-4 nodes and distorting delay computation. Raise this threshold or remove it for production use.
+### Why TM-02 and TM-03 Are Still Wrong
 
-**Demand calibration is single-corridor-specific.** The flow→delay calibration curve was fitted on a single 3-link corridor (400m links, 8.06 m/s free-flow, 117s cycle). It does not generalize correctly when corridor length changes. The demand calibration needs re-fitting against each specific corridor topology.
+**TM-02 (Calea Aradului):** The corridor has 4 signals but the demand calibration computes flow for the origin signal only. Calea Aradului is a north-boundary corridor — the signals in the scenario may not be on the same route a bus actually traverses, so the arrival model's origin-signal delay doesn't reflect actual corridor demand.
 
-**Ground truth delay figures require clarification.** The "ground truth" values (8.7s–13.4s) derive from the TACTICS fuzzy controller benchmark against `data/scenarios.json`, not from physical in-field measurement. They represent the expected delay reduction from adaptive signal control, not the absolute corridor delay under baseline conditions.
+**TM-03 (Calea Șagului):** Despite now having 5 signals + 4 links (corrected from the 30m collapse), UXsim over-predicts delay by 10.4s. The arrival-model delay for the origin signal (14.5s overall) is the bottleneck — the downstream signals have higher delays, but only the origin signal's delay feeds the demand calibration. The corridor demand is not homogeneous along its length.
 
-**Signal chain construction is a research topic, not a solved problem.** The current approach (OSM road centerline projection → signals within 80m → cluster within 25m → chain with 200m gap threshold) works for some corridors but fails for others due to:
-- OSM road geometry not matching actual signalized intersection locations
-- Boulevard dual-carriageway signal clustering (two signals per intersection)
-- Gaps in signal coverage along corridors (unsignalized mid-block links)
+The fundamental issue: **demand calibration uses a single-signal delay to represent corridor-wide demand**. For TM-03, signal-775 (origin) has avgDelay 17.1s while signal-779 (last) has only 3.2s. A single demand entry from origin→dest doesn't capture the distributed nature of real queue buildup.
 
-### Results
+### TACTICS Closed-Loop UXsim Adapter
+
+New script `scripts/tactics_uxsim_adapter.py` runs UXsim with per-timestep TACTICS fuzzy adaptation:
 
 ```
-UXsim Validation (current state — with known topology issues):
-Scenario     Ground Truth    UXsim Delay    Error    Nodes    Status
-----------------------------------------------------------------------
-TM-01              11.2s          35.0s      23.8s       4    Topology + calibration
-TM-02               8.7s           0.4s       8.3s       2    Topology collapse
-TM-03              13.4s           2.3s      11.1s       2    Topology collapse
-TM-04               9.6s          19.9s      10.3s       4    Topology + calibration
-
-The "validated" 0.0s error claim for TM-03 in prior versions was incorrect.
-That result came from a smaller signal cluster no longer present after
-proper corridor reconstruction. All 4 scenarios currently show errors
->8s due to the issues documented above.
+Each simulation tick:
+  1. Read incoming vehicle speeds → compute speed ratio
+  2. Estimate queue fraction from speed ratio
+  3. Run TACTICS Mamdani inference (16 rules) → delta-green
+  4. Apply adaptation to node signal in-place via user_function
 ```
+
+The user_function hook (UXsim's per-node callback mechanism) allows signal modification without rebuilding the network. Speed ratio is computed from `node.incoming_vehicles` each tick; TACTICS adaptation is pre-computed per hour to avoid per-tick fuzzy inference overhead.
+
+The near-identical results between static and adaptive modes (error difference: TM-03 10.4s→10.3s, TM-04 2.2s→2.3s) indicate the adaptation **is running** but the underlying demand mismatch dominates. The queue model is the issue, not the signal logic.
+
+### What's Still Broken
+
+**Demand calibration is the main unsolved problem.** The flow→delay mapping requires re-fitting per corridor topology. A multivariate model (flow = f(length, cycle_length, speed_ratio, n_signals)) would generalize better than the current single-corridor curve.
+
+**The signal chain for TM-02 may be wrong.** The 4 signals in the scenario don't form a clean linear chain — some may be on parallel roads or the wrong direction of the boulevard. Route geometry from probe-aggregation should be used to validate chain ordering.
+
+**TomTom ground truth is noisy.** TomTom segments within corridor bounding boxes don't always match the actual route — 107.9s for TM-01 is unrealistically high. TomTom delay is per-segment, not corridor-to-corridor. The STPT arrival model is the more trustworthy source for the consensus.
+
+**The 10m filter is a partial fix.** True urban topology needs a smarter filter — one that considers whether two signals are on the same road (same heading) vs opposite carriageways of the same intersection. The current spatial filter only considers distance, not road network topology.
 
 ### Why UXsim?
 
@@ -683,14 +697,21 @@ UXsim was chosen over other options for specific reasons:
 ### Scripts
 
 ```bash
-# Run UXsim integration for all 4 scenarios
+# Extract real ground truth from STPT probes + TomTom (replaces circular benchmark)
+python3 scripts/ground-truth-from-probes.py
+
+# Run static UXsim (all 4 scenarios)
 python3 scripts/uxsim-adapter.py
+
+# Run TACTICS-adaptive UXsim (closed-loop signal control)
+python3 scripts/tactics_uxsim_adapter.py
 
 # Run specific scenario
 python3 scripts/uxsim-adapter.py --scenario TM-03
+python3 scripts/tactics_uxsim_adapter.py --scenario TM-03
 
-# Run historical time-series analysis only
-python3 scripts/uxsim-adapter.py --hist
+# Compare static vs TACTICS-adaptive
+python3 scripts/tactics_uxsim_adapter.py --compare
 ```
 
 ### Outputs
@@ -700,17 +721,17 @@ python3 scripts/uxsim-adapter.py --hist
 | `data/uxsim/TM-01/nodes.csv` | Signal nodes with coordinates, signal timing, offsets |
 | `data/uxsim/TM-01/links.csv` | Link definitions (start→end, length, free-flow speed, jam density) |
 | `data/uxsim/TM-01/demand.csv` | Demand entries (origin→dest, time window, flow veh/s) |
-| `data/uxsim/validation-results.json` | Ground truth vs UXsim delay comparison |
-| `data/uxsim/historical-analysis.json` | TomTom archive congestion by time slot |
+| `data/uxsim/validation-results.json` | Ground truth vs static UXsim delay comparison |
+| `data/uxsim/tactics-adaptive-results.json` | Ground truth vs TACTICS-adaptive UXsim delay comparison |
+| `data/uxsim/ground-truth-real.json` | Real probe-derived ground truth (STPT + TomTom consensus) |
 
 ### What's Next
 
-1. **Fix the 30m link filter** — raise threshold to 150m or remove to preserve valid signal chains
-2. **Re-fit demand calibration per corridor** — the single-corridor calibration curve does not generalize; each corridor topology needs its own flow→delay mapping
-3. **Validate signalIds with aerial imagery** — manually verify correct signal chains per corridor against satellite view
-4. **Fix TM-01/02/04 topology** — apply the same signal chain methodology used for TM-03
-5. **SUMO co-simulation** — cross-validate UXsim results against SUMO for the central Timișoara network
-6. **RL policy training** — UXsim + arrival model → trained signal control agent
+1. **Fix demand calibration** — multivariate model: flow = f(length, cycle, speed_ratio, n_signals) per corridor
+2. **Validate signal chains against route geometry** — use probe-aggregation route linestrings to order signals, not OSM heuristic
+3. **Per-signal demand entries** — instead of single origin→dest demand, add one entry per signal approach to model distributed queue buildup
+4. **SUMO co-simulation** — cross-validate UXsim results against SUMO for the central Timișoara network
+5. **RL policy training** — UXsim + arrival model → trained signal control agent using the now-corrected ground truth framework
 
 ---
 

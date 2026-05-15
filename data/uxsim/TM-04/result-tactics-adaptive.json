@@ -1,0 +1,15 @@
+{
+  "scenario_id": "TM-04",
+  "corridor": "Bulevardul Circumvala\u021biunii",
+  "ground_truth_delay_s": 20.1,
+  "uxsim_delay_s": 17.84,
+  "error_s": 2.26,
+  "total_trips": 24,
+  "avg_travel_time_s": 17.84,
+  "nodes": 5,
+  "links": 4,
+  "demands": 4,
+  "mode": "tactics-adaptive",
+  "wait_count": 0,
+  "abort_count": 0
+}

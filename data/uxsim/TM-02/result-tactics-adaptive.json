@@ -1,0 +1,15 @@
+{
+  "scenario_id": "TM-02",
+  "corridor": "Calea Aradului",
+  "ground_truth_delay_s": 25.7,
+  "uxsim_delay_s": 17.26,
+  "error_s": 8.44,
+  "total_trips": 23,
+  "avg_travel_time_s": 17.26,
+  "nodes": 4,
+  "links": 3,
+  "demands": 4,
+  "mode": "tactics-adaptive",
+  "wait_count": 0,
+  "abort_count": 0
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "scenario_id": "TM-01",
+    "corridor": "Bulevardul Republicii",
+    "ground_truth_delay_s": 23.8,
+    "uxsim_delay_s": 20.27,
+    "error_s": 3.53,
+    "total_trips": 28,
+    "avg_travel_time_s": 20.27,
+    "nodes": 4,
+    "links": 3,
+    "demands": 4,
+    "mode": "tactics-adaptive",
+    "wait_count": 0,
+    "abort_count": 0
+  },
+  {
+    "scenario_id": "TM-02",
+    "corridor": "Calea Aradului",
+    "ground_truth_delay_s": 25.7,
+    "uxsim_delay_s": 17.26,
+    "error_s": 8.44,
+    "total_trips": 23,
+    "avg_travel_time_s": 17.26,
+    "nodes": 4,
+    "links": 3,
+    "demands": 4,
+    "mode": "tactics-adaptive",
+    "wait_count": 0,
+    "abort_count": 0
+  },
+  {
+    "scenario_id": "TM-03",
+    "corridor": "Calea \u0218agului",
+    "ground_truth_delay_s": 14.5,
+    "uxsim_delay_s": 24.84,
+    "error_s": 10.34,
+    "total_trips": 14,
+    "avg_travel_time_s": 24.84,
+    "nodes": 5,
+    "links": 4,
+    "demands": 3,
+    "mode": "tactics-adaptive",
+    "wait_count": 0,
+    "abort_count": 0
+  },
+  {
+    "scenario_id": "TM-04",
+    "corridor": "Bulevardul Circumvala\u021biunii",
+    "ground_truth_delay_s": 20.1,
+    "uxsim_delay_s": 17.84,
+    "error_s": 2.26,
+    "total_trips": 24,
+    "avg_travel_time_s": 17.84,
+    "nodes": 5,
+    "links": 4,
+    "demands": 4,
+    "mode": "tactics-adaptive",
+    "wait_count": 0,
+    "abort_count": 0
+  }
+]

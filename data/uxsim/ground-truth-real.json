@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-05-15T13:51:46.305139Z",
+  "sources": [
+    "STPT arrival-model.json (probe-derived speed ratios and delays per signal per slot)",
+    "TomTom tomtom-corridor-profiles.json + flow CSVs (May 14 floating car data)"
+  ],
+  "note": "scenarios.json groundTruth values are likely delay reductions from TACTICS adaptive control, not absolute delays",
+  "scenarios": {
+    "TM-01": {
+      "corridor": "Bulevardul Republicii",
+      "consensus_delay_s": 23.8,
+      "confidence": "high",
+      "source": "arrival_model",
+      "arrival_model": {
+        "avg_delay_s": 23.8,
+        "avg_speed_ratio": 0.572,
+        "n_signals": 4,
+        "slot_results": {
+          "morning-rush": {
+            "avg_delay_s": 22.1,
+            "avg_speed_ratio": 0.575,
+            "total_samples": 1273,
+            "n_signals": 4
+          },
+          "midday": {
+            "avg_delay_s": 22.5,
+            "avg_speed_ratio": 0.57,
+            "total_samples": 2636,
+            "n_signals": 4
+          },
+          "afternoon-rush": {
+            "avg_delay_s": 26.0,
+            "avg_speed_ratio": 0.571,
+            "total_samples": 2276,
+            "n_signals": 4
+          },
+          "evening": {
+            "avg_delay_s": 26.5,
+            "avg_speed_ratio": 0.598,
+            "total_samples": 199,
+            "n_signals": 4
+          }
+        }
+      },
+      "tomtom": {
+        "avg_delay_s": 107.9,
+        "avg_speed_ratio": 0.739,
+        "n_segments": 6
+      },
+      "old_benchmark_groundTruth": 11.2
+    },
+    "TM-02": {
+      "corridor": "Calea Aradului",
+      "consensus_delay_s": 25.7,
+      "confidence": "high",
+      "source": "arrival_model",
+      "arrival_model": {
+        "avg_delay_s": 25.7,
+        "avg_speed_ratio": 0.506,
+        "n_signals": 4,
+        "slot_results": {
+          "morning-rush": {
+            "avg_delay_s": 28.2,
+            "avg_speed_ratio": 0.479,
+            "total_samples": 971,
+            "n_signals": 4
+          },
+          "midday": {
+            "avg_delay_s": 23.0,
+            "avg_speed_ratio": 0.513,
+            "total_samples": 1329,
+            "n_signals": 4
+          },
+          "afternoon-rush": {
+            "avg_delay_s": 26.6,
+            "avg_speed_ratio": 0.51,
+            "total_samples": 1294,
+            "n_signals": 4
+          },
+          "evening": {
+            "avg_delay_s": 24.3,
+            "avg_speed_ratio": 0.614,
+            "total_samples": 99,
+            "n_signals": 4
+          }
+        }
+      },
+      "tomtom": {
+        "avg_delay_s": 55.1,
+        "avg_speed_ratio": 0.605,
+        "n_segments": 3
+      },
+      "old_benchmark_groundTruth": 8.7
+    },
+    "TM-03": {
+      "corridor": "Calea \u0218agului",
+      "consensus_delay_s": 14.5,
+      "confidence": "high",
+      "source": "arrival_model",
+      "arrival_model": {
+        "avg_delay_s": 14.5,
+        "avg_speed_ratio": 0.581,
+        "n_signals": 5,
+        "slot_results": {
+          "morning-rush": {
+            "avg_delay_s": 13.7,
+            "avg_speed_ratio": 0.601,
+            "total_samples": 177,
+            "n_signals": 5
+          },
+          "midday": {
+            "avg_delay_s": 15.2,
+            "avg_speed_ratio": 0.568,
+            "total_samples": 242,
+            "n_signals": 5
+          },
+          "afternoon-rush": {
+            "avg_delay_s": 14.4,
+            "avg_speed_ratio": 0.577,
+            "total_samples": 231,
+            "n_signals": 5
+          },
+          "evening": {
+            "avg_delay_s": 9.6,
+            "avg_speed_ratio": 0.665,
+            "total_samples": 5,
+            "n_signals": 1
+          }
+        }
+      },
+      "tomtom": null,
+      "old_benchmark_groundTruth": 13.4
+    },
+    "TM-04": {
+      "corridor": "Bulevardul Circumvala\u021biunii",
+      "consensus_delay_s": 20.1,
+      "confidence": "high",
+      "source": "arrival_model",
+      "arrival_model": {
+        "avg_delay_s": 20.1,
+        "avg_speed_ratio": 0.551,
+        "n_signals": 5,
+        "slot_results": {
+          "morning-rush": {
+            "avg_delay_s": 18.5,
+            "avg_speed_ratio": 0.571,
+            "total_samples": 261,
+            "n_signals": 5
+          },
+          "midday": {
+            "avg_delay_s": 17.8,
+            "avg_speed_ratio": 0.569,
+            "total_samples": 546,
+            "n_signals": 5
+          },
+          "afternoon-rush": {
+            "avg_delay_s": 22.6,
+            "avg_speed_ratio": 0.518,
+            "total_samples": 449,
+            "n_signals": 5
+          },
+          "evening": {
+            "avg_delay_s": 29.1,
+            "avg_speed_ratio": 0.538,
+            "total_samples": 66,
+            "n_signals": 4
+          }
+        }
+      },
+      "tomtom": {
+        "avg_delay_s": 12.1,
+        "avg_speed_ratio": 0.858,
+        "n_segments": 4
+      },
+      "old_benchmark_groundTruth": 9.6
+    }
+  }
+}
