@@ -1,4 +1,39 @@
 import type { Actor, Coordinate, Scenario, SignalProgram, SignalState } from "./data";
+import { readFileSync, existsSync } from "fs";
+import { join } from "path";
+
+// ---------------------------------------------------------------------------
+// Calibrated car-following defaults (loaded once at module init)
+// Used to replace the static 2.8m minimum gap with an IDM-calibrated gap.
+// ---------------------------------------------------------------------------
+
+const CALIB_PATH = join(__dirname, "..", "data", "derived", "calibration-results.json");
+
+interface SimCalibration {
+  defaults: { cityTimeGapSeconds: number; cityWaveSpeedKph: number };
+  routes: Array<{ route: string; timeGapSeconds: number; quality: string }>;
+}
+
+function getSimCalibration(): SimCalibration {
+  if (existsSync(CALIB_PATH)) {
+    try {
+      return JSON.parse(readFileSync(CALIB_PATH, "utf-8"));
+    } catch {
+      // fall through to hardcoded defaults
+    }
+  }
+  return {
+    defaults: { cityTimeGapSeconds: 15.7, cityWaveSpeedKph: 12 },
+    routes: [],
+  };
+}
+
+const SIM_CALIB = getSimCalibration();
+
+function getSimTimeGap(route: string): number {
+  const entry = SIM_CALIB.routes.find(r => r.route === route && r.quality !== "low");
+  return entry?.timeGapSeconds ?? SIM_CALIB.defaults.cityTimeGapSeconds;
+}
 
 export interface ActorFrame {
   id: string;
@@ -552,7 +587,9 @@ function advanceActorStates(
 
       for (const candidate of laneCandidates) {
         if (leader && leader.nextDistance >= leader.distance && candidate.distance <= leader.distance) {
-          const gap = Math.max(candidate.actor.lengthMeters ?? 4.8, 4.8) + 2.8;
+          const timeGap = getSimTimeGap(candidate.actor.route ?? "");
+          const baseGap = Math.max(candidate.actor.lengthMeters ?? 4.8, 4.8) + 2.8;
+          const gap = baseGap + candidate.speedMps * timeGap;
           const maxDistance = Math.max(0, leader.nextDistance - gap);
 
           if (candidate.nextDistance > maxDistance) {

@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync } from "fs";
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from "fs";
 import { queryAllProbeSegments } from "./stpt-probe";
 import type { ProbeSegment } from "./stpt-probe";
 
@@ -50,6 +50,59 @@ export interface CalibrationOutput {
     avgSpeedKph: number;
     cityAvgDelaySeconds: number;
   };
+}
+
+// ---------------------------------------------------------------------------
+// Runtime calibration access (avoids re-running full calibration on startup)
+// ---------------------------------------------------------------------------
+
+const CALIBRATION_CACHE_FILE = "data/derived/calibration-results.json";
+
+/**
+ * Load calibration from the cached JSON file written by calibrateRoutes().
+ * Falls back to defaults if no cached file exists.
+ */
+export async function getCalibration(): Promise<CalibrationOutput> {
+  if (existsSync(CALIBRATION_CACHE_FILE)) {
+    try {
+      return JSON.parse(readFileSync(CALIBRATION_CACHE_FILE, "utf-8")) as CalibrationOutput;
+    } catch {
+      // Fall through to defaults
+    }
+  }
+  // Return city defaults without running full calibration
+  return {
+    generatedAt: new Date().toISOString(),
+    method: "idm-newell-gipps-calibration",
+    description: "Defaults (calibration cache not available)",
+    defaults: {
+      cityDesiredSpeedKph: 34,
+      cityTimeGapSeconds: 17,
+      cityMaxAccelMps2: 4.5,
+      cityComfortDecelMps2: 3.9,
+      cityAvgSpeedKph: 22,
+      cityMinSpeedKph: 3,
+      cityP50SpeedKph: 20,
+      cityP85SpeedKph: 35,
+      cityAvgDelaySeconds: 30,
+    },
+    routes: [],
+    summary: { totalRoutes: 0, highQualityRoutes: 0, avgSpeedKph: 22, cityAvgDelaySeconds: 30 },
+  };
+}
+
+/** Shortcut: get route-specific time gap, or city default if route unknown. */
+export async function getRouteTimeGap(route: string): Promise<number> {
+  const calib = await getCalibration();
+  const entry = calib.routes.find(r => r.route === route);
+  if (entry && entry.quality !== "low") return entry.timeGapSeconds;
+  return calib.defaults.cityTimeGapSeconds;
+}
+
+/** Shortcut: get city-wide default time gap. */
+export async function getDefaultTimeGap(): Promise<number> {
+  const calib = await getCalibration();
+  return calib.defaults.cityTimeGapSeconds;
 }
 
 const NOMINAL_BUS_SPEED_KPH = 18;

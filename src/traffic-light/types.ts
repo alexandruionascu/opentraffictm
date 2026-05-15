@@ -162,3 +162,32 @@ export interface PrecomputedTrafficLightDataset extends TrafficLightDataset {
   passCount: number;
   passCountsByLightId: Record<string, number>;
 }
+
+// ---------------------------------------------------------------------------
+// Queue Estimation types
+// ---------------------------------------------------------------------------
+
+export type QueueEstimateMethod = "idm-calibrated" | "gap-count" | "stopped-count";
+
+export interface QueueEstimate {
+  signalId: string;
+  timestamp: number;
+  distanceToStopLineMeters: number;
+  busSpeedKph: number;
+  vehiclesAhead: number;
+  queueLengthMeters: number;
+  confidence: number;
+  method: QueueEstimateMethod;
+}
+
+export interface QueueCandidate {
+  vehicleId: string;
+  route: string;
+  signalId: string;
+  signalName: string;
+  distanceToStopLineMeters: number;
+  speedKph: number;
+  bearingDeg: number;
+  timestamp: number;
+  confidence: number;
+}

@@ -122,6 +122,8 @@ See [docs/uxsim/README.md](docs/uxsim/README.md) for full methodology, calibrati
 
 ## Traffic Analysis Results
 
+> **For AI agents:** A condensed reference for answering traffic analysis questions is in [`AGENT_README.md`](AGENT_README.md). It contains all key numbers, interpretations, and common Q&A in a format optimized for RAG/chat contexts.
+
 From **~67 hours** of STPT probe data (2026-05-12 20:13 → 2026-05-15 11:42, May 12–15, 2026):
 
 | Metric | Value |
@@ -131,6 +133,9 @@ From **~67 hours** of STPT probe data (2026-05-12 20:13 → 2026-05-15 11:42, Ma
 | TomTom speed ratio | **0.921x** free-flow |
 | Travel Time Index (TTI) | **0.63** |
 | Buffer Index (BI) | **0.40** |
+| Probe segments analyzed | **897,748** |
+| Routes calibrated | **57** (8 high-quality) |
+| Anomaly routes detected | **23** (probe vs TomTom >20% disagreement) |
 | Probe segments analyzed | **897,748** |
 | Routes calibrated | **57** (8 high-quality) |
 | Anomaly routes detected | **23** (probe vs TomTom >20% disagreement) |
@@ -157,6 +162,100 @@ From **~67 hours** of STPT probe data (2026-05-12 20:13 → 2026-05-15 11:42, Ma
 | Newell (1961) | waveSpeedKph | 12 km/h |
 | Gipps (1981) | desiredSpeed | 28–30.7 km/h |
 | Gipps (1981) | maxBrakeMps2 | 2.0 m/s² |
+
+### Queue Length Estimation from GPS Probes
+
+A core limitation in traffic modeling is that demand is unknown — you measure speeds and delays, but not the absolute number of vehicles present. Queue length estimation from STPT GPS probes addresses this by using the calibrated car-following geometry in reverse: when a bus is stopped or slow near a signal, the distance from the bus to the stop line tells us how many vehicles are queued ahead.
+
+**Method:** For each bus GPS observation within 180m of a signal, with speed < 12 km/h and heading toward the signal:
+1. Compute distance from bus to stop line (signal distance − 9.5m bus stop offset)
+2. Apply IDM jam-density gap formula: `gap = (vehicleLength + 2.8m) + v_mps × T_queue`
+3. Vehicles ahead = `floor((distanceToStopLine − 9.5m) / effectiveGap)`
+
+**Key calibration insight:** The calibration's `timeGapSeconds` (~15.7s) measures gaps during all driving conditions (free-flow + car-following). For queue geometry at signals, a smaller value is appropriate — we use **1.5s** (jam-density / time-to-collision research baseline). This gives a 7.6m gap at rest, vs 50m+ gap at 36 km/h with the driving time gap.
+
+**Results from 500k probe observations (995 signals):**
+
+| Queue Metric | Value |
+|-------------|-------|
+| Signals with queue observations | **995** |
+| Signals with median queue > 0 | **138 (14%)** |
+| Signals with median queue ≥ 5 | **25** |
+| Signals with median queue ≥ 10 | **12** |
+| Max median queue | **20 vehicles** |
+
+**Most congested signal approaches** (median queue, p95):
+
+| Signal | Location | Median | p95 | Samples |
+|--------|----------|--------|-----|---------|
+| signal-1005 | — | 20 | 20 | 6 |
+| signal-981 | — | 17 | 17 | 146 |
+| signal-641 | — | 16 | 21 | 25 |
+| signal-56 | Calea Aradului corridor | 14 | 16 | 522 |
+| signal-141 | — | 14 | 20 | 94 |
+| signal-1090 | — | 12 | 20 | 1,670 |
+| signal-489 | — | 10 | 18 | 1,985 |
+
+Output: `data/derived/queue-estimates.json`
+
+**Caveats:**
+- These are space-based maximums from single-bus observations — they represent the upper bound of queue length given observed geometry, not a demand counter
+- Rush vs off-peak is nearly identical (e.g., signal-56: 15 rush / 14 off-peak), consistent with Timișoara being 83% saturated
+- Attribution to specific signals is ambiguous when signals are spaced 200–300m apart
+
+### Queue-to-Capacity Ratio (QCR) Analysis
+
+QCR converts observed queue lengths into demand estimates by comparing arrivals during red to green-phase discharge capacity:
+
+```
+QCR = (queue × 3600 / red_seconds) / (1800 × lanes)
+QCR > 1.0 = queue grows each cycle (oversaturated)
+QCR < 1.0 = queue clears during green (stable, undersaturated)
+```
+
+**City-wide QCR distribution** (462 signals with ≥ 50 samples):
+
+| Congestion Level | QCR Range | Signals | % |
+|-----------------|-----------|---------|---|
+| OVERSATURATED | ≥ 1.0 | 0 | 0% |
+| HEAVY | 0.75–1.0 | 0 | 0% |
+| LIGHT | 0.50–0.75 | 2 | 0% |
+| FREE | < 0.50 | 460 | 100% |
+
+**Near-capacity signals** (QCR 0.50–1.0, most stressed approaches):
+
+| Signal | Median Queue | QCR | QSI | Cycle | Green% | Red s |
+|--------|-------------|-----|-----|-------|--------|-------|
+| signal-981 | 17 | 0.50 | 65% | 42s | 19% | 34 |
+| signal-56 | 14 | 0.70 | 54% | 147s | 86% | 20 |
+| signal-927 | 7 | 0.39 | 27% | 119s | 85% | 18 |
+| signal-1126 | 10 | 0.42 | 38% | 116s | 79% | 24 |
+
+**Interpretation:** 0 signals are oversaturated (QCR ≥ 1.0) and only 2 are near-capacity (QCR 0.50–0.75). This means the GPS-derived queues are not generating sustained oversaturation. The likely reason is the adaptive signal system itself: Timișoara's controllers (SWARCO/UTOPIA/SCOOT) continuously adjust green time to prevent queue blow-up at major intersections. The system doesn't try to optimize flow — it just prevents collapse. This keeps individual signals stable while the city-wide average speed stays depressed (19.4 km/h city-wide, V1 route at 8.8 km/h). Possible explanations:
+1. The 9.5m bus-stop offset inflates observed queue length (buses stop upstream of the stop line)
+2. Queue clears fully during green — oversaturation is transient, not persistent
+3. The adaptive system actively prevents any single intersection from going oversaturated
+4. The probe data captures peak-cycle moments but averages hide the buildup
+
+For signals with short red phases (18–20s), even small queues produce high arrival rates. `signal-981` (QCR=0.50) has only a 34s red but 17 vehicles queue → demand equivalent to 1800 vph/lane, exactly at capacity. `signal-56` (QCR=0.70) on Calea Aradului is the most stressed approach in the network.
+
+Run: `node scripts/qcr-analysis.mjs`
+
+## Queue & Demand Analysis Scripts
+
+```bash
+# Step 1: Compute queue lengths from GPS probes (IDM jam-density geometry)
+# Outputs: data/derived/queue-estimates.json (995 signals, 500k observations)
+node scripts/queue-from-probes.mjs --full
+
+# Step 2: QCR analysis — convert queues to demand estimates
+# Outputs: QCR, QSI per signal + city-wide saturation distribution
+node scripts/qcr-analysis.mjs
+```
+
+**What these answer:** Given a bus stopped at distance D from a stop line, how many vehicles are ahead? And does that queue exceed what the green phase can discharge?
+
+See sections above for methodology and results.
 
 ### Slowest Corridors
 
