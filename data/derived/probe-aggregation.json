@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-05-14T20:41:15.874Z",
+  "generatedAt": "2026-05-15T11:01:50.531Z",
   "windowSeconds": 0,
   "scope": "Timisoara STPT historical probes (stpt.db)",
   "counts": {
     "totalWindows": 57,
-    "totalVehicles": 192,
+    "totalVehicles": 206,
     "routesWithData": 57,
-    "totalSegments": 290727
+    "totalSegments": 897748
   },
   "byRoute": [
     {
@@ -14,12 +14,12 @@
       "windowEnd": "2026-05-13T11:11:16.000Z",
       "segmentId": "33",
       "route": "33",
-      "sampleCount": 8811,
-      "avgSpeedKph": 16.1,
+      "sampleCount": 26937,
+      "avgSpeedKph": 16.8,
       "minSpeedKph": 0.11791701801699382,
-      "maxSpeedKph": 59.818912107816935,
-      "avgDelaySeconds": 21.6,
-      "totalDistanceMeters": 622906,
+      "maxSpeedKph": 788.6591514172037,
+      "avgDelaySeconds": 21,
+      "totalDistanceMeters": 1967157,
       "geometry": [
         [
           21.209641,
@@ -32,16 +32,60 @@
       ]
     },
     {
+      "windowStart": "2026-05-14T02:10:39.000Z",
+      "windowEnd": "2026-05-12T20:26:57.000Z",
+      "segmentId": "40",
+      "route": "40",
+      "sampleCount": 23633,
+      "avgSpeedKph": 16.5,
+      "minSpeedKph": 0.1882196532360581,
+      "maxSpeedKph": 335.0961727693819,
+      "avgDelaySeconds": 20.7,
+      "totalDistanceMeters": 1679372,
+      "geometry": [
+        [
+          21.23344,
+          45.755199
+        ],
+        [
+          21.234381,
+          45.750721
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T10:42:14.000Z",
+      "windowEnd": "2026-05-13T13:14:02.000Z",
+      "segmentId": "E8",
+      "route": "E8",
+      "sampleCount": 30715,
+      "avgSpeedKph": 18.3,
+      "minSpeedKph": 0.17115399949938864,
+      "maxSpeedKph": 180.28271828718778,
+      "avgDelaySeconds": 17.6,
+      "totalDistanceMeters": 2439795,
+      "geometry": [
+        [
+          21.205879,
+          45.72858
+        ],
+        [
+          21.23728,
+          45.743832
+        ]
+      ]
+    },
+    {
       "windowStart": "2026-05-12T19:23:14.000Z",
       "windowEnd": "2026-05-13T13:30:46.000Z",
       "segmentId": "E1",
       "route": "E1",
-      "sampleCount": 8894,
-      "avgSpeedKph": 17.7,
-      "minSpeedKph": 0.2198091795274141,
-      "maxSpeedKph": 68.37237544846963,
-      "avgDelaySeconds": 21.1,
-      "totalDistanceMeters": 683899,
+      "sampleCount": 27518,
+      "avgSpeedKph": 18.4,
+      "minSpeedKph": 0.1465432464727518,
+      "maxSpeedKph": 666.7956719376916,
+      "avgDelaySeconds": 20.1,
+      "totalDistanceMeters": 2203973,
       "geometry": [
         [
           21.223021,
@@ -55,129 +99,173 @@
     },
     {
       "windowStart": "2026-05-13T11:47:37.000Z",
-      "windowEnd": "2026-05-13T14:01:24.000Z",
+      "windowEnd": "2026-05-14T14:01:44.000Z",
       "segmentId": "M37",
       "route": "M37",
-      "sampleCount": 2624,
-      "avgSpeedKph": 34.5,
-      "minSpeedKph": 0.2546397895400032,
+      "sampleCount": 7513,
+      "avgSpeedKph": 34.7,
+      "minSpeedKph": 0.24275964468898945,
       "maxSpeedKph": 89.1867301287467,
-      "avgDelaySeconds": 9.1,
-      "totalDistanceMeters": 391587,
+      "avgDelaySeconds": 8.3,
+      "totalDistanceMeters": 1126283,
       "geometry": [
         [
           21.203609,
           45.726582
         ],
         [
-          21.205351,
-          45.728062
+          21.20582,
+          45.728439
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T10:59:01.000Z",
-      "windowEnd": "2026-05-13T13:01:38.000Z",
+      "windowStart": "2026-05-14T03:02:51.000Z",
+      "windowEnd": "2026-05-14T13:01:16.000Z",
       "segmentId": "13",
       "route": "13",
-      "sampleCount": 3402,
-      "avgSpeedKph": 17,
-      "minSpeedKph": 0.22874384906162956,
-      "maxSpeedKph": 54.44775856049344,
-      "avgDelaySeconds": 19.2,
-      "totalDistanceMeters": 253077,
+      "sampleCount": 10601,
+      "avgSpeedKph": 17.3,
+      "minSpeedKph": 0.1882084199824733,
+      "maxSpeedKph": 60.70369830295432,
+      "avgDelaySeconds": 19,
+      "totalDistanceMeters": 790983,
       "geometry": [
         [
-          21.223261,
-          45.75346
+          21.22459,
+          45.757919
         ],
         [
-          21.224739,
-          45.756592
+          21.23209,
+          45.755661
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T11:00:08.000Z",
-      "windowEnd": "2026-05-12T20:49:05.000Z",
+      "windowStart": "2026-05-13T20:30:31.000Z",
+      "windowEnd": "2026-05-15T08:42:30.000Z",
+      "segmentId": "M11",
+      "route": "M11",
+      "sampleCount": 16788,
+      "avgSpeedKph": 17.8,
+      "minSpeedKph": 0.20802517794288086,
+      "maxSpeedKph": 114.59108188493728,
+      "avgDelaySeconds": 21.1,
+      "totalDistanceMeters": 1287355,
+      "geometry": [
+        [
+          21.223881,
+          45.75724
+        ],
+        [
+          21.24453,
+          45.7617
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T10:07:29.000Z",
+      "windowEnd": "2026-05-13T19:00:48.000Z",
+      "segmentId": "E4",
+      "route": "E4",
+      "sampleCount": 13006,
+      "avgSpeedKph": 30.9,
+      "minSpeedKph": 0.21834640137701003,
+      "maxSpeedKph": 1041.711312241655,
+      "avgDelaySeconds": 10.6,
+      "totalDistanceMeters": 1733108,
+      "geometry": [
+        [
+          21.233959,
+          45.757778
+        ],
+        [
+          21.241341,
+          45.760719
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T19:14:32.000Z",
+      "windowEnd": "2026-05-14T14:16:24.000Z",
       "segmentId": "E3",
       "route": "E3",
-      "sampleCount": 6034,
-      "avgSpeedKph": 18.5,
+      "sampleCount": 15593,
+      "avgSpeedKph": 19,
       "minSpeedKph": 0.17986710934219793,
-      "maxSpeedKph": 65.13910112684239,
-      "avgDelaySeconds": 19.7,
-      "totalDistanceMeters": 483624,
+      "maxSpeedKph": 949.071325587953,
+      "avgDelaySeconds": 19.2,
+      "totalDistanceMeters": 1277098,
       "geometry": [
         [
-          21.170361,
-          45.72044
+          21.224739,
+          45.748119
         ],
         [
-          21.19268,
-          45.738091
+          21.248819,
+          45.74781
         ]
       ]
     },
     {
-      "windowStart": "2026-05-12T19:23:07.000Z",
-      "windowEnd": "2026-05-13T13:14:02.000Z",
-      "segmentId": "E8",
-      "route": "E8",
-      "sampleCount": 10307,
-      "avgSpeedKph": 18,
-      "minSpeedKph": 0.19144865632106411,
-      "maxSpeedKph": 180.28271828718778,
-      "avgDelaySeconds": 17.9,
-      "totalDistanceMeters": 804197,
+      "windowStart": "2026-05-14T09:54:22.000Z",
+      "windowEnd": "2026-05-14T07:13:49.000Z",
+      "segmentId": "1",
+      "route": "1",
+      "sampleCount": 38300,
+      "avgSpeedKph": 15.7,
+      "minSpeedKph": 0.1223144193162354,
+      "maxSpeedKph": 142.74957487861812,
+      "avgDelaySeconds": 20.7,
+      "totalDistanceMeters": 2593860,
       "geometry": [
         [
-          21.25403,
-          45.7556
+          21.216311,
+          45.746521
         ],
         [
-          21.23728,
-          45.743832
+          21.22381,
+          45.751518
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T09:40:39.000Z",
-      "windowEnd": "2026-05-13T14:46:24.000Z",
+      "windowStart": "2026-05-14T10:00:17.000Z",
+      "windowEnd": "2026-05-13T20:28:30.000Z",
       "segmentId": "E7",
       "route": "E7",
-      "sampleCount": 9697,
-      "avgSpeedKph": 19.3,
+      "sampleCount": 27427,
+      "avgSpeedKph": 19.8,
       "minSpeedKph": 0.15011315103557923,
-      "maxSpeedKph": 61.415575057734905,
-      "avgDelaySeconds": 18.6,
-      "totalDistanceMeters": 819174,
+      "maxSpeedKph": 66.70740128992612,
+      "avgDelaySeconds": 17.8,
+      "totalDistanceMeters": 2360209,
       "geometry": [
         [
-          21.194031,
-          45.735519
+          21.23069,
+          45.747971
         ],
         [
-          21.23308,
-          45.7542
+          21.23321,
+          45.754551
         ]
       ]
     },
     {
-      "windowStart": "2026-05-12T20:28:00.000Z",
+      "windowStart": "2026-05-14T11:20:09.000Z",
       "windowEnd": "2026-05-13T05:44:27.000Z",
       "segmentId": "33b",
       "route": "33b",
-      "sampleCount": 5061,
-      "avgSpeedKph": 20,
+      "sampleCount": 16301,
+      "avgSpeedKph": 20.6,
       "minSpeedKph": 0.18844644275964945,
       "maxSpeedKph": 96.55971495407991,
-      "avgDelaySeconds": 15.5,
-      "totalDistanceMeters": 442521,
+      "avgDelaySeconds": 15.4,
+      "totalDistanceMeters": 1455938,
       "geometry": [
         [
-          21.20797,
-          45.731419
+          21.21773,
+          45.748039
         ],
         [
           21.215139,
@@ -186,174 +274,20 @@
       ]
     },
     {
-      "windowStart": "2026-05-13T02:50:34.000Z",
-      "windowEnd": "2026-05-12T20:26:57.000Z",
-      "segmentId": "40",
-      "route": "40",
-      "sampleCount": 6958,
-      "avgSpeedKph": 16.8,
-      "minSpeedKph": 0.21842150648893333,
-      "maxSpeedKph": 335.0961727693819,
-      "avgDelaySeconds": 20.4,
-      "totalDistanceMeters": 504036,
-      "geometry": [
-        [
-          21.233629,
-          45.755409
-        ],
-        [
-          21.234381,
-          45.750721
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T20:26:44.000Z",
-      "windowEnd": "2026-05-13T14:46:22.000Z",
-      "segmentId": "M11",
-      "route": "M11",
-      "sampleCount": 5902,
-      "avgSpeedKph": 16.1,
-      "minSpeedKph": 0.20802517794288086,
-      "maxSpeedKph": 92.71579195901116,
-      "avgDelaySeconds": 24.7,
-      "totalDistanceMeters": 412473,
-      "geometry": [
-        [
-          21.221991,
-          45.753151
-        ],
-        [
-          21.23563,
-          45.758579
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T19:24:58.000Z",
-      "windowEnd": "2026-05-13T13:43:02.000Z",
-      "segmentId": "M22",
-      "route": "M22",
-      "sampleCount": 2032,
-      "avgSpeedKph": 23.3,
-      "minSpeedKph": 0.2091723647529112,
-      "maxSpeedKph": 447.27405989878093,
-      "avgDelaySeconds": 14.4,
-      "totalDistanceMeters": 202490,
-      "geometry": [
-        [
-          21.247829,
-          45.731201
-        ],
-        [
-          21.292789,
-          45.724079
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T03:29:58.000Z",
-      "windowEnd": "2026-05-13T14:46:42.000Z",
-      "segmentId": "E4",
-      "route": "E4",
-      "sampleCount": 4027,
-      "avgSpeedKph": 30.8,
-      "minSpeedKph": 0.30022630189338884,
-      "maxSpeedKph": 117.68871035927428,
-      "avgDelaySeconds": 10.9,
-      "totalDistanceMeters": 536419,
-      "geometry": [
-        [
-          21.236,
-          45.758751
-        ],
-        [
-          21.322371,
-          45.80912
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T19:23:13.000Z",
-      "windowEnd": "2026-05-13T14:46:59.000Z",
-      "segmentId": "1",
-      "route": "1",
-      "sampleCount": 12263,
-      "avgSpeedKph": 15.7,
-      "minSpeedKph": 0.1223144193162354,
-      "maxSpeedKph": 142.74957487861812,
-      "avgDelaySeconds": 21,
-      "totalDistanceMeters": 828534,
-      "geometry": [
-        [
-          21.207291,
-          45.7505
-        ],
-        [
-          21.260349,
-          45.76955
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T19:23:14.000Z",
-      "windowEnd": "2026-05-13T14:46:59.000Z",
-      "segmentId": "8",
-      "route": "8",
-      "sampleCount": 9759,
-      "avgSpeedKph": 17.5,
-      "minSpeedKph": 0.20015086797202158,
-      "maxSpeedKph": 275.83708802567526,
-      "avgDelaySeconds": 19.6,
-      "totalDistanceMeters": 749092,
-      "geometry": [
-        [
-          21.257959,
-          45.736691
-        ],
-        [
-          21.258869,
-          45.73418
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T03:26:38.000Z",
-      "windowEnd": "2026-05-13T14:45:37.000Z",
-      "segmentId": "9",
-      "route": "9",
-      "sampleCount": 10263,
-      "avgSpeedKph": 18.8,
-      "minSpeedKph": 0.18824436159813893,
-      "maxSpeedKph": 143.5598565939909,
-      "avgDelaySeconds": 18.4,
-      "totalDistanceMeters": 843624,
-      "geometry": [
-        [
-          21.19669,
-          45.74033
-        ],
-        [
-          21.25827,
-          45.73362
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T02:18:05.000Z",
+      "windowStart": "2026-05-14T10:42:00.000Z",
       "windowEnd": "2026-05-13T14:03:32.000Z",
       "segmentId": "2",
       "route": "2",
-      "sampleCount": 14312,
-      "avgSpeedKph": 16.1,
-      "minSpeedKph": 0.18503833680367687,
-      "maxSpeedKph": 50.128096812759274,
-      "avgDelaySeconds": 19.8,
-      "totalDistanceMeters": 1000697,
+      "sampleCount": 43647,
+      "avgSpeedKph": 16.4,
+      "minSpeedKph": 0.13724630943697774,
+      "maxSpeedKph": 325.96877794641114,
+      "avgDelaySeconds": 19.3,
+      "totalDistanceMeters": 3136669,
       "geometry": [
         [
-          21.195101,
-          45.739651
+          21.204531,
+          45.727409
         ],
         [
           21.232651,
@@ -362,16 +296,148 @@
       ]
     },
     {
+      "windowStart": "2026-05-14T11:20:28.000Z",
+      "windowEnd": "2026-05-14T04:30:42.000Z",
+      "segmentId": "M38",
+      "route": "M38",
+      "sampleCount": 2919,
+      "avgSpeedKph": 43.1,
+      "minSpeedKph": 0.21834640150629706,
+      "maxSpeedKph": 91.54010684170527,
+      "avgDelaySeconds": 6.9,
+      "totalDistanceMeters": 543140,
+      "geometry": [
+        [
+          21.2006,
+          45.722679
+        ],
+        [
+          21.243919,
+          45.74802
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T01:41:02.000Z",
+      "windowEnd": "2026-05-13T20:04:04.000Z",
+      "segmentId": "M22",
+      "route": "M22",
+      "sampleCount": 5595,
+      "avgSpeedKph": 24.3,
+      "minSpeedKph": 0.2091723647529112,
+      "maxSpeedKph": 447.27405989878093,
+      "avgDelaySeconds": 13.6,
+      "totalDistanceMeters": 582338,
+      "geometry": [
+        [
+          21.24732,
+          45.73164
+        ],
+        [
+          21.248039,
+          45.73114
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-13T20:26:09.000Z",
+      "windowEnd": "2026-05-13T07:28:29.000Z",
+      "segmentId": "7",
+      "route": "7",
+      "sampleCount": 46106,
+      "avgSpeedKph": 17,
+      "minSpeedKph": 0.10459172084729,
+      "maxSpeedKph": 167.69756887156345,
+      "avgDelaySeconds": 18.3,
+      "totalDistanceMeters": 3379957,
+      "geometry": [
+        [
+          21.200701,
+          45.734718
+        ],
+        [
+          21.19561,
+          45.738319
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T19:41:07.000Z",
+      "windowEnd": "2026-05-13T21:03:27.000Z",
+      "segmentId": "M51",
+      "route": "M51",
+      "sampleCount": 5773,
+      "avgSpeedKph": 35.4,
+      "minSpeedKph": 0.2025937466044577,
+      "maxSpeedKph": 92.11719560276691,
+      "avgDelaySeconds": 9.4,
+      "totalDistanceMeters": 891129,
+      "geometry": [
+        [
+          21.203831,
+          45.726669
+        ],
+        [
+          21.215759,
+          45.745762
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-12T19:23:14.000Z",
+      "windowEnd": "2026-05-15T05:50:49.000Z",
+      "segmentId": "8",
+      "route": "8",
+      "sampleCount": 29933,
+      "avgSpeedKph": 17.6,
+      "minSpeedKph": 0.13708401318807673,
+      "maxSpeedKph": 834.1013630927813,
+      "avgDelaySeconds": 19.5,
+      "totalDistanceMeters": 2293562,
+      "geometry": [
+        [
+          21.257959,
+          45.736691
+        ],
+        [
+          21.248091,
+          45.747608
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-13T03:26:38.000Z",
+      "windowEnd": "2026-05-14T06:05:40.000Z",
+      "segmentId": "9",
+      "route": "9",
+      "sampleCount": 33720,
+      "avgSpeedKph": 18.5,
+      "minSpeedKph": 0.11989452326319913,
+      "maxSpeedKph": 420.44642754302754,
+      "avgDelaySeconds": 18.1,
+      "totalDistanceMeters": 2707743,
+      "geometry": [
+        [
+          21.19669,
+          45.74033
+        ],
+        [
+          21.24795,
+          45.741589
+        ]
+      ]
+    },
+    {
       "windowStart": "2026-05-13T02:15:53.000Z",
       "windowEnd": "2026-05-13T04:33:06.000Z",
       "segmentId": "4",
       "route": "4",
-      "sampleCount": 10745,
-      "avgSpeedKph": 18.5,
-      "minSpeedKph": 0.17778100980281775,
+      "sampleCount": 37975,
+      "avgSpeedKph": 18.1,
+      "minSpeedKph": 0.15826365505313514,
       "maxSpeedKph": 741.7368340974094,
-      "avgDelaySeconds": 19.3,
-      "totalDistanceMeters": 891835,
+      "avgDelaySeconds": 19.4,
+      "totalDistanceMeters": 3021442,
       "geometry": [
         [
           21.212589,
@@ -384,108 +450,64 @@
       ]
     },
     {
-      "windowStart": "2026-05-12T20:11:35.000Z",
-      "windowEnd": "2026-05-12T20:51:05.000Z",
-      "segmentId": "18",
-      "route": "18",
-      "sampleCount": 7481,
-      "avgSpeedKph": 14,
-      "minSpeedKph": 0.1792159170349656,
-      "maxSpeedKph": 74.52030012633836,
-      "avgDelaySeconds": 26.9,
-      "totalDistanceMeters": 452110,
-      "geometry": [
-        [
-          21.2076,
-          45.750431
-        ],
-        [
-          21.20945,
-          45.747742
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T20:48:11.000Z",
-      "windowEnd": "2026-05-13T07:28:29.000Z",
-      "segmentId": "7",
-      "route": "7",
-      "sampleCount": 14792,
-      "avgSpeedKph": 16.9,
-      "minSpeedKph": 0.18509059596519623,
-      "maxSpeedKph": 121.6366873492842,
-      "avgDelaySeconds": 18.8,
-      "totalDistanceMeters": 1081656,
-      "geometry": [
-        [
-          21.204941,
-          45.7286
-        ],
-        [
-          21.19561,
-          45.738319
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T02:12:12.000Z",
-      "windowEnd": "2026-05-13T14:46:47.000Z",
+      "windowStart": "2026-05-14T13:22:51.000Z",
+      "windowEnd": "2026-05-14T07:53:44.000Z",
       "segmentId": "5",
       "route": "5",
-      "sampleCount": 8453,
-      "avgSpeedKph": 17.8,
-      "minSpeedKph": 0.20356123628586106,
-      "maxSpeedKph": 398.771180850881,
-      "avgDelaySeconds": 19.3,
-      "totalDistanceMeters": 696528,
+      "sampleCount": 25585,
+      "avgSpeedKph": 18.3,
+      "minSpeedKph": 0.1152364255033456,
+      "maxSpeedKph": 407.9943652477626,
+      "avgDelaySeconds": 18.9,
+      "totalDistanceMeters": 2182693,
       "geometry": [
         [
-          21.21792,
-          45.75666
+          21.2211,
+          45.75589
         ],
         [
-          21.22224,
-          45.756351
+          21.223631,
+          45.75396
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T14:22:18.000Z",
-      "windowEnd": "2026-05-12T20:40:18.000Z",
-      "segmentId": "5b",
-      "route": "5b",
-      "sampleCount": 2069,
-      "avgSpeedKph": 20.2,
-      "minSpeedKph": 0.220165954627008,
-      "maxSpeedKph": 74.7657820182087,
-      "avgDelaySeconds": 17.8,
-      "totalDistanceMeters": 190199,
+      "windowStart": "2026-05-13T20:13:38.000Z",
+      "windowEnd": "2026-05-14T20:31:24.000Z",
+      "segmentId": "18",
+      "route": "18",
+      "sampleCount": 23100,
+      "avgSpeedKph": 14.5,
+      "minSpeedKph": 0.1792159170349656,
+      "maxSpeedKph": 103.40366385596698,
+      "avgDelaySeconds": 25.3,
+      "totalDistanceMeters": 1438105,
       "geometry": [
         [
-          21.209379,
-          45.747822
+          21.207729,
+          45.750469
         ],
         [
-          21.208179,
-          45.750542
+          21.209419,
+          45.747871
         ]
       ]
     },
     {
-      "windowStart": "2026-05-12T20:38:31.000Z",
+      "windowStart": "2026-05-13T20:37:46.000Z",
       "windowEnd": "2026-05-13T03:39:03.000Z",
       "segmentId": "11",
       "route": "11",
-      "sampleCount": 8217,
-      "avgSpeedKph": 15.4,
-      "minSpeedKph": 0.18821454126928008,
-      "maxSpeedKph": 56.69948049608958,
-      "avgDelaySeconds": 23.7,
-      "totalDistanceMeters": 547673,
+      "sampleCount": 23569,
+      "avgSpeedKph": 15.7,
+      "minSpeedKph": 0.18820113895403454,
+      "maxSpeedKph": 58.15813085006777,
+      "avgDelaySeconds": 23.1,
+      "totalDistanceMeters": 1593994,
       "geometry": [
         [
-          21.22156,
-          45.75272
+          21.2078,
+          45.750271
         ],
         [
           21.2332,
@@ -494,284 +516,174 @@
       ]
     },
     {
-      "windowStart": "2026-05-13T01:50:57.000Z",
-      "windowEnd": "2026-05-13T14:46:37.000Z",
-      "segmentId": "M14",
-      "route": "M14",
-      "sampleCount": 6358,
-      "avgSpeedKph": 18.2,
-      "minSpeedKph": 0.11066527196874441,
-      "maxSpeedKph": 56.89482924504434,
-      "avgDelaySeconds": 19.6,
-      "totalDistanceMeters": 502362,
+      "windowStart": "2026-05-14T20:25:48.000Z",
+      "windowEnd": "2026-05-14T19:36:19.000Z",
+      "segmentId": "E2",
+      "route": "E2",
+      "sampleCount": 38596,
+      "avgSpeedKph": 17.9,
+      "minSpeedKph": 0.13442115525560214,
+      "maxSpeedKph": 59.786758305238806,
+      "avgDelaySeconds": 18.9,
+      "totalDistanceMeters": 2978823,
       "geometry": [
         [
-          21.2013,
-          45.74947
+          21.25964,
+          45.732658
         ],
         [
-          21.249399,
-          45.802189
+          21.26392,
+          45.730759
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-13T14:22:18.000Z",
+      "windowEnd": "2026-05-15T08:42:29.000Z",
+      "segmentId": "5b",
+      "route": "5b",
+      "sampleCount": 6850,
+      "avgSpeedKph": 20.5,
+      "minSpeedKph": 0.20696398474816646,
+      "maxSpeedKph": 121.82909181177085,
+      "avgDelaySeconds": 17.7,
+      "totalDistanceMeters": 613861,
+      "geometry": [
+        [
+          21.209379,
+          45.747822
+        ],
+        [
+          21.206659,
+          45.753342
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-13T21:00:41.000Z",
+      "windowEnd": "2026-05-13T20:43:20.000Z",
+      "segmentId": "14",
+      "route": "14",
+      "sampleCount": 34255,
+      "avgSpeedKph": 14.7,
+      "minSpeedKph": 0.1881859337208946,
+      "maxSpeedKph": 75.1062606663638,
+      "avgDelaySeconds": 24.6,
+      "totalDistanceMeters": 2168855,
+      "geometry": [
+        [
+          21.20574,
+          45.75021
+        ],
+        [
+          21.2094,
+          45.74781
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T20:37:04.000Z",
+      "windowEnd": "2026-05-15T08:41:46.000Z",
+      "segmentId": "M14",
+      "route": "M14",
+      "sampleCount": 20427,
+      "avgSpeedKph": 17.4,
+      "minSpeedKph": 0.11066527196874441,
+      "maxSpeedKph": 325.41209182179387,
+      "avgDelaySeconds": 21.8,
+      "totalDistanceMeters": 1527463,
+      "geometry": [
+        [
+          21.222321,
+          45.752289
+        ],
+        [
+          21.25316,
+          45.80529
         ]
       ]
     },
     {
       "windowStart": "2026-05-13T02:29:57.000Z",
-      "windowEnd": "2026-05-12T20:42:34.000Z",
+      "windowEnd": "2026-05-14T20:38:36.000Z",
       "segmentId": "16",
       "route": "16",
-      "sampleCount": 10006,
+      "sampleCount": 31475,
       "avgSpeedKph": 14.2,
       "minSpeedKph": 0.11633716225720574,
-      "maxSpeedKph": 66.86728167464254,
-      "avgDelaySeconds": 25.9,
-      "totalDistanceMeters": 615914,
+      "maxSpeedKph": 74.43561841585561,
+      "avgDelaySeconds": 26.2,
+      "totalDistanceMeters": 1925411,
       "geometry": [
         [
           21.24577,
           45.731232
         ],
         [
-          21.24951,
-          45.740929
+          21.24967,
+          45.740791
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T02:16:42.000Z",
-      "windowEnd": "2026-05-13T14:46:43.000Z",
+      "windowStart": "2026-05-15T02:13:17.000Z",
+      "windowEnd": "2026-05-14T19:56:49.000Z",
       "segmentId": "15",
       "route": "15",
-      "sampleCount": 7334,
-      "avgSpeedKph": 14.2,
+      "sampleCount": 23395,
+      "avgSpeedKph": 14.8,
       "minSpeedKph": 0.1067471295620938,
       "maxSpeedKph": 572.0185572972009,
-      "avgDelaySeconds": 26.2,
-      "totalDistanceMeters": 452565,
+      "avgDelaySeconds": 25.4,
+      "totalDistanceMeters": 1490654,
       "geometry": [
         [
-          21.24803,
-          45.73312
+          21.248619,
+          45.73399
         ],
         [
-          21.250139,
-          45.736691
+          21.24663,
+          45.731171
         ]
       ]
     },
     {
-      "windowStart": "2026-05-12T19:23:19.000Z",
-      "windowEnd": "2026-05-13T14:46:28.000Z",
-      "segmentId": "14",
-      "route": "14",
-      "sampleCount": 10947,
-      "avgSpeedKph": 14.9,
-      "minSpeedKph": 0.18821953302637265,
-      "maxSpeedKph": 75.1062606663638,
-      "avgDelaySeconds": 24.1,
-      "totalDistanceMeters": 705782,
-      "geometry": [
-        [
-          21.22925,
-          45.76791
-        ],
-        [
-          21.22777,
-          45.75922
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T19:23:18.000Z",
-      "windowEnd": "2026-05-13T14:46:27.000Z",
+      "windowStart": "2026-05-14T02:26:57.000Z",
+      "windowEnd": "2026-05-15T08:42:32.000Z",
       "segmentId": "17",
       "route": "17",
-      "sampleCount": 8389,
-      "avgSpeedKph": 14.7,
+      "sampleCount": 25716,
+      "avgSpeedKph": 14.9,
       "minSpeedKph": 0.08006034718880864,
-      "maxSpeedKph": 65.14792034846481,
-      "avgDelaySeconds": 25.1,
-      "totalDistanceMeters": 535612,
+      "maxSpeedKph": 101.51450801772991,
+      "avgDelaySeconds": 24.7,
+      "totalDistanceMeters": 1650234,
       "geometry": [
         [
-          21.229179,
-          45.759541
+          21.26823,
+          45.76918
         ],
         [
-          21.23349,
-          45.757809
+          21.255251,
+          45.763859
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T04:18:51.000Z",
-      "windowEnd": "2026-05-13T04:17:49.000Z",
-      "segmentId": "M48",
-      "route": "M48",
-      "sampleCount": 958,
-      "avgSpeedKph": 41.2,
-      "minSpeedKph": 0.2752074434615297,
-      "maxSpeedKph": 87.1657584364705,
-      "avgDelaySeconds": 8.2,
-      "totalDistanceMeters": 171099,
-      "geometry": [
-        [
-          21.23587,
-          45.758678
-        ],
-        [
-          21.23222,
-          45.75573
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T09:14:06.000Z",
-      "windowEnd": "2026-05-13T14:46:58.000Z",
-      "segmentId": "V1",
-      "route": "V1",
-      "sampleCount": 3038,
-      "avgSpeedKph": 8.8,
-      "minSpeedKph": 0.14913201922257016,
-      "maxSpeedKph": 76.793164846418,
-      "avgDelaySeconds": 33.1,
-      "totalDistanceMeters": 117585,
-      "geometry": [
-        [
-          21.22496,
-          45.74868
-        ],
-        [
-          21.240379,
-          45.75515
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T19:23:21.000Z",
-      "windowEnd": "2026-05-13T11:52:04.000Z",
-      "segmentId": "E6",
-      "route": "E6",
-      "sampleCount": 2076,
-      "avgSpeedKph": 23,
-      "minSpeedKph": 0.2370070027166233,
-      "maxSpeedKph": 68.26078904301893,
-      "avgDelaySeconds": 15.6,
-      "totalDistanceMeters": 206463,
-      "geometry": [
-        [
-          21.228939,
-          45.759399
-        ],
-        [
-          21.260691,
-          45.763599
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T19:23:14.000Z",
-      "windowEnd": "2026-05-13T14:46:43.000Z",
-      "segmentId": "46",
-      "route": "46",
-      "sampleCount": 2205,
-      "avgSpeedKph": 21.8,
-      "minSpeedKph": 0.18347162897435312,
-      "maxSpeedKph": 58.324548188280765,
-      "avgDelaySeconds": 13.6,
-      "totalDistanceMeters": 207762,
-      "geometry": [
-        [
-          21.24749,
-          45.779572
-        ],
-        [
-          21.236179,
-          45.75877
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T10:31:53.000Z",
-      "windowEnd": "2026-05-12T20:03:02.000Z",
-      "segmentId": "M23",
-      "route": "M23",
-      "sampleCount": 2100,
-      "avgSpeedKph": 29.4,
-      "minSpeedKph": 0.24018104151471106,
-      "maxSpeedKph": 79.40169896143313,
-      "avgDelaySeconds": 9.1,
-      "totalDistanceMeters": 265869,
-      "geometry": [
-        [
-          21.258739,
-          45.734039
-        ],
-        [
-          21.248859,
-          45.731079
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T01:37:20.000Z",
-      "windowEnd": "2026-05-13T14:46:43.000Z",
-      "segmentId": "M24",
-      "route": "M24",
-      "sampleCount": 1805,
-      "avgSpeedKph": 27.8,
-      "minSpeedKph": 0.26669248674611323,
-      "maxSpeedKph": 76.8476127320617,
-      "avgDelaySeconds": 11,
-      "totalDistanceMeters": 216286,
-      "geometry": [
-        [
-          21.249599,
-          45.735619
-        ],
-        [
-          21.322531,
-          45.719082
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T19:23:43.000Z",
-      "windowEnd": "2026-05-13T14:46:57.000Z",
-      "segmentId": "32",
-      "route": "32",
-      "sampleCount": 2312,
-      "avgSpeedKph": 19.7,
-      "minSpeedKph": 0.24018104151471106,
-      "maxSpeedKph": 54.15844183060591,
-      "avgDelaySeconds": 16,
-      "totalDistanceMeters": 197793,
-      "geometry": [
-        [
-          21.21916,
-          45.7327
-        ],
-        [
-          21.20867,
-          45.719398
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T02:28:46.000Z",
+      "windowStart": "2026-05-13T20:50:06.000Z",
       "windowEnd": "2026-05-12T20:49:19.000Z",
       "segmentId": "E4b",
       "route": "E4b",
-      "sampleCount": 2109,
-      "avgSpeedKph": 27,
-      "minSpeedKph": 0.30022630189338884,
-      "maxSpeedKph": 74.24655664577038,
-      "avgDelaySeconds": 12.7,
-      "totalDistanceMeters": 246100,
+      "sampleCount": 7120,
+      "avgSpeedKph": 26.1,
+      "minSpeedKph": 0.18819804057076614,
+      "maxSpeedKph": 80.76048488699651,
+      "avgDelaySeconds": 12.8,
+      "totalDistanceMeters": 801903,
       "geometry": [
         [
-          21.201139,
-          45.749401
+          21.2274,
+          45.759312
         ],
         [
           21.25922,
@@ -780,20 +692,20 @@
       ]
     },
     {
-      "windowStart": "2026-05-13T01:13:35.000Z",
+      "windowStart": "2026-05-15T05:50:41.000Z",
       "windowEnd": "2026-05-12T21:03:10.000Z",
       "segmentId": "M35",
       "route": "M35",
-      "sampleCount": 2898,
-      "avgSpeedKph": 24.6,
-      "minSpeedKph": 0.2261628192052619,
-      "maxSpeedKph": 82.55985663429121,
-      "avgDelaySeconds": 12.8,
-      "totalDistanceMeters": 308653,
+      "sampleCount": 9059,
+      "avgSpeedKph": 25.9,
+      "minSpeedKph": 0.20911419988134092,
+      "maxSpeedKph": 88.0210814343282,
+      "avgDelaySeconds": 12,
+      "totalDistanceMeters": 1009569,
       "geometry": [
         [
-          21.23633,
-          45.758831
+          21.25975,
+          45.7649
         ],
         [
           21.25876,
@@ -802,24 +714,332 @@
       ]
     },
     {
-      "windowStart": "2026-05-12T19:23:13.000Z",
-      "windowEnd": "2026-05-13T14:29:44.000Z",
-      "segmentId": "M51",
-      "route": "M51",
-      "sampleCount": 1747,
-      "avgSpeedKph": 36.2,
-      "minSpeedKph": 0.2361109531312918,
-      "maxSpeedKph": 81.79125477286665,
-      "avgDelaySeconds": 9,
-      "totalDistanceMeters": 283049,
+      "windowStart": "2026-05-14T06:04:05.000Z",
+      "windowEnd": "2026-05-12T20:33:19.000Z",
+      "segmentId": "M49",
+      "route": "M49",
+      "sampleCount": 8234,
+      "avgSpeedKph": 25.7,
+      "minSpeedKph": 0.22016595476922374,
+      "maxSpeedKph": 86.7726698615896,
+      "avgDelaySeconds": 11.7,
+      "totalDistanceMeters": 913814,
       "geometry": [
         [
-          21.202971,
-          45.725479
+          21.23105,
+          45.771252
         ],
         [
-          21.211399,
-          45.74094
+          21.23246,
+          45.75861
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-13T04:18:51.000Z",
+      "windowEnd": "2026-05-15T04:16:49.000Z",
+      "segmentId": "M48",
+      "route": "M48",
+      "sampleCount": 2434,
+      "avgSpeedKph": 41.2,
+      "minSpeedKph": 0.20355741218292195,
+      "maxSpeedKph": 87.1657584364705,
+      "avgDelaySeconds": 8.2,
+      "totalDistanceMeters": 432396,
+      "geometry": [
+        [
+          21.23587,
+          45.758678
+        ],
+        [
+          21.23328,
+          45.755211
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-13T20:04:18.000Z",
+      "windowEnd": "2026-05-13T20:01:47.000Z",
+      "segmentId": "M24",
+      "route": "M24",
+      "sampleCount": 5382,
+      "avgSpeedKph": 28.1,
+      "minSpeedKph": 0.24732981622089187,
+      "maxSpeedKph": 78.57223534839773,
+      "avgDelaySeconds": 10.3,
+      "totalDistanceMeters": 650312,
+      "geometry": [
+        [
+          21.248039,
+          45.73114
+        ],
+        [
+          21.257299,
+          45.738739
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T07:13:10.000Z",
+      "windowEnd": "2026-05-13T20:41:37.000Z",
+      "segmentId": "M36",
+      "route": "M36",
+      "sampleCount": 7940,
+      "avgSpeedKph": 29.6,
+      "minSpeedKph": 0.12763467987426183,
+      "maxSpeedKph": 79.65688642751174,
+      "avgDelaySeconds": 10.4,
+      "totalDistanceMeters": 1013705,
+      "geometry": [
+        [
+          21.21348,
+          45.743759
+        ],
+        [
+          21.19043,
+          45.732731
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T20:13:33.000Z",
+      "windowEnd": "2026-05-15T08:42:32.000Z",
+      "segmentId": "M46",
+      "route": "M46",
+      "sampleCount": 7059,
+      "avgSpeedKph": 32.2,
+      "minSpeedKph": 0.16271424038368967,
+      "maxSpeedKph": 83.83556724335405,
+      "avgDelaySeconds": 11.3,
+      "totalDistanceMeters": 976223,
+      "geometry": [
+        [
+          21.199591,
+          45.721581
+        ],
+        [
+          21.205139,
+          45.728569
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-13T09:14:06.000Z",
+      "windowEnd": "2026-05-13T15:57:04.000Z",
+      "segmentId": "V1",
+      "route": "V1",
+      "sampleCount": 8501,
+      "avgSpeedKph": 8.9,
+      "minSpeedKph": 0.1474210924123438,
+      "maxSpeedKph": 76.793164846418,
+      "avgDelaySeconds": 32.8,
+      "totalDistanceMeters": 328653,
+      "geometry": [
+        [
+          21.22496,
+          45.74868
+        ],
+        [
+          21.22467,
+          45.74884
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-12T19:23:21.000Z",
+      "windowEnd": "2026-05-15T08:42:31.000Z",
+      "segmentId": "E6",
+      "route": "E6",
+      "sampleCount": 6551,
+      "avgSpeedKph": 23.4,
+      "minSpeedKph": 0.20015086797202158,
+      "maxSpeedKph": 84.29014106914728,
+      "avgDelaySeconds": 15.8,
+      "totalDistanceMeters": 660831,
+      "geometry": [
+        [
+          21.228939,
+          45.759399
+        ],
+        [
+          21.20887,
+          45.779381
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T01:45:15.000Z",
+      "windowEnd": "2026-05-15T08:40:28.000Z",
+      "segmentId": "46",
+      "route": "46",
+      "sampleCount": 7034,
+      "avgSpeedKph": 22.7,
+      "minSpeedKph": 0.18347162897435312,
+      "maxSpeedKph": 60.87881842462059,
+      "avgDelaySeconds": 13.8,
+      "totalDistanceMeters": 687106,
+      "geometry": [
+        [
+          21.238819,
+          45.759701
+        ],
+        [
+          21.247761,
+          45.779369
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T02:15:58.000Z",
+      "windowEnd": "2026-05-13T20:04:50.000Z",
+      "segmentId": "23",
+      "route": "23",
+      "sampleCount": 17626,
+      "avgSpeedKph": 19.8,
+      "minSpeedKph": 0.1668481201268596,
+      "maxSpeedKph": 61.845269034733924,
+      "avgDelaySeconds": 15.6,
+      "totalDistanceMeters": 1508275,
+      "geometry": [
+        [
+          21.259211,
+          45.733768
+        ],
+        [
+          21.25281,
+          45.75013
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-15T01:56:03.000Z",
+      "windowEnd": "2026-05-14T19:36:35.000Z",
+      "segmentId": "32",
+      "route": "32",
+      "sampleCount": 7400,
+      "avgSpeedKph": 19.5,
+      "minSpeedKph": 0.20239467811184123,
+      "maxSpeedKph": 55.28269794946267,
+      "avgDelaySeconds": 15.6,
+      "totalDistanceMeters": 621519,
+      "geometry": [
+        [
+          21.225679,
+          45.748859
+        ],
+        [
+          21.225031,
+          45.747879
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-13T10:31:53.000Z",
+      "windowEnd": "2026-05-15T08:42:31.000Z",
+      "segmentId": "M23",
+      "route": "M23",
+      "sampleCount": 6087,
+      "avgSpeedKph": 29.1,
+      "minSpeedKph": 0.1665776128249541,
+      "maxSpeedKph": 81.05839605171457,
+      "avgDelaySeconds": 9.5,
+      "totalDistanceMeters": 763612,
+      "geometry": [
+        [
+          21.258739,
+          45.734039
+        ],
+        [
+          21.320629,
+          45.719299
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T11:30:31.000Z",
+      "windowEnd": "2026-05-14T18:16:16.000Z",
+      "segmentId": "M43",
+      "route": "M43",
+      "sampleCount": 6256,
+      "avgSpeedKph": 34.4,
+      "minSpeedKph": 0.20912668160485123,
+      "maxSpeedKph": 81.25633797084457,
+      "avgDelaySeconds": 10.5,
+      "totalDistanceMeters": 934100,
+      "geometry": [
+        [
+          21.229521,
+          45.759449
+        ],
+        [
+          21.232241,
+          45.757931
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T02:03:24.000Z",
+      "windowEnd": "2026-05-15T08:42:04.000Z",
+      "segmentId": "24",
+      "route": "24",
+      "sampleCount": 12601,
+      "avgSpeedKph": 23.6,
+      "minSpeedKph": 0.21076708010732817,
+      "maxSpeedKph": 70.57521480044232,
+      "avgDelaySeconds": 11.8,
+      "totalDistanceMeters": 1282839,
+      "geometry": [
+        [
+          21.279961,
+          45.72644
+        ],
+        [
+          21.25342,
+          45.73637
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T01:46:08.000Z",
+      "windowEnd": "2026-05-13T17:31:25.000Z",
+      "segmentId": "M27",
+      "route": "M27",
+      "sampleCount": 3917,
+      "avgSpeedKph": 36.9,
+      "minSpeedKph": 0.20783347730168367,
+      "maxSpeedKph": 90.32584791649592,
+      "avgDelaySeconds": 8.8,
+      "totalDistanceMeters": 625441,
+      "geometry": [
+        [
+          21.23085,
+          45.75914
+        ],
+        [
+          21.22827,
+          45.759289
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-15T03:21:26.000Z",
+      "windowEnd": "2026-05-14T19:04:17.000Z",
+      "segmentId": "M30",
+      "route": "M30",
+      "sampleCount": 5938,
+      "avgSpeedKph": 23.6,
+      "minSpeedKph": 0.15726139626373126,
+      "maxSpeedKph": 85.8207867415123,
+      "avgDelaySeconds": 14.4,
+      "totalDistanceMeters": 603231,
+      "geometry": [
+        [
+          21.23502,
+          45.758362
+        ],
+        [
+          21.23238,
+          45.757938
         ]
       ]
     },
@@ -828,12 +1048,12 @@
       "windowEnd": "2026-05-13T14:05:32.000Z",
       "segmentId": "21",
       "route": "21",
-      "sampleCount": 4051,
-      "avgSpeedKph": 19.8,
-      "minSpeedKph": 0.19812872272885856,
+      "sampleCount": 11890,
+      "avgSpeedKph": 20.1,
+      "minSpeedKph": 0.1560940735678277,
       "maxSpeedKph": 58.59968370080599,
-      "avgDelaySeconds": 16.3,
-      "totalDistanceMeters": 348655,
+      "avgDelaySeconds": 15.2,
+      "totalDistanceMeters": 1033016,
       "geometry": [
         [
           21.279079,
@@ -846,196 +1066,42 @@
       ]
     },
     {
-      "windowStart": "2026-05-12T19:23:13.000Z",
-      "windowEnd": "2026-05-13T14:46:40.000Z",
-      "segmentId": "23",
-      "route": "23",
-      "sampleCount": 5696,
-      "avgSpeedKph": 19.2,
-      "minSpeedKph": 0.2317536365991829,
-      "maxSpeedKph": 58.409271629982584,
-      "avgDelaySeconds": 16.5,
-      "totalDistanceMeters": 474710,
-      "geometry": [
-        [
-          21.240549,
-          45.757389
-        ],
-        [
-          21.24341,
-          45.759029
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T03:15:42.000Z",
-      "windowEnd": "2026-05-13T14:46:57.000Z",
-      "segmentId": "M43",
-      "route": "M43",
-      "sampleCount": 2345,
-      "avgSpeedKph": 34.4,
-      "minSpeedKph": 0.29080848062858883,
-      "maxSpeedKph": 81.23989456357549,
-      "avgDelaySeconds": 10.7,
-      "totalDistanceMeters": 350596,
-      "geometry": [
-        [
-          21.23245,
-          45.75848
-        ],
-        [
-          21.11017,
-          45.76022
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T11:13:31.000Z",
-      "windowEnd": "2026-05-12T20:33:19.000Z",
-      "segmentId": "M49",
-      "route": "M49",
-      "sampleCount": 3108,
-      "avgSpeedKph": 26.4,
-      "minSpeedKph": 0.2542926264395029,
-      "maxSpeedKph": 76.85862087901697,
-      "avgDelaySeconds": 11.4,
-      "totalDistanceMeters": 356194,
-      "geometry": [
-        [
-          21.232519,
-          45.758881
-        ],
-        [
-          21.23246,
-          45.75861
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T02:00:47.000Z",
-      "windowEnd": "2026-05-13T14:46:57.000Z",
-      "segmentId": "24",
-      "route": "24",
-      "sampleCount": 3902,
-      "avgSpeedKph": 22.6,
-      "minSpeedKph": 0.220165954627008,
-      "maxSpeedKph": 70.47631645608493,
-      "avgDelaySeconds": 13,
-      "totalDistanceMeters": 382304,
-      "geometry": [
-        [
-          21.281219,
-          45.726189
-        ],
-        [
-          21.272169,
-          45.715462
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T03:20:52.000Z",
-      "windowEnd": "2026-05-13T12:23:13.000Z",
-      "segmentId": "M39",
-      "route": "M39",
-      "sampleCount": 709,
-      "avgSpeedKph": 53.8,
-      "minSpeedKph": 0.25901877031673387,
-      "maxSpeedKph": 77.91590687400773,
-      "avgDelaySeconds": 2.1,
-      "totalDistanceMeters": 164782,
-      "geometry": [
-        [
-          21.203461,
-          45.726398
-        ],
-        [
-          21.205059,
-          45.727821
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-12T19:23:13.000Z",
-      "windowEnd": "2026-05-13T14:46:58.000Z",
+      "windowStart": "2026-05-14T01:52:52.000Z",
+      "windowEnd": "2026-05-13T19:50:25.000Z",
       "segmentId": "28",
       "route": "28",
-      "sampleCount": 2317,
-      "avgSpeedKph": 18.4,
+      "sampleCount": 6978,
+      "avgSpeedKph": 19.5,
       "minSpeedKph": 0.22016595476922374,
-      "maxSpeedKph": 48.02638286338554,
-      "avgDelaySeconds": 16.3,
-      "totalDistanceMeters": 184422,
+      "maxSpeedKph": 57.259893287218425,
+      "avgDelaySeconds": 14.7,
+      "totalDistanceMeters": 583918,
       "geometry": [
         [
-          21.23715,
-          45.759159
+          21.235491,
+          45.758579
         ],
         [
-          21.2526,
-          45.7635
+          21.232229,
+          45.75703
         ]
       ]
     },
     {
-      "windowStart": "2026-05-12T19:23:08.000Z",
-      "windowEnd": "2026-05-12T20:41:50.000Z",
-      "segmentId": "E2",
-      "route": "E2",
-      "sampleCount": 11985,
-      "avgSpeedKph": 17.8,
-      "minSpeedKph": 0.13442115525560214,
-      "maxSpeedKph": 59.786758305238806,
-      "avgDelaySeconds": 19.2,
-      "totalDistanceMeters": 922091,
-      "geometry": [
-        [
-          21.239349,
-          45.74176
-        ],
-        [
-          21.238529,
-          45.77541
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T11:14:51.000Z",
-      "windowEnd": "2026-05-13T11:13:32.000Z",
-      "segmentId": "M30",
-      "route": "M30",
-      "sampleCount": 1844,
-      "avgSpeedKph": 23.1,
-      "minSpeedKph": 0.17982260860907115,
-      "maxSpeedKph": 85.8207867415123,
-      "avgDelaySeconds": 15.1,
-      "totalDistanceMeters": 184226,
-      "geometry": [
-        [
-          21.236059,
-          45.758781
-        ],
-        [
-          21.235399,
-          45.748039
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T02:26:14.000Z",
+      "windowStart": "2026-05-14T02:27:20.000Z",
       "windowEnd": "2026-05-13T11:24:25.000Z",
       "segmentId": "M42",
       "route": "M42",
-      "sampleCount": 657,
-      "avgSpeedKph": 27.1,
-      "minSpeedKph": 0.23715078996582392,
+      "sampleCount": 2288,
+      "avgSpeedKph": 26.3,
+      "minSpeedKph": 0.2284200657379063,
       "maxSpeedKph": 83.81501990048032,
-      "avgDelaySeconds": 15.8,
-      "totalDistanceMeters": 77680,
+      "avgDelaySeconds": 15.4,
+      "totalDistanceMeters": 259465,
       "geometry": [
         [
-          21.253309,
-          45.747871
+          21.253361,
+          45.747829
         ],
         [
           21.25325,
@@ -1044,178 +1110,134 @@
       ]
     },
     {
-      "windowStart": "2026-05-13T02:14:04.000Z",
-      "windowEnd": "2026-05-13T14:46:12.000Z",
-      "segmentId": "M38",
-      "route": "M38",
-      "sampleCount": 1047,
-      "avgSpeedKph": 41.6,
-      "minSpeedKph": 0.21834640150629706,
-      "maxSpeedKph": 81.28779004115815,
-      "avgDelaySeconds": 7.5,
-      "totalDistanceMeters": 188698,
+      "windowStart": "2026-05-13T03:20:52.000Z",
+      "windowEnd": "2026-05-15T05:00:58.000Z",
+      "segmentId": "M39",
+      "route": "M39",
+      "sampleCount": 1792,
+      "avgSpeedKph": 53.9,
+      "minSpeedKph": 0.25147025377918397,
+      "maxSpeedKph": 98.02945500547126,
+      "avgDelaySeconds": 2.7,
+      "totalDistanceMeters": 414485,
       "geometry": [
         [
-          21.203501,
-          45.72644
+          21.203461,
+          45.726398
         ],
         [
-          21.19261,
-          45.71336
+          21.20792,
+          45.7313
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T01:45:56.000Z",
-      "windowEnd": "2026-05-13T13:59:51.000Z",
-      "segmentId": "M27",
-      "route": "M27",
-      "sampleCount": 1389,
-      "avgSpeedKph": 35.7,
-      "minSpeedKph": 0.20783347730168367,
-      "maxSpeedKph": 90.32584791649592,
-      "avgDelaySeconds": 9.5,
-      "totalDistanceMeters": 215737,
-      "geometry": [
-        [
-          21.232361,
-          45.757999
-        ],
-        [
-          21.39238,
-          45.784161
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T01:46:31.000Z",
-      "windowEnd": "2026-05-12T20:13:18.000Z",
-      "segmentId": "M46",
-      "route": "M46",
-      "sampleCount": 2374,
-      "avgSpeedKph": 30.4,
-      "minSpeedKph": 0.20015086797202158,
-      "maxSpeedKph": 83.83556724335405,
-      "avgDelaySeconds": 11.9,
-      "totalDistanceMeters": 311362,
-      "geometry": [
-        [
-          21.203581,
-          45.726521
-        ],
-        [
-          21.20528,
-          45.728069
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T03:50:07.000Z",
-      "windowEnd": "2026-05-13T14:42:47.000Z",
-      "segmentId": "M36",
-      "route": "M36",
-      "sampleCount": 2543,
-      "avgSpeedKph": 28.4,
-      "minSpeedKph": 0.20015086797202158,
-      "maxSpeedKph": 79.65688642751174,
-      "avgDelaySeconds": 12.2,
-      "totalDistanceMeters": 312468,
-      "geometry": [
-        [
-          21.11618,
-          45.710751
-        ],
-        [
-          21.215759,
-          45.745861
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T02:06:59.000Z",
-      "windowEnd": "2026-05-12T20:54:48.000Z",
+      "windowStart": "2026-05-14T06:08:41.000Z",
+      "windowEnd": "2026-05-13T20:52:50.000Z",
       "segmentId": "M41",
       "route": "M41",
-      "sampleCount": 1548,
-      "avgSpeedKph": 31.8,
-      "minSpeedKph": 0.2261356375379349,
-      "maxSpeedKph": 78.56992170635769,
-      "avgDelaySeconds": 10.3,
-      "totalDistanceMeters": 212855,
+      "sampleCount": 4761,
+      "avgSpeedKph": 32.7,
+      "minSpeedKph": 0.22140866304382456,
+      "maxSpeedKph": 83.14837200384004,
+      "avgDelaySeconds": 11,
+      "totalDistanceMeters": 670677,
       "geometry": [
         [
-          21.22994,
-          45.759369
+          21.235531,
+          45.74894
         ],
         [
-          21.23225,
-          45.757889
+          21.23229,
+          45.75795
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T02:05:25.000Z",
-      "windowEnd": "2026-05-13T14:45:52.000Z",
-      "segmentId": "M47",
-      "route": "M47",
-      "sampleCount": 1394,
-      "avgSpeedKph": 39.5,
-      "minSpeedKph": 0.24990286175774284,
-      "maxSpeedKph": 83.22196956936797,
-      "avgDelaySeconds": 9.3,
-      "totalDistanceMeters": 238127,
-      "geometry": [
-        [
-          21.232531,
-          45.75848
-        ],
-        [
-          21.223379,
-          45.769718
-        ]
-      ]
-    },
-    {
-      "windowStart": "2026-05-13T02:31:21.000Z",
-      "windowEnd": "2026-05-13T14:46:59.000Z",
+      "windowStart": "2026-05-14T07:45:27.000Z",
+      "windowEnd": "2026-05-14T06:27:28.000Z",
       "segmentId": "M50",
       "route": "M50",
-      "sampleCount": 2016,
-      "avgSpeedKph": 43.8,
-      "minSpeedKph": 0.25901877031673387,
-      "maxSpeedKph": 82.94808975995446,
+      "sampleCount": 6823,
+      "avgSpeedKph": 43,
+      "minSpeedKph": 0.2509553686849116,
+      "maxSpeedKph": 194.81923418741738,
       "avgDelaySeconds": 8,
-      "totalDistanceMeters": 383193,
+      "totalDistanceMeters": 1264487,
       "geometry": [
         [
-          21.252819,
-          45.74807
+          21.25141,
+          45.751579
         ],
         [
-          21.23177,
-          45.758881
+          21.23315,
+          45.755459
         ]
       ]
     },
     {
-      "windowStart": "2026-05-13T01:54:06.000Z",
-      "windowEnd": "2026-05-13T14:46:56.000Z",
-      "segmentId": "M44",
-      "route": "M44",
-      "sampleCount": 1405,
-      "avgSpeedKph": 36.2,
-      "minSpeedKph": 0.14053228388702224,
-      "maxSpeedKph": 80.2233724812315,
-      "avgDelaySeconds": 11.6,
-      "totalDistanceMeters": 221120,
+      "windowStart": "2026-05-14T02:03:43.000Z",
+      "windowEnd": "2026-05-13T16:57:47.000Z",
+      "segmentId": "M47",
+      "route": "M47",
+      "sampleCount": 4175,
+      "avgSpeedKph": 38.8,
+      "minSpeedKph": 0.2236081380240004,
+      "maxSpeedKph": 83.60679647346993,
+      "avgDelaySeconds": 9.1,
+      "totalDistanceMeters": 699488,
       "geometry": [
         [
-          21.233931,
-          45.75742
+          21.23241,
+          45.758511
         ],
         [
-          21.232309,
-          45.758289
+          21.232109,
+          45.7584
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T01:59:06.000Z",
+      "windowEnd": "2026-05-15T05:47:57.000Z",
+      "segmentId": "M44",
+      "route": "M44",
+      "sampleCount": 4257,
+      "avgSpeedKph": 35.2,
+      "minSpeedKph": 0.14053228388702224,
+      "maxSpeedKph": 82.75574354397013,
+      "avgDelaySeconds": 11.5,
+      "totalDistanceMeters": 649055,
+      "geometry": [
+        [
+          21.233841,
+          45.757759
+        ],
+        [
+          21.239679,
+          45.744659
+        ]
+      ]
+    },
+    {
+      "windowStart": "2026-05-14T18:49:22.000Z",
+      "windowEnd": "2026-05-15T08:42:27.000Z",
+      "segmentId": "M29",
+      "route": "M29",
+      "sampleCount": 5765,
+      "avgSpeedKph": 24.2,
+      "minSpeedKph": 0.1447757076788256,
+      "maxSpeedKph": 59.495253159036324,
+      "avgDelaySeconds": 11.2,
+      "totalDistanceMeters": 599382,
+      "geometry": [
+        [
+          21.25602,
+          45.75745
+        ],
+        [
+          21.26074,
+          45.765259
         ]
       ]
     },
@@ -1224,12 +1246,12 @@
       "windowEnd": "2026-05-13T12:51:31.000Z",
       "segmentId": "M45",
       "route": "M45",
-      "sampleCount": 2125,
+      "sampleCount": 6912,
       "avgSpeedKph": 21.1,
-      "minSpeedKph": 0.2472340481409386,
+      "minSpeedKph": 0.2446288386324708,
       "maxSpeedKph": 67.40005227703736,
-      "avgDelaySeconds": 14.4,
-      "totalDistanceMeters": 193907,
+      "avgDelaySeconds": 13.5,
+      "totalDistanceMeters": 627869,
       "geometry": [
         [
           21.22533,
@@ -1240,170 +1262,148 @@
           45.75872
         ]
       ]
-    },
-    {
-      "windowStart": "2026-05-13T01:56:28.000Z",
-      "windowEnd": "2026-05-13T14:46:43.000Z",
-      "segmentId": "M29",
-      "route": "M29",
-      "sampleCount": 1887,
-      "avgSpeedKph": 23,
-      "minSpeedKph": 0.24018104165692675,
-      "maxSpeedKph": 59.495253159036324,
-      "avgDelaySeconds": 12.2,
-      "totalDistanceMeters": 186770,
-      "geometry": [
-        [
-          21.262751,
-          45.765991
-        ],
-        [
-          21.260321,
-          45.76038
-        ]
-      ]
     }
   ],
   "cityWide": {
-    "totalSamples": 290727,
-    "avgSpeedKph": 19.3,
-    "avgDelaySeconds": 19.1,
+    "totalSamples": 897748,
+    "avgSpeedKph": 19.4,
+    "avgDelaySeconds": 18.7,
     "speedHistogram": [
       {
         "bin": "0-5",
-        "count": 53651
+        "count": 162527
       },
       {
         "bin": "5-10",
-        "count": 42938
+        "count": 129124
       },
       {
         "bin": "10-15",
-        "count": 38774
+        "count": 118234
       },
       {
         "bin": "15-20",
-        "count": 32558
+        "count": 101113
       },
       {
         "bin": "20-25",
-        "count": 29557
+        "count": 93227
       },
       {
         "bin": "25-30",
-        "count": 28362
+        "count": 90028
       },
       {
         "bin": "30-35",
-        "count": 24050
+        "count": 76488
       },
       {
         "bin": "35-40",
-        "count": 16194
+        "count": 50899
       },
       {
         "bin": "40-45",
-        "count": 9267
+        "count": 28745
       },
       {
         "bin": "45-50",
-        "count": 4815
+        "count": 15034
       },
       {
         "bin": "50-55",
-        "count": 2697
+        "count": 8741
       },
       {
         "bin": "55-60",
-        "count": 2116
+        "count": 7056
       },
       {
         "bin": "60-65",
-        "count": 2147
+        "count": 6289
       },
       {
         "bin": "65-70",
-        "count": 1929
+        "count": 5266
       },
       {
         "bin": "70-75",
-        "count": 1120
+        "count": 3035
       },
       {
         "bin": "75-80",
-        "count": 384
+        "count": 1282
       },
       {
         "bin": "80-85",
-        "count": 67
+        "count": 228
       },
       {
         "bin": "85-90",
-        "count": 11
+        "count": 140
       },
       {
         "bin": "90-95",
-        "count": 12
+        "count": 53
       },
       {
         "bin": "95-100",
-        "count": 7
+        "count": 23
       },
       {
         "bin": "100-105",
-        "count": 6
+        "count": 16
       },
       {
         "bin": "105-110",
-        "count": 6
+        "count": 12
       },
       {
         "bin": "110-115",
-        "count": 6
+        "count": 20
       },
       {
         "bin": "115-120",
-        "count": 5
+        "count": 13
       },
       {
         "bin": "120-125",
-        "count": 4
+        "count": 13
       },
       {
         "bin": "125-130",
-        "count": 1
+        "count": 7
       },
       {
         "bin": "130-135",
-        "count": 1
+        "count": 6
       },
       {
         "bin": "135-140",
-        "count": 3
+        "count": 7
       },
       {
         "bin": "140-145",
-        "count": 3
+        "count": 6
       },
       {
         "bin": "145-150",
-        "count": 0
-      },
-      {
-        "bin": "150-155",
         "count": 3
       },
       {
+        "bin": "150-155",
+        "count": 10
+      },
+      {
         "bin": "155-160",
-        "count": 1
+        "count": 6
       },
       {
         "bin": "160-165",
-        "count": 2
+        "count": 5
       },
       {
         "bin": "165-170",
-        "count": 1
+        "count": 3
       },
       {
         "bin": "170-175",
@@ -1411,51 +1411,51 @@
       },
       {
         "bin": "175-180",
-        "count": 2
-      },
-      {
-        "bin": "180-185",
         "count": 3
       },
       {
+        "bin": "180-185",
+        "count": 5
+      },
+      {
         "bin": "185-190",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "190-195",
-        "count": 0
+        "count": 3
       },
       {
         "bin": "195-200",
-        "count": 2
+        "count": 3
       },
       {
         "bin": "200-205",
-        "count": 2
+        "count": 3
       },
       {
         "bin": "205-210",
-        "count": 0
+        "count": 3
       },
       {
         "bin": "210-215",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "215-220",
-        "count": 2
+        "count": 6
       },
       {
         "bin": "220-225",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "225-230",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "230-235",
-        "count": 2
+        "count": 3
       },
       {
         "bin": "235-240",
@@ -1467,35 +1467,35 @@
       },
       {
         "bin": "245-250",
-        "count": 1
+        "count": 2
       },
       {
         "bin": "250-255",
-        "count": 1
+        "count": 3
       },
       {
         "bin": "255-260",
-        "count": 0
-      },
-      {
-        "bin": "260-265",
-        "count": 0
-      },
-      {
-        "bin": "265-270",
-        "count": 0
-      },
-      {
-        "bin": "270-275",
-        "count": 0
-      },
-      {
-        "bin": "275-280",
         "count": 1
       },
       {
+        "bin": "260-265",
+        "count": 1
+      },
+      {
+        "bin": "265-270",
+        "count": 2
+      },
+      {
+        "bin": "270-275",
+        "count": 2
+      },
+      {
+        "bin": "275-280",
+        "count": 2
+      },
+      {
         "bin": "280-285",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "285-290",
@@ -1507,7 +1507,7 @@
       },
       {
         "bin": "295-300",
-        "count": 0
+        "count": 2
       },
       {
         "bin": "300-305",
@@ -1523,7 +1523,7 @@
       },
       {
         "bin": "315-320",
-        "count": 1
+        "count": 2
       },
       {
         "bin": "320-325",
@@ -1531,15 +1531,15 @@
       },
       {
         "bin": "325-330",
-        "count": 0
+        "count": 3
       },
       {
         "bin": "330-335",
-        "count": 1
+        "count": 2
       },
       {
         "bin": "335-340",
-        "count": 1
+        "count": 4
       },
       {
         "bin": "340-345",
@@ -1563,7 +1563,7 @@
       },
       {
         "bin": "365-370",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "370-375",
@@ -1583,11 +1583,11 @@
       },
       {
         "bin": "390-395",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "395-400",
-        "count": 1
+        "count": 2
       },
       {
         "bin": "400-405",
@@ -1595,7 +1595,7 @@
       },
       {
         "bin": "405-410",
-        "count": 0
+        "count": 3
       },
       {
         "bin": "410-415",
@@ -1603,11 +1603,11 @@
       },
       {
         "bin": "415-420",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "420-425",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "425-430",
@@ -1635,7 +1635,7 @@
       },
       {
         "bin": "455-460",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "460-465",
@@ -1651,7 +1651,7 @@
       },
       {
         "bin": "475-480",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "480-485",
@@ -1727,7 +1727,7 @@
       },
       {
         "bin": "570-575",
-        "count": 1
+        "count": 2
       },
       {
         "bin": "575-580",
@@ -1779,7 +1779,7 @@
       },
       {
         "bin": "635-640",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "640-645",
@@ -1803,7 +1803,7 @@
       },
       {
         "bin": "665-670",
-        "count": 0
+        "count": 1
       },
       {
         "bin": "670-675",
@@ -1868,36 +1868,276 @@
       {
         "bin": "745-750",
         "count": 0
+      },
+      {
+        "bin": "750-755",
+        "count": 0
+      },
+      {
+        "bin": "755-760",
+        "count": 0
+      },
+      {
+        "bin": "760-765",
+        "count": 0
+      },
+      {
+        "bin": "765-770",
+        "count": 0
+      },
+      {
+        "bin": "770-775",
+        "count": 0
+      },
+      {
+        "bin": "775-780",
+        "count": 0
+      },
+      {
+        "bin": "780-785",
+        "count": 0
+      },
+      {
+        "bin": "785-790",
+        "count": 1
+      },
+      {
+        "bin": "790-795",
+        "count": 0
+      },
+      {
+        "bin": "795-800",
+        "count": 1
+      },
+      {
+        "bin": "800-805",
+        "count": 1
+      },
+      {
+        "bin": "805-810",
+        "count": 0
+      },
+      {
+        "bin": "810-815",
+        "count": 0
+      },
+      {
+        "bin": "815-820",
+        "count": 0
+      },
+      {
+        "bin": "820-825",
+        "count": 0
+      },
+      {
+        "bin": "825-830",
+        "count": 0
+      },
+      {
+        "bin": "830-835",
+        "count": 1
+      },
+      {
+        "bin": "835-840",
+        "count": 0
+      },
+      {
+        "bin": "840-845",
+        "count": 0
+      },
+      {
+        "bin": "845-850",
+        "count": 0
+      },
+      {
+        "bin": "850-855",
+        "count": 0
+      },
+      {
+        "bin": "855-860",
+        "count": 0
+      },
+      {
+        "bin": "860-865",
+        "count": 0
+      },
+      {
+        "bin": "865-870",
+        "count": 0
+      },
+      {
+        "bin": "870-875",
+        "count": 0
+      },
+      {
+        "bin": "875-880",
+        "count": 0
+      },
+      {
+        "bin": "880-885",
+        "count": 0
+      },
+      {
+        "bin": "885-890",
+        "count": 0
+      },
+      {
+        "bin": "890-895",
+        "count": 0
+      },
+      {
+        "bin": "895-900",
+        "count": 0
+      },
+      {
+        "bin": "900-905",
+        "count": 0
+      },
+      {
+        "bin": "905-910",
+        "count": 0
+      },
+      {
+        "bin": "910-915",
+        "count": 0
+      },
+      {
+        "bin": "915-920",
+        "count": 0
+      },
+      {
+        "bin": "920-925",
+        "count": 0
+      },
+      {
+        "bin": "925-930",
+        "count": 0
+      },
+      {
+        "bin": "930-935",
+        "count": 0
+      },
+      {
+        "bin": "935-940",
+        "count": 0
+      },
+      {
+        "bin": "940-945",
+        "count": 0
+      },
+      {
+        "bin": "945-950",
+        "count": 1
+      },
+      {
+        "bin": "950-955",
+        "count": 0
+      },
+      {
+        "bin": "955-960",
+        "count": 0
+      },
+      {
+        "bin": "960-965",
+        "count": 0
+      },
+      {
+        "bin": "965-970",
+        "count": 0
+      },
+      {
+        "bin": "970-975",
+        "count": 0
+      },
+      {
+        "bin": "975-980",
+        "count": 0
+      },
+      {
+        "bin": "980-985",
+        "count": 0
+      },
+      {
+        "bin": "985-990",
+        "count": 0
+      },
+      {
+        "bin": "990-995",
+        "count": 0
+      },
+      {
+        "bin": "995-1000",
+        "count": 0
+      },
+      {
+        "bin": "1000-1005",
+        "count": 0
+      },
+      {
+        "bin": "1005-1010",
+        "count": 0
+      },
+      {
+        "bin": "1010-1015",
+        "count": 0
+      },
+      {
+        "bin": "1015-1020",
+        "count": 0
+      },
+      {
+        "bin": "1020-1025",
+        "count": 0
+      },
+      {
+        "bin": "1025-1030",
+        "count": 0
+      },
+      {
+        "bin": "1030-1035",
+        "count": 0
+      },
+      {
+        "bin": "1035-1040",
+        "count": 0
+      },
+      {
+        "bin": "1040-1045",
+        "count": 1
+      },
+      {
+        "bin": "1045-1050",
+        "count": 0
       }
     ],
     "delayHistogram": [
       {
         "bin": "0-10",
-        "count": 153836
+        "count": 483047
       },
       {
         "bin": "10-20",
-        "count": 20149
+        "count": 61839
       },
       {
         "bin": "20-30",
-        "count": 23041
+        "count": 70013
       },
       {
         "bin": "30-40",
-        "count": 23849
+        "count": 71819
       },
       {
         "bin": "40-50",
-        "count": 23938
+        "count": 71836
       },
       {
         "bin": "50-60",
-        "count": 28963
+        "count": 87125
       },
       {
         "bin": "60-70",
-        "count": 16951
+        "count": 52069
       },
       {
         "bin": "70-80",
@@ -1907,28 +2147,34 @@
   },
   "byTimeSlot": {
     "night": {
-      "sampleCount": 269463,
+      "sampleCount": 696959,
       "avgSpeedKph": 19.2,
-      "avgDelaySeconds": 19.1,
-      "routeCount": 51
+      "avgDelaySeconds": 19,
+      "routeCount": 45
     },
     "midday": {
-      "sampleCount": 18237,
-      "avgSpeedKph": 18.3,
-      "avgDelaySeconds": 20,
-      "routeCount": 4
+      "sampleCount": 167683,
+      "avgSpeedKph": 18.4,
+      "avgDelaySeconds": 18.7,
+      "routeCount": 7
     },
     "afternoon-rush": {
-      "sampleCount": 2069,
-      "avgSpeedKph": 20.2,
-      "avgDelaySeconds": 17.8,
+      "sampleCount": 6850,
+      "avgSpeedKph": 20.5,
+      "avgDelaySeconds": 17.7,
       "routeCount": 1
     },
     "morning-rush": {
-      "sampleCount": 958,
-      "avgSpeedKph": 41.2,
-      "avgDelaySeconds": 8.2,
-      "routeCount": 1
+      "sampleCount": 11493,
+      "avgSpeedKph": 29.1,
+      "avgDelaySeconds": 11.2,
+      "routeCount": 2
+    },
+    "mid-morning": {
+      "sampleCount": 14763,
+      "avgSpeedKph": 35.8,
+      "avgDelaySeconds": 9.3,
+      "routeCount": 2
     }
   }
 }
