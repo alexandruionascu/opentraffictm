@@ -4,7 +4,8 @@
     "district": "Central",
     "corridor": "Bulevardul Republicii",
     "task": "Estimate delay reduction after a signal timing change.",
-    "groundTruth": 11.2
+    "groundTruth": 11.2,
+    "signalIds": ["signal-141", "signal-142", "signal-389", "signal-392", "signal-391", "signal-393", "signal-143", "signal-144", "signal-252", "signal-287", "signal-105", "signal-108"]
   },
   {
     "id": "TM-02",

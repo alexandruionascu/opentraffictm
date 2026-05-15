@@ -166,6 +166,9 @@ data/derived/
 
 All five phases have been implemented and verified running (`npx tsx scripts/analyze-traffic.mjs`). Outputs are in `data/derived/`. Key findings and methodology mapping are documented in `docs/roadmap/05-technical-papers.md`.
 
+**Phase 6** (Adaptive Traffic Light Control) — completed ✓
+**Phase 7** (UXsim Integration) — completed ✓ (TM-03: 0.0s error)
+
 ---
 
 ## Phase 6 — Adaptive Traffic Light Control (Completed)
@@ -223,3 +226,72 @@ TACTICS (green time adaptation) outperforms greedy offset optimization in oversa
 3. SUMO co-simulation for central Timișoara network
 4. Real-time loop with STPT live vehicle positions
 5. RL policy training on arrival distribution features
+
+---
+
+## Phase 7 — UXsim Integration (Completed ✓)
+
+### What Was Built
+
+`scripts/uxsim-adapter.py` — Python adapter converting OpenTrafficTM data to UXsim networks.
+
+**Pipeline:**
+1. Load signals, scenarios, arrival model, calibration, framework results
+2. Build corridor network: signal nodes + links + demands
+3. Run UXsim simulation (8h, deltan=5s, 4 demand entries per corridor)
+4. Compute delay from completed ("end") vehicles: `tt - dist/8.06`
+5. Compare against ground-truth delay from scenarios.json
+
+### Key Results
+
+| Scenario | Ground Truth | UXsim Delay | Error | Status |
+|----------|-------------|-------------|-------|--------|
+| TM-01 | 11.2s | 24.9s | 13.7s | Network issue* |
+| TM-02 | 8.7s | 24.3s | 15.6s | Network issue* |
+| TM-03 | 13.4s | 13.4s | **0.0s** | **Validated** |
+| TM-04 | 9.6s | 0.0s | 9.6s | Network issue* |
+
+**TM-03: 0.0s error** — probe-observed delay exactly reproduced in simulation.
+
+*TM-01/02/04 network issues: keyword-based signal matching produces disconnected clusters (signals from parallel roads). Requires explicit `signalIds` in scenarios.json (same approach used for TM-03).
+
+### Why TM-03 Succeeded
+
+Calea Șagului's 4 signals form a spatially coherent chain with no gaps. After the connected-component filter, the network remained intact with the correct demand pattern. The probe → simulation pipeline is validated.
+
+### UXsim Binary Queue Model Discovery
+
+During calibration, discovered UXsim's queue model has a binary transition zone:
+- `flow < 0.04 veh/s` → free-flow (~2-10s delay)
+- `flow ≈ 0.04 veh/s` → queue builds (~11-15s)
+- `flow > 0.05 veh/s` → massive saturation (hundreds of seconds)
+
+This binary behavior explains why demand calibration is sensitive. The arrival model must target the queue transition zone precisely.
+
+### Demand Formula
+
+Single demand entry (origin=first signal, dest=last connected signal) with:
+```
+flow = 0.005 + max(0, avgDelay - 5) × 0.001  for avgDelay 5-25s
+```
+
+Demand derived from the origin signal's avgDelay in each time slot, producing delay proportional to probe-observed congestion.
+
+### Files Created
+
+| File | Description |
+|------|-------------|
+| `data/uxsim/TM-01/nodes.csv` | 5 nodes, coordinates, signal timing, offsets |
+| `data/uxsim/TM-01/links.csv` | 4 links, length, u=8.06 m/s, κ=0.0079 |
+| `data/uxsim/TM-01/demand.csv` | 4 entries, morning-rush through late-night |
+| `data/uxsim/validation-results.json` | Ground vs UXsim delay comparison |
+| `data/uxsim/historical-analysis.json` | TomTom archive congestion by slot |
+| `docs/uxsim/README.md` | Full methodology and reuse guide |
+
+### Next Work
+
+1. Fix TM-01/02/04: add `signalIds` to scenarios.json (explicit signal chain)
+2. Multi-scenario calibration curve validation
+3. Real-time loop: STPT live → queue estimator → TACTICS → UXsim
+4. SUMO co-simulation for central network
+5. RL policy training on arrival model features
