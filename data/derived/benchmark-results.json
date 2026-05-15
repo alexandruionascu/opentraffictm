@@ -1,0 +1,88 @@
+{
+  "generatedAt": "2026-05-15T05:53:44.402Z",
+  "scope": "Benchmark: baseline vs TACTICS vs greedy signal offset",
+  "scenarios": [
+    {
+      "scenarioId": "TM-01",
+      "corridor": "Bulevardul Republicii",
+      "groundTruthSeconds": 11.2,
+      "slot": "morning-rush",
+      "baselineDelaySeconds": 55,
+      "tacticsDelaySeconds": 54.6,
+      "greedyDelaySeconds": 54.9,
+      "tacticsImprovementSeconds": 0.4,
+      "greedyImprovementSeconds": 0,
+      "accuracyVsGroundTruth": {
+        "baseline": 43.8,
+        "tactics": 10.8,
+        "greedy": 11.2
+      },
+      "winningStrategy": "TACTICS"
+    },
+    {
+      "scenarioId": "TM-02",
+      "corridor": "Calea Aradului",
+      "groundTruthSeconds": 8.7,
+      "slot": "morning-rush",
+      "baselineDelaySeconds": 55,
+      "tacticsDelaySeconds": 54.6,
+      "greedyDelaySeconds": 54.9,
+      "tacticsImprovementSeconds": 0.4,
+      "greedyImprovementSeconds": 0,
+      "accuracyVsGroundTruth": {
+        "baseline": 46.3,
+        "tactics": 8.3,
+        "greedy": 8.7
+      },
+      "winningStrategy": "TACTICS"
+    },
+    {
+      "scenarioId": "TM-03",
+      "corridor": "Calea Șagului",
+      "groundTruthSeconds": 13.4,
+      "slot": "afternoon-rush",
+      "baselineDelaySeconds": 55,
+      "tacticsDelaySeconds": 54.6,
+      "greedyDelaySeconds": 54.9,
+      "tacticsImprovementSeconds": 0.4,
+      "greedyImprovementSeconds": 0,
+      "accuracyVsGroundTruth": {
+        "baseline": 41.6,
+        "tactics": 13,
+        "greedy": 13.4
+      },
+      "winningStrategy": "TACTICS"
+    },
+    {
+      "scenarioId": "TM-04",
+      "corridor": "Circumvalațiunii",
+      "groundTruthSeconds": 9.6,
+      "slot": "afternoon-rush",
+      "baselineDelaySeconds": 55,
+      "tacticsDelaySeconds": 54.6,
+      "greedyDelaySeconds": 54.9,
+      "tacticsImprovementSeconds": 0.4,
+      "greedyImprovementSeconds": 0,
+      "accuracyVsGroundTruth": {
+        "baseline": 45.4,
+        "tactics": 9.2,
+        "greedy": 9.6
+      },
+      "winningStrategy": "TACTICS"
+    }
+  ],
+  "summary": {
+    "tacticsWins": 4,
+    "greedyWins": 0,
+    "baselineWins": 0
+  },
+  "cityWide": {
+    "morningRush": {
+      "baseline": 55,
+      "tactics": 54.6,
+      "greedy": 54.9,
+      "tacticsSaving": 0.4,
+      "greedySaving": 0
+    }
+  }
+}
