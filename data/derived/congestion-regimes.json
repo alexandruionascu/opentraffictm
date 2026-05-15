@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-15T11:02:29.032Z",
-  "description": "Congestion regime classification combining STPT probe data and TomTom flow data",
+  "generatedAt": "2026-05-15T11:42:24.913Z",
+  "description": "Congestion regime classification combining STPT probe data and TomTom flow data (Kerner 2004/2009 three-phase + Lomax 1996 TTI/BI)",
   "records": [
     {
       "route": "33",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 16.8,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -23,7 +23,7 @@
     },
     {
       "route": "40",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 16.5,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -42,7 +42,7 @@
     },
     {
       "route": "E8",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 18.3,
       "speedRatio": null,
       "confidence": 0.65,
@@ -61,7 +61,7 @@
     },
     {
       "route": "E1",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 18.4,
       "speedRatio": null,
       "confidence": 0.65,
@@ -99,7 +99,7 @@
     },
     {
       "route": "13",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 17.3,
       "speedRatio": 0.692,
       "confidence": 0.85,
@@ -118,7 +118,7 @@
     },
     {
       "route": "M11",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 17.8,
       "speedRatio": 0.692,
       "confidence": 0.85,
@@ -137,7 +137,7 @@
     },
     {
       "route": "E4",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 30.9,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -156,7 +156,7 @@
     },
     {
       "route": "E3",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 19,
       "speedRatio": 0.667,
       "confidence": 0.85,
@@ -175,7 +175,7 @@
     },
     {
       "route": "1",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 15.7,
       "speedRatio": 0.683,
       "confidence": 0.85,
@@ -194,7 +194,7 @@
     },
     {
       "route": "E7",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 19.8,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -213,7 +213,7 @@
     },
     {
       "route": "33b",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 20.6,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -232,7 +232,7 @@
     },
     {
       "route": "2",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 16.4,
       "speedRatio": null,
       "confidence": 0.65,
@@ -270,7 +270,7 @@
     },
     {
       "route": "M22",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 24.3,
       "speedRatio": null,
       "confidence": 0.65,
@@ -289,7 +289,7 @@
     },
     {
       "route": "7",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 17,
       "speedRatio": null,
       "confidence": 0.65,
@@ -327,7 +327,7 @@
     },
     {
       "route": "8",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 17.6,
       "speedRatio": null,
       "confidence": 0.65,
@@ -346,7 +346,7 @@
     },
     {
       "route": "9",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 18.5,
       "speedRatio": null,
       "confidence": 0.65,
@@ -365,7 +365,7 @@
     },
     {
       "route": "4",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 18.1,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -384,7 +384,7 @@
     },
     {
       "route": "5",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 18.3,
       "speedRatio": 0.692,
       "confidence": 0.85,
@@ -403,7 +403,7 @@
     },
     {
       "route": "18",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 14.5,
       "speedRatio": 0.333,
       "confidence": 0.85,
@@ -422,7 +422,7 @@
     },
     {
       "route": "11",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 15.7,
       "speedRatio": 0.333,
       "confidence": 0.85,
@@ -441,7 +441,7 @@
     },
     {
       "route": "E2",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 17.9,
       "speedRatio": null,
       "confidence": 0.65,
@@ -460,7 +460,7 @@
     },
     {
       "route": "5b",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 20.5,
       "speedRatio": 0.333,
       "confidence": 0.85,
@@ -479,7 +479,7 @@
     },
     {
       "route": "14",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 14.7,
       "speedRatio": 0.333,
       "confidence": 0.85,
@@ -498,7 +498,7 @@
     },
     {
       "route": "M14",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 17.4,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -517,7 +517,7 @@
     },
     {
       "route": "16",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 14.2,
       "speedRatio": null,
       "confidence": 0.65,
@@ -536,7 +536,7 @@
     },
     {
       "route": "15",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 14.8,
       "speedRatio": null,
       "confidence": 0.65,
@@ -555,7 +555,7 @@
     },
     {
       "route": "17",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 14.9,
       "speedRatio": null,
       "confidence": 0.65,
@@ -574,7 +574,7 @@
     },
     {
       "route": "E4b",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 26.1,
       "speedRatio": 0.692,
       "confidence": 0.85,
@@ -593,7 +593,7 @@
     },
     {
       "route": "M35",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 25.9,
       "speedRatio": null,
       "confidence": 0.65,
@@ -612,7 +612,7 @@
     },
     {
       "route": "M49",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 25.7,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -650,7 +650,7 @@
     },
     {
       "route": "M24",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 28.1,
       "speedRatio": null,
       "confidence": 0.65,
@@ -669,7 +669,7 @@
     },
     {
       "route": "M36",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 29.6,
       "speedRatio": 0.683,
       "confidence": 0.85,
@@ -688,7 +688,7 @@
     },
     {
       "route": "M46",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 32.2,
       "speedRatio": null,
       "confidence": 0.65,
@@ -726,7 +726,7 @@
     },
     {
       "route": "E6",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 23.4,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -745,7 +745,7 @@
     },
     {
       "route": "46",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 22.7,
       "speedRatio": null,
       "confidence": 0.65,
@@ -764,7 +764,7 @@
     },
     {
       "route": "23",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 19.8,
       "speedRatio": null,
       "confidence": 0.65,
@@ -783,7 +783,7 @@
     },
     {
       "route": "32",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 19.5,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -802,7 +802,7 @@
     },
     {
       "route": "M23",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 29.1,
       "speedRatio": null,
       "confidence": 0.65,
@@ -840,7 +840,7 @@
     },
     {
       "route": "24",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 23.6,
       "speedRatio": null,
       "confidence": 0.65,
@@ -878,7 +878,7 @@
     },
     {
       "route": "M30",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 23.6,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -897,7 +897,7 @@
     },
     {
       "route": "21",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 20.1,
       "speedRatio": null,
       "confidence": 0.65,
@@ -916,7 +916,7 @@
     },
     {
       "route": "28",
-      "regime": "blocked",
+      "regime": "heavy",
       "avgSpeedKph": 19.5,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -935,7 +935,7 @@
     },
     {
       "route": "M42",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 26.3,
       "speedRatio": null,
       "confidence": 0.65,
@@ -1049,7 +1049,7 @@
     },
     {
       "route": "M29",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 24.2,
       "speedRatio": null,
       "confidence": 0.65,
@@ -1068,7 +1068,7 @@
     },
     {
       "route": "M45",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 21.1,
       "speedRatio": 1,
       "confidence": 0.85,
@@ -1522,7 +1522,7 @@
     },
     {
       "route": "tomtom-45.75138,21.23845",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 36,
       "speedRatio": 0.621,
       "confidence": 0.8,
@@ -1537,7 +1537,7 @@
     },
     {
       "route": "tomtom-45.75056,21.23779",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 36,
       "speedRatio": 0.621,
       "confidence": 0.8,
@@ -1552,7 +1552,7 @@
     },
     {
       "route": "tomtom-45.74841,21.23373",
-      "regime": "heavy",
+      "regime": "synchronized",
       "avgSpeedKph": 36,
       "speedRatio": 0.621,
       "confidence": 0.8,
@@ -2190,8 +2190,9 @@
   "byRegime": {
     "free": 52,
     "light": 17,
-    "heavy": 22,
-    "blocked": 27
+    "synchronized": 22,
+    "heavy": 26,
+    "blocked": 1
   },
   "summary": {
     "totalSegments": 118,
@@ -2271,7 +2272,7 @@
         "tomtom-45.75902,21.22086",
         "tomtom-45.75860,21.22218"
       ],
-      "heavy": [
+      "synchronized": [
         "E4",
         "33b",
         "M22",
@@ -2295,7 +2296,7 @@
         "tomtom-45.75056,21.23779",
         "tomtom-45.74841,21.23373"
       ],
-      "blocked": [
+      "heavy": [
         "33",
         "40",
         "E8",
@@ -2319,12 +2320,16 @@
         "16",
         "15",
         "17",
-        "V1",
         "23",
         "32",
         "28"
+      ],
+      "blocked": [
+        "V1"
       ]
     },
-    "cityCongestionIndex": 0.64
+    "cityCongestionIndex": 0.24,
+    "travelTimeIndex": 0.63,
+    "bufferIndex": 0.4
   }
 }

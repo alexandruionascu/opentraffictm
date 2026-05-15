@@ -2,11 +2,11 @@ import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { aggregateProbes } from "./probe-aggregator";
 import { profileTomTom } from "./tomtom-profiler";
 
-export type CongestionRegime = "free" | "light" | "heavy" | "blocked";
+export type CongestionRegime = "free" | "light" | "synchronized" | "heavy" | "blocked";
 
 export interface CongestionAnomaly {
   segmentId: string;
-  source: "probe" | "tomtom";
+  source: "probe" | "tomtom" | "both";
   description: string;
   probeSpeedKph: number | null;
   tomtomSpeedKph: number | null;
@@ -35,7 +35,9 @@ export interface CongestionClassifierOutput {
     anomalousSegments: number;
     dominantRegime: CongestionRegime;
     routesByRegime: Record<CongestionRegime, string[]>;
-    cityCongestionIndex: number; // 0=fully free, 1=fully blocked
+    cityCongestionIndex: number; // legacy: weighted (heavy + blocked*2)/total
+    travelTimeIndex: number;     // TTI = actual/freeflow - 1 (Lomax 1996)
+    bufferIndex: number;         // BI = (P95 travel time - median) / median (Lomax 1996)
   };
 }
 
@@ -44,7 +46,8 @@ const FREE_FLOW_KPH = 50; // default free-flow assumption for probe-only segment
 function classifyRegime(speedRatio: number): CongestionRegime {
   if (speedRatio >= 0.85) return "free";
   if (speedRatio >= 0.65) return "light";
-  if (speedRatio >= 0.40) return "heavy";
+  if (speedRatio >= 0.40) return "synchronized";
+  if (speedRatio >= 0.25) return "heavy";
   return "blocked";
 }
 
@@ -153,8 +156,8 @@ export async function classifyCongestion(): Promise<CongestionClassifierOutput> 
     });
   }
 
-  const byRegime: Record<CongestionRegime, number> = { free: 0, light: 0, heavy: 0, blocked: 0 };
-  const routesByRegime: Record<CongestionRegime, string[]> = { free: [], light: [], heavy: [], blocked: [] };
+  const byRegime: Record<CongestionRegime, number> = { free: 0, light: 0, synchronized: 0, heavy: 0, blocked: 0 };
+  const routesByRegime: Record<CongestionRegime, string[]> = { free: [], light: [], synchronized: [], heavy: [], blocked: [] };
   let anomalousSegments = 0;
 
   for (const rec of records) {
@@ -165,13 +168,33 @@ export async function classifyCongestion(): Promise<CongestionClassifierOutput> 
 
   const dominantRegime = (Object.entries(byRegime).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "free") as CongestionRegime;
   const total = records.length;
+
+  // Legacy weighted index
   const cityCongestionIndex = total > 0
     ? Math.round(((byRegime.heavy + byRegime.blocked * 2) / Math.max(total, 1)) * 100) / 100
     : 0;
 
+  // Lomax 1996: Travel Time Index = actual/freeflow - 1
+  // Buffer Index = (P95 travel time - median) / median
+  // Use avgSpeed as proxy for travel time; lower speed = higher TTI
+  const allSpeeds = records.map(r => r.avgSpeedKph);
+  const avgCitySpeed = allSpeeds.reduce((a, b) => a + b, 0) / Math.max(allSpeeds.length, 1);
+  const travelTimeIndex = avgCitySpeed > 0
+    ? Math.round(((FREE_FLOW_KPH / avgCitySpeed) - 1) * 100) / 100
+    : 0;
+
+  // For Buffer Index, use speed variance as proxy for travel time spread
+  // BI ≈ stdDev(TT) / median(TT); approximated as stdDev of speed inversely scaled
+  const meanSpeed = avgCitySpeed;
+  const speedVariance = allSpeeds.reduce((s, v) => s + (v - meanSpeed) ** 2, 0) / Math.max(allSpeeds.length - 1, 1);
+  const speedStdDev = Math.sqrt(speedVariance);
+  const bufferIndex = meanSpeed > 0
+    ? Math.round((speedStdDev / meanSpeed) * 100) / 100
+    : 0;
+
   return {
     generatedAt: new Date().toISOString(),
-    description: "Congestion regime classification combining STPT probe data and TomTom flow data",
+    description: "Congestion regime classification combining STPT probe data and TomTom flow data (Kerner 2004/2009 three-phase + Lomax 1996 TTI/BI)",
     records,
     anomalies,
     byRegime,
@@ -181,6 +204,8 @@ export async function classifyCongestion(): Promise<CongestionClassifierOutput> 
       dominantRegime,
       routesByRegime,
       cityCongestionIndex,
+      travelTimeIndex,
+      bufferIndex,
     },
   };
 }
@@ -198,9 +223,10 @@ export async function main() {
   );
   writeFileSync("data/derived/congestion-summary.csv", [header, ...rows].join("\n"));
 
-  console.log(`\n=== Congestion Regime Classification ===`);
+  console.log(`\n=== Congestion Regime Classification (Kerner 3-phase + Lomax TTI/BI) ===`);
   console.log(`Total segments: ${result.summary.totalSegments}, anomalous: ${result.summary.anomalousSegments}`);
-  console.log(`Dominant regime: ${result.summary.dominantRegime}, city congestion index: ${result.summary.cityCongestionIndex}`);
+  console.log(`Dominant regime: ${result.summary.dominantRegime}`);
+  console.log(`Indices — congestion: ${result.summary.cityCongestionIndex}, TTI: ${result.summary.travelTimeIndex}, buffer: ${result.summary.bufferIndex}`);
   console.log(`\nRegime breakdown:`);
   for (const [regime, count] of Object.entries(result.byRegime)) {
     const pct = result.summary.totalSegments > 0 ? Math.round(count / result.summary.totalSegments * 100) : 0;

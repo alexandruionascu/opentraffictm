@@ -15,6 +15,12 @@ export interface RouteCalibration {
   timeGapSeconds: number;    // IDM time gap (derived from gap ratio)
   maxAccelMps2: number;       // IDM max acceleration
   comfortDecelMps2: number;  // IDM comfortable deceleration
+  // Newell 1961: kinematic wave model
+  newellDeltaSeconds: number;  // trajectory offset (approx 1/stdDev of spacing)
+  newellWaveSpeedKph: number;  // wave speed from downstream queue discharge
+  // Gipps 1981: safety-distance model
+  gippsDesiredSpeedKph: number;
+  gippsMaxBrakeMps2: number;   // maximum braking deceleration
   avgSpeedKph: number;
   minSpeedKph: number;
   maxSpeedKph: number;
@@ -24,7 +30,7 @@ export interface RouteCalibration {
 
 export interface CalibrationOutput {
   generatedAt: string;
-  method: "idm-calibration";
+  method: "idm-newell-gipps-calibration";
   description: string;
   defaults: {
     cityDesiredSpeedKph: number;
@@ -107,6 +113,84 @@ function estimateIDMParams(speeds: number[], distances: number[], timeDeltas: nu
   return { desiredSpeedKph: Math.round(desiredSpeedKph * 10) / 10, timeGapSeconds: Math.round(timeGapSeconds * 10) / 10, maxAccelMps2: Math.round(maxAccelMps2 * 100) / 100, comfortDecelMps2: Math.round(comfortDecelMps2 * 100) / 100 };
 }
 
+/**
+ * Newell 1961 — simplified kinematic wave model.
+ * Uses trajectory offset and wave speed from speed/headway data.
+ * Lower variance in time gaps → smaller delta (tighter car-following).
+ */
+function estimateNewellParams(speeds: number[], distances: number[], timeDeltas: number[]): {
+  newellDeltaSeconds: number;
+  newellWaveSpeedKph: number;
+} {
+  if (speeds.length < 10) {
+    return { newellDeltaSeconds: 2.0, newellWaveSpeedKph: 18 };
+  }
+
+  // Wave speed: approximate as mean speed during deceleration events
+  const decels: { speed: number; gap: number }[] = [];
+  for (let i = 1; i < speeds.length; i++) {
+    if (speeds[i] < speeds[i - 1] && timeDeltas[i] > 0) {
+      const gapM = distances[i];
+      const speedMs = speeds[i] / 3.6;
+      if (speedMs > 0) {
+        decels.push({ speed: speeds[i], gap: gapM });
+      }
+    }
+  }
+  // Wave speed from jam-density slope: downstream queue discharge ≈ 18 km/h typical urban
+  const waveSpeedKph = decels.length > 0
+    ? Math.max(decels.reduce((a, d) => a + d.speed, 0) / decels.length, 12)
+    : 18;
+
+  // Newell delta: time offset ≈ spacing / wave speed; use speed variance as proxy
+  const meanSpeed = speeds.reduce((a, b) => a + b, 0) / speeds.length;
+  const variance = speeds.reduce((s, v) => s + (v - meanSpeed) ** 2, 0) / Math.max(speeds.length - 1, 1);
+  const stdDev = Math.sqrt(variance);
+  // Higher stdDev → more variable traffic → larger Newell delta
+  const deltaSeconds = Math.min(Math.max(stdDev * 0.15, 0.5), 5);
+
+  return {
+    newellDeltaSeconds: Math.round(deltaSeconds * 10) / 10,
+    newellWaveSpeedKph: Math.round(waveSpeedKph * 10) / 10,
+  };
+}
+
+/**
+ * Gipps 1981 — safety-distance model with explicit braking constraint.
+ * desiredSpeed: p85 speed (same as IDM)
+ * maxBrake: estimated from deceleration events (p15 of negative accels)
+ */
+function estimateGippsParams(speeds: number[], distances: number[], timeDeltas: number[]): {
+  gippsDesiredSpeedKph: number;
+  gippsMaxBrakeMps2: number;
+} {
+  if (speeds.length < 10) {
+    return { gippsDesiredSpeedKph: 34, gippsMaxBrakeMps2: 5.0 };
+  }
+
+  const p85Speed = percentile(speeds, 85);
+  const desiredSpeedKph = Math.max(p85Speed, 20);
+
+  const decels: number[] = [];
+  for (let i = 1; i < speeds.length; i++) {
+    if (timeDeltas[i] > 0) {
+      const dv = speeds[i] - speeds[i - 1];
+      const dt = timeDeltas[i];
+      if (dv < 0 && Math.abs(dv) < 20) {
+        decels.push(Math.abs((dv / dt) * 3.6));
+      }
+    }
+  }
+  const maxBrakeMps2 = decels.length > 0
+    ? Math.min(Math.max(percentile(decels, 15), 2.0), 8.0)
+    : 5.0;
+
+  return {
+    gippsDesiredSpeedKph: Math.round(desiredSpeedKph * 10) / 10,
+    gippsMaxBrakeMps2: Math.round(maxBrakeMps2 * 100) / 100,
+  };
+}
+
 export async function calibrateRoutes(): Promise<CalibrationOutput> {
   const allSegments = await queryAllProbeSegments();
 
@@ -131,6 +215,8 @@ export async function calibrateRoutes(): Promise<CalibrationOutput> {
     const quality: RouteCalibration["quality"] = segs.length >= 5000 && stdDev < 12 ? "high" : segs.length >= 500 && stdDev < 20 ? "medium" : "low";
 
     const idm = estimateIDMParams(speeds, distances, timeDeltas);
+    const newell = estimateNewellParams(speeds, distances, timeDeltas);
+    const gipps = estimateGippsParams(speeds, distances, timeDeltas);
 
     routes.push({
       route,
@@ -139,6 +225,10 @@ export async function calibrateRoutes(): Promise<CalibrationOutput> {
       timeGapSeconds: idm.timeGapSeconds,
       maxAccelMps2: idm.maxAccelMps2,
       comfortDecelMps2: idm.comfortDecelMps2,
+      newellDeltaSeconds: newell.newellDeltaSeconds,
+      newellWaveSpeedKph: newell.newellWaveSpeedKph,
+      gippsDesiredSpeedKph: gipps.gippsDesiredSpeedKph,
+      gippsMaxBrakeMps2: gipps.gippsMaxBrakeMps2,
       avgSpeedKph: Math.round(mean * 10) / 10,
       minSpeedKph: minOf(speeds),
       maxSpeedKph: maxOf(speeds),
@@ -176,8 +266,8 @@ export async function calibrateRoutes(): Promise<CalibrationOutput> {
 
   return {
     generatedAt: new Date().toISOString(),
-    method: "idm-calibration",
-    description: "IDM car-following parameter calibration from STPT historical probe segments",
+    method: "idm-newell-gipps-calibration",
+    description: "Multi-model car-following calibration: IDM (Treiber 2000), Newell kinematic wave (1961), Gipps safety-distance (1981) from STPT historical probe segments",
     defaults,
     routes: routes.sort((a, b) => b.sampleCount - a.sampleCount),
     summary: {
@@ -195,9 +285,9 @@ export async function main() {
   const result = await calibrateRoutes();
   writeFileSync("data/derived/calibration-results.json", JSON.stringify(result, null, 2));
 
-  const header = "route,sampleCount,desiredSpeedKph,timeGapSeconds,maxAccelMps2,comfortDecelMps2,avgSpeedKph,minSpeedKph,maxSpeedKph,avgDelaySeconds,quality";
+  const header = "route,sampleCount,desiredSpeedKph,timeGapSeconds,maxAccelMps2,comfortDecelMps2,newellDeltaSeconds,newellWaveSpeedKph,gippsDesiredSpeedKph,gippsMaxBrakeMps2,avgSpeedKph,minSpeedKph,maxSpeedKph,avgDelaySeconds,quality";
   const rows = result.routes.map(r =>
-    `${r.route},${r.sampleCount},${r.desiredSpeedKph},${r.timeGapSeconds},${r.maxAccelMps2},${r.comfortDecelMps2},${r.avgSpeedKph},${r.minSpeedKph},${r.maxSpeedKph},${r.avgDelaySeconds},${r.quality}`
+    `${r.route},${r.sampleCount},${r.desiredSpeedKph},${r.timeGapSeconds},${r.maxAccelMps2},${r.comfortDecelMps2},${r.newellDeltaSeconds},${r.newellWaveSpeedKph},${r.gippsDesiredSpeedKph},${r.gippsMaxBrakeMps2},${r.avgSpeedKph},${r.minSpeedKph},${r.maxSpeedKph},${r.avgDelaySeconds},${r.quality}`
   );
   writeFileSync("data/derived/calibration-results.csv", [header, ...rows].join("\n"));
 
@@ -206,9 +296,9 @@ export async function main() {
   console.log(`Routes: ${result.summary.totalRoutes} (${result.summary.highQualityRoutes} high-quality)`);
   console.log(`City-wide IDM defaults: desiredSpeed=${result.defaults.cityDesiredSpeedKph} km/h, timeGap=${result.defaults.cityTimeGapSeconds} s, maxAccel=${result.defaults.cityMaxAccelMps2} m/s², comfortDecel=${result.defaults.cityComfortDecelMps2} m/s²`);
   console.log(`City-wide speed: avg=${result.defaults.cityAvgSpeedKph} km/h, p50=${result.defaults.cityP50SpeedKph}, p85=${result.defaults.cityP85SpeedKph} km/h`);
-  console.log(`\nPer-route IDM parameters:`);
+  console.log(`\nPer-route IDM+Newell+Gipps parameters:`);
   for (const r of result.routes.slice(0, 20)) {
-    console.log(`  ${r.route}: desiredSpeed=${r.desiredSpeedKph} km/h, timeGap=${r.timeGapSeconds} s, maxAccel=${r.maxAccelMps2}, comfortDecel=${r.comfortDecelMps2} | avg=${r.avgSpeedKph} km/h, delay=${r.avgDelaySeconds}s, quality=${r.quality} (${r.sampleCount} segments)`);
+    console.log(`  ${r.route}: IDM desiredSpeed=${r.desiredSpeedKph} km/h, timeGap=${r.timeGapSeconds} s | Newell delta=${r.newellDeltaSeconds}s, wave=${r.newellWaveSpeedKph} km/h | Gipps desiredSpeed=${r.gippsDesiredSpeedKph} km/h, maxBrake=${r.gippsMaxBrakeMps2} m/s² | avg=${r.avgSpeedKph} km/h, delay=${r.avgDelaySeconds}s, quality=${r.quality} (${r.sampleCount} segments)`);
   }
 }
 

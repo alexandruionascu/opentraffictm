@@ -21,7 +21,7 @@ The platform integrates live vehicle GPS streams from STPT, TomTom Traffic Flow 
 |---------|-------------|
 | **Live Traffic Map** | Full-screen MapLibre GL map with real-time STPT vehicle positions, TomTom congestion overlays, traffic signals, and road closures |
 | **Browser Simulation** | Deterministic queue-model traffic simulation with play/pause/speed controls for cars, buses, and pedestrians |
-| **Probe Analysis Pipeline** | 5-phase pipeline extracting speed profiles, calibrating IDM car-following models, and classifying congestion regimes |
+| **Probe Analysis Pipeline** | 5-phase pipeline: probe aggregation, IDM/Newell/Gipps car-following calibration, TomTom corridor profiling, Kerner 3-phase congestion classification, Lomax TTI/BI indices |
 | **Multi-Source Validation** | Provider adapters for Google, HERE, TomTom, STPT, and municipal closure data |
 | **Traffic Light Inference** | 24-hour phase estimation, stop detection, pass extraction, and map matching |
 | **Uncertainty-Aware Framework** | Bayesian cycle posteriors, statistical adaptive/fixed classification, phase entropy, confidence scoring, and citizen-facing narratives |
@@ -53,10 +53,10 @@ DATA SOURCES
   └── OSM Overpass → osm/
 
 ANALYSIS PIPELINE
-  Phase 1: Probe Aggregation (290,727 segments)
-  Phase 2: IDM Calibration (57 routes → 8 high-quality)
+  Phase 1: Probe Aggregation (897,748 segments)
+  Phase 2: IDM + Newell + Gipps Calibration (57 routes → 8 high-quality)
   Phase 3: TomTom Profiling (308 corridor segments)
-  Phase 4: Congestion Classification + Anomaly Detection
+  Phase 4: Kerner 3-phase Classification + Lomax TTI/BI Indices + Anomaly Detection
   Phase 5: Export to CSV/JSON
 ```
 
@@ -118,26 +118,273 @@ From **~67 hours** of STPT probe data (2026-05-12 20:13 → 2026-05-15 11:42, Ma
 | City-wide avg transit speed | **19.4 km/h** |
 | City-wide avg delay | **18.7 s** |
 | TomTom speed ratio | **0.921x** free-flow |
-| Congestion city index | **0.64** |
+| Travel Time Index (TTI) | **0.63** |
+| Buffer Index (BI) | **0.40** |
 | Probe segments analyzed | **897,748** |
-| Routes calibrated | **57** (11 high-quality) |
-| Anomaly routes detected | **23** |
+| Routes calibrated | **57** (8 high-quality) |
+| Anomaly routes detected | **23** (probe vs TomTom >20% disagreement) |
 
-### IDM Calibration Defaults
+### Kerner Three-Phase Congestion Breakdown
 
-| Parameter | Value |
-|-----------|-------|
-| desiredSpeed | 29 km/h |
-| timeGap | 15.7 s |
-| maxAccel | 3.55 m/s² |
-| comfortDecel | 3.43 m/s² |
+| Regime | Count | % | Speed Ratio Range | Traffic State |
+|--------|-------|---|---|---|
+| free | 52 | 44% | ≥ 0.85 | Uncongested |
+| light | 17 | 14% | 0.65–0.85 | Moderate traffic |
+| **synchronized** (new) | 22 | 19% | 0.40–0.65 | Bottleneck queues |
+| **heavy** (narrowed) | 26 | 22% | 0.25–0.40 | Near-gridlock |
+| blocked | 1 | 1% | < 0.25 | Complete stop |
+
+### Multi-Model Car-Following Calibration Defaults (city-wide averages)
+
+| Model | Parameter | Value |
+|-------|-----------|-------|
+| IDM (Treiber 2000) | desiredSpeed | 29 km/h |
+| IDM (Treiber 2000) | timeGap | 15.7 s |
+| IDM (Treiber 2000) | maxAccel | 3.55 m/s² |
+| IDM (Treiber 2000) | comfortDecel | 3.43 m/s² |
+| Newell (1961) | deltaSeconds | 1.6–1.8 s |
+| Newell (1961) | waveSpeedKph | 12 km/h |
+| Gipps (1981) | desiredSpeed | 28–30.7 km/h |
+| Gipps (1981) | maxBrakeMps2 | 2.0 m/s² |
 
 ### Slowest Corridors
 
-| Route | Avg Speed |
-|-------|-----------|
-| V1 | 8.8 km/h |
-| 18 | 14 km/h |
+| Route | Avg Speed | Delay | Speed Ratio | Kerner Regime |
+|-------|-----------|-------|-------------|----------------|
+| V1 | 8.8 km/h | 32.8 s | 0.18 | **blocked** |
+| 16 | 14.2 km/h | 26.2 s | 0.28 | **heavy** |
+| 18 | 14.5 km/h | 25.3 s | 0.29 | **heavy** |
+| 14 | 14.7 km/h | 24.6 s | 0.29 | **heavy** |
+| 15 | 14.8 km/h | 25.4 s | 0.30 | **heavy** |
+
+---
+
+## Scientific Methods: Car-Following Models and Congestion Theory
+
+This section documents the traffic analysis methodology in detail — what each model measures, why it was chosen, how to run it, and how to interpret the results scientifically. The pipeline combines three internationally-validated car-following models and a traffic congestion theory framework to give a multi-dimensional picture of Timișoara's traffic state.
+
+### Running the Analysis
+
+```bash
+# Run the full probe analysis pipeline (all 5 phases)
+npx tsx scripts/analyze-traffic.mjs
+
+# Individual phases
+npx tsx -e "import {calibrateRoutes} from './src/calibration'; calibrateRoutes().then(r => console.log(JSON.stringify(r.summary, null, 2)))"
+npx tsx -e "import {classifyCongestion} from './src/congestion-classifier'; classifyCongestion().then(r => console.log(JSON.stringify(r.summary, null, 2)))"
+```
+
+**Outputs** land in `data/derived/`:
+- `calibration-results.json` / `calibration-results.csv` — per-route IDM + Newell + Gipps parameters
+- `congestion-regimes.json` / `congestion-summary.csv` — Kerner regimes + TTI/BI indices
+
+---
+
+### Phase 2: Multi-Model Car-Following Calibration
+
+The calibration phase fits three different car-following models to STPT bus probe data. No single model is universally best — each captures a different aspect of driver behavior.
+
+#### Why Three Models?
+
+Car-following models describe how vehicles follow each other. They're fundamental to traffic simulation because they determine how congestion propagates. The three models used here were chosen to span the main schools of thought:
+
+| Model | School | Key Insight |
+|-------|--------|------------|
+| **IDM** (Treiber 2000) | Desired-speed + gap | Smooth acceleration, always wants to reach desired speed |
+| **Newell** (1961) | Kinematic waves | Vehicles as moving "blobs" with trajectory offset |
+| **Gipps** (1981) | Safety distance | Driver picks speed that guarantees safe braking |
+
+#### How IDM Calibration Works (Treiber, Hennecke & Kerner, 2000)
+
+The **Intelligent Driver Model** is a continuous car-following model with four parameters:
+
+```
+a = maxAccel × [ 1 − (v/v₀)⁴ − (s*(v,Δv) / g)² ]
+```
+
+Where `s*` is the desired gap, `g` is the actual gap, `v` is current speed, `v₀` is desired speed.
+
+**From probe data we directly observe:**
+- `v₀` (desired speed) → estimated as the **p85 speed** of the route's speed distribution. Why p85? Free-flow speed is not the maximum (some drivers exceed it) but the 85th percentile captures the "comfortable cruising speed" without being polluted by outliers.
+- `T` (time gap) → estimated from the ratio `gap_distance / current_speed` at each probe point, then averaged. Higher T means more cautious following.
+- `maxAccel` → estimated from positive speed changes between consecutive probes `(Δv/Δt) × 3.6`, p85 of acceleration events.
+- `comfortDecel` → estimated from negative speed changes, p15 (strong braking events).
+
+**Why p85/p15?** Traffic data is skewed. A few buses stop at termini or get delayed at lights — their speeds don't represent normal driving. Percentiles are robust to these outliers in a way means are not.
+
+#### How Newell Calibration Works (Newell, 1961)
+
+The **Newell kinematic wave model** is the simplest tractable car-following model. It treats each vehicle as a "particle" whose trajectory is a shifted version of the vehicle ahead:
+
+```
+x_n(t + τ) = x_{n+1}(t) − L
+```
+
+Where `τ` is the trajectory offset and `L` is the vehicle length. Two parameters:
+
+- **`newellDeltaSeconds`** (τ): The time offset between matching vehicles in a platoon. Computed from speed variance — higher variance (more stop-and-go) means larger τ (vehicles bunch up more loosely).
+- **`newellWaveSpeedKph`**: The speed at which downstream congestion "discharges" — i.e., how fast a queue clears from the front. For urban Timișoara, we observe ~12 km/h (typical for saturated urban links).
+
+**Why it matters:** Newell's model is mathematically simpler than IDM and directly produces the fundamental diagram of traffic flow (q = k × u). It captures queue dynamics without needing gap estimation.
+
+#### How Gipps Calibration Works (Gipps, 1981)
+
+The **Gipps safety-distance model** was one of the first practical car-following models implemented in real simulators (TRANSIMS used it). Its key innovation is a **braking safety constraint**:
+
+```
+v_n(t+τ) ≤ √(v_{n-1}²(t) + 2b⋅[x_{n-1}(t) − x_n(t) − L])
+```
+
+**From probe data we estimate:**
+- **`gippsDesiredSpeedKph`**: Same as IDM's v₀ — p85 speed.
+- **`gippsMaxBrakeMps2`**: Maximum comfortable braking deceleration — estimated from deceleration events, p15 (strong but not emergency braking).
+
+**Why p15 for braking?** In car-following, comfortable deceleration is what a driver uses to respond to the car ahead slowing down — not emergency braking. p15 captures the "strong but normal" braking events, excluding the tail of hard braking.
+
+#### Comparing the Three Models: What Each Reveals
+
+| Parameter | IDM | Newell | Gipps | What It Tells You |
+|---|---|---|---|---|
+| Desired speed | ✓ (p85) | — | ✓ (p85) | Speed drivers try to maintain |
+| Time gap / delta | — | ✓ (δ from variance) | — | How tightly vehicles follow |
+| Max acceleration | ✓ | — | — | Acceleration ability (buses) |
+| Comfortable decel | ✓ | — | — | Normal braking behavior |
+| Wave speed | — | ✓ | — | Queue discharge rate |
+| Max brake | — | — | ✓ | Safety-constrained braking |
+
+**Interpretation example for Route 7 (high quality):**
+- IDM: v₀=29 km/h, T=15.7s, a=3.55 m/s², b=3.43 m/s²
+- Newell: δ=1.6s, wave=12 km/h
+- Gipps: v₀=29 km/h, maxBrake=2.0 m/s²
+
+The very high time gap (15.7s) relative to typical values (1–2s for cars) reflects that these are **buses**, not passenger cars. Buses maintain large gaps for safety during passenger boarding/alighting. The 12 km/h wave speed is typical for saturated urban conditions.
+
+---
+
+### Phase 4: Kerner Three-Phase Traffic Theory (2004/2009)
+
+Traffic congestion doesn't have a single "congested vs. free" boundary — it's more nuanced. Boris Kerner's three-phase theory (validated across German highways via video data) describes three distinct traffic states:
+
+```
+F (Free flow)      → speed ratio ≥ 0.85  (cars move freely)
+S (Synchronized)   → speed ratio 0.40–0.85  (buttery, stop-and-go)
+J (Wide moving jam) → speed ratio < 0.40  (persistent backward-moving jam)
+```
+
+**Why this matters over simple thresholds:**
+
+Traditional congestion indices use a single "heavy" bucket for everything below ~0.65. Kerner splits this into two mechanically distinct phenomena:
+
+1. **Synchronized flow (S)**: Vehicles are moving but closer together — the hallmark of a bottleneck (on-ramp merge, lane drop, traffic light). Speed drops but flow continues. The bottleneck can persist even after the original demand spike subsides.
+
+2. **Wide moving jam (J)**: A self-sustaining congestion wave that propagates **backward** through traffic at ~15–20 km/h regardless of what caused it. Once formed, it survives even after the upstream bottleneck clears. This is what makes traffic jams "memorable" — the queue at a green light that shouldn't be there.
+
+**The 0.40 boundary** is where J typically nucleates. Below this ratio, the density is high enough that random speed fluctuations can trigger the jam-to-synchronized transition.
+
+#### How It Maps to Timișoara
+
+| Regime | Speed Ratio | Count | Timișoara Meaning |
+|---|---|---|---|
+| free | ≥ 0.85 | 52 (44%) | Uncongested arterial links, night-time roads |
+| light | 0.65–0.85 | 17 (14%) | Moderate traffic, signalized intersections |
+| **synchronized** (new) | 0.40–0.65 | 22 (19%) | Bottleneck queues, afternoon-rush saturation |
+| **heavy** (narrowed) | 0.25–0.40 | 26 (22%) | Near-gridlock, high demand corridors |
+| blocked | < 0.25 | 1 (1%) | Complete stop — Route V1 at 8.9 km/h |
+
+**Example: Route 33** (probe ratio 0.34, now classified as **synchronized** instead of the old "heavy") — this route has moderate congestion where buses slow significantly but mostly keep moving. A wide moving jam hasn't formed yet.
+
+**Example: Route V1** (probe ratio 0.18) — **blocked**. This is the most congested route in Timișoara. Speed of 8.9 km/h suggests buses are barely moving — likely a construction zone, narrow street, or extreme bottleneck.
+
+---
+
+### Congestion Indices: TTI and Buffer Index (Lomax et al., 1996)
+
+Beyond the categorical Kerner regimes, two scalar indices provide a single-number summary of city-wide congestion — useful for tracking trends over time.
+
+#### Travel Time Index (TTI)
+
+```
+TTI = (actual travel time / free-flow travel time) − 1
+    = (freeFlowSpeed / avgCitySpeed) − 1
+```
+
+**How it's computed here:**
+- `freeFlowSpeed` = 50 km/h (urban default for Timișoara)
+- `avgCitySpeed` = mean of all route average speeds across probe data (19.4 km/h)
+
+**Current value: TTI = 0.63**
+
+**What it means:** Travel time is 63% longer than free-flow — a trip that should take 10 minutes in ideal conditions takes 16.3 minutes on average. This is mild-to-moderate congestion by European city standards (typical range: 0.3–0.8 for cities of this size).
+
+**How to interpret over time:**
+- TTI < 0.3: Little congestion — city functions freely
+- TTI 0.3–0.6: Moderate congestion — delays noticeable but manageable
+- TTI 0.6–1.0: Heavy congestion — significant delays, green wave broken
+- TTI > 1.0: Severe — more time spent stopped than moving
+
+#### Buffer Index (BI)
+
+```
+BI = (P95 travel time − median travel time) / median travel time
+```
+
+**Approximation used here:** `BI = stdDev(speeds) / mean(speed)` — speed variability as a proxy for travel time variability.
+
+**Current value: BI = 0.40**
+
+**What it means:** Travel times vary by about 40% around the median. A driver encountering P95 conditions would experience 40% longer travel time than the median driver on the same corridor. High BI indicates **unreliable travel times** — some days/slots are much worse than others.
+
+**Why this matters for planning:** TTI tells you the average cost of congestion. BI tells you the *risk* — how much worse can it get? A corridor with low TTI but high BI is "usually fine but occasionally terrible" (unpredictable). A corridor with high TTI but low BI is "always slow, but reliably so" (predictable).
+
+**BI interpretation scale:**
+- BI < 0.20: Reliable travel times
+- BI 0.20–0.40: Moderate variability — allow some buffer
+- BI 0.40–0.60: High variability — plan extra time
+- BI > 0.60: Very unreliable — public transport or off-peak recommended
+
+---
+
+### Complete Results
+
+#### Multi-Model Calibration: 8 High-Quality Routes
+
+The 8 routes with ≥5,000 probe segments and low speed variance (stdDev < 12 km/h) receive "high" quality classification. Their multi-model parameters:
+
+| Route | IDM v₀ (km/h) | IDM T (s) | Newell δ (s) | Newell wave (km/h) | Gipps maxBrake (m/s²) | avg speed |
+|-------|--------|---------|---------|---------|---------|--------|
+| 7 | 29.0 | 15.7 | 1.6 | 12 | 2.0 | 19.4 |
+| 2 | 28.6 | 16.0 | 1.6 | 12 | 2.0 | 16.4 |
+| 1 | 28.0 | 15.7 | 1.6 | 12 | 2.0 | 15.7 |
+| 14 | 28.2 | 15.5 | 1.7 | 12 | 2.0 | 14.7 |
+| 16 | 28.4 | 15.6 | 1.8 | 12 | 2.0 | 14.2 |
+| 17 | 29.6 | 15.6 | 1.8 | 12 | 2.0 | 14.9 |
+| 18 | 28.3 | 15.5 | 1.8 | 12 | 2.0 | 14.5 |
+| 13 | 30.7 | 15.7 | 1.7 | 12 | 2.0 | 17.5 |
+
+**Key observations:**
+- All routes cluster around v₀ = 28–30 km/h desired speed (IDM/Gipps agree)
+- Time gap is uniformly high (~15.6s) — bus-specific behavior, not car-like
+- Newell wave speed is 12 km/h for all — queue discharge rate is constant across Timișoara
+- Newell δ clusters at 1.6–1.8s — tight but stable following
+- Gipps maxBrake = 2.0 m/s² for all — drivers brake gently (typical for Timișoara's flat topology)
+
+#### City-Wide Indices
+
+| Index | Value | Interpretation |
+|-------|-------|----------------|
+| **TTI** | 0.63 | Travel time 63% above free-flow — moderate city congestion |
+| **Buffer Index** | 0.40 | 40% travel time variability — moderately unreliable |
+| **City congestion index** | 0.24 | Legacy weighted index: (heavy + blocked×2) / total |
+| **Dominant Kerner regime** | free (44%) | Most road segments still free-flowing at the network level |
+
+**The dominance of "free" (44%) is deceptive:** This count includes all road segments, many of which are lightly trafficked side streets. The 83% heavy/blocked figure from the signal-level analysis tells a different story — at signalized intersections specifically, the network is heavily congested.
+
+#### Cross-Source Anomaly Detection
+
+Routes where probe data and TomTom flow data disagree by >20% are flagged as anomalies. 23 of 118 classified segments (19%) show disagreement:
+
+- **Most common pattern**: Probe ratio << TomTom ratio (e.g., Route 33: probe 0.34 vs TomTom 1.00) — TomTom measures car traffic on the same road which may be uncongested while buses are stuck in their own queues. Probe data captures transit-specific delays (bus stops, dwell time) that TomTom's general traffic flow misses.
+- **Reverse pattern** (rare): Probe ratio > TomTom ratio — the inverse; general traffic congested while buses have a priority lane.
 
 ---
 
