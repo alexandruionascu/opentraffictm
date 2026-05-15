@@ -87,6 +87,28 @@ npm run fetch:timisoara-road-closures
 
 ---
 
+## Run UXsim Simulation (Replicate Results)
+
+```bash
+# Prerequisites
+pip install uxsim pandas
+
+# Run all 4 scenarios
+python3 scripts/uxsim-adapter.py
+
+# Run specific scenario (TM-03 is the validated one: 0.038s error)
+python3 scripts/uxsim-adapter.py --scenario TM-03
+
+# Historical time-series only
+python3 scripts/uxsim-adapter.py --hist
+```
+
+**Results** are written to `data/uxsim/validation-results.json` with ground truth vs UXsim delay comparison.
+
+See [docs/uxsim/README.md](docs/uxsim/README.md) for full methodology, calibration curve, and reuse instructions.
+
+---
+
 ## Traffic Analysis Results
 
 From **21.6 hours** of STPT probe data (2026-05-12 17:13 → 2026-05-13 14:47):
