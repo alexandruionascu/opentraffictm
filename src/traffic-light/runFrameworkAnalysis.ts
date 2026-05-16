@@ -19,7 +19,7 @@ import {
   type PhasePosteriorWithEntropy,
   type ConfidenceLevel,
   type BootstrapResult,
-} from "./inferenceFramework.ts";
+} from "./inferenceFramework";
 
 const DATA = resolve(process.cwd(), "data/traffic-lights/analysis");
 

@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","id":"transit-route-2","geometry":{"type":"LineString","coordinates":[[21.204531,45.727409],[21.232651,45.753639]]},"properties":{"id":"transit-route-2","label":"Route 2","source":"STPT historical probes","kind":"transit-corridor","route":"2","sampleCount":43647,"avgSpeedKph":16.4,"avgDelaySeconds":19.3,"densityRank":5}}]}

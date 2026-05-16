@@ -21,6 +21,9 @@ try {
   await build({
     absWorkingDir: projectRoot,
     bundle: true,
+    define: {
+      __dirname: JSON.stringify(path.join(projectRoot, "src")),
+    },
     format: "esm",
     outfile: bundlePath,
     platform: "node",

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
-import type { FeatureCollection, LineString, Point } from "geojson";
+import type { FeatureCollection, LineString, Point, Polygon } from "geojson";
 import type { GeoJSONSource, Map as MapLibreMap, StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { type Scenario, type ActorType, type SignalState } from "../data";
@@ -16,6 +16,7 @@ import { downloadJson } from "../contracts";
 
 type LineCollection = FeatureCollection<LineString>;
 type PointCollection = FeatureCollection<Point>;
+type PolygonCollection = FeatureCollection<Polygon>;
 type LaneCollection = FeatureCollection<LineString>;
 type MapStyleMode = "midnight" | "daylight" | "aerial";
 type SelectedSignalDetails = {
@@ -289,6 +290,7 @@ function actorGeoJson(frame: SimulationFrame): FeatureCollection<Point> {
         congestion: actor.congestion,
         stoppedFor: actor.stoppedFor ?? "",
         laneIndex: actor.laneIndex,
+        headingDeg: actor.headingDeg,
       },
       geometry: {
         type: "Point",
@@ -329,6 +331,341 @@ function actorHeadingGeoJson(frame: SimulationFrame): FeatureCollection<LineStri
             ],
           },
         };
+      }),
+  };
+}
+
+function roundedRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
+  const right = x + width;
+  const bottom = y + height;
+
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(right - radius, y);
+  ctx.quadraticCurveTo(right, y, right, y + radius);
+  ctx.lineTo(right, bottom - radius);
+  ctx.quadraticCurveTo(right, bottom, right - radius, bottom);
+  ctx.lineTo(x + radius, bottom);
+  ctx.quadraticCurveTo(x, bottom, x, bottom - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+function drawVehicleSprite(kind: "car" | "bus") {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(64, 64);
+
+  const isBus = kind === "bus";
+  const bodyWidth = isBus ? 42 : 34;
+  const bodyHeight = isBus ? 94 : 70;
+  const x = -bodyWidth / 2;
+  const y = -bodyHeight / 2;
+  const bodyGradient = ctx.createLinearGradient(x, y, x + bodyWidth, y + bodyHeight);
+  bodyGradient.addColorStop(0, isBus ? "#fff2b8" : "#9cf2ff");
+  bodyGradient.addColorStop(0.22, isBus ? "#f6c453" : "#50c8f0");
+  bodyGradient.addColorStop(0.68, isBus ? "#d99122" : "#197eaa");
+  bodyGradient.addColorStop(1, isBus ? "#8a5a0f" : "#0b3d57");
+
+  ctx.shadowColor = isBus ? "rgba(251, 191, 36, 0.44)" : "rgba(76, 201, 240, 0.42)";
+  ctx.shadowBlur = 16;
+  ctx.shadowOffsetX = 6;
+  ctx.shadowOffsetY = 9;
+  roundedRectPath(ctx, x, y, bodyWidth, bodyHeight, isBus ? 10 : 14);
+  ctx.fillStyle = bodyGradient;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "rgba(2, 8, 14, 0.82)";
+  ctx.stroke();
+
+  const glassGradient = ctx.createLinearGradient(0, y + 8, 0, y + bodyHeight - 8);
+  glassGradient.addColorStop(0, "#effcff");
+  glassGradient.addColorStop(0.45, "#98dfff");
+  glassGradient.addColorStop(1, "#19384c");
+
+  if (isBus) {
+    roundedRectPath(ctx, -13, y + 12, 26, 16, 5);
+    ctx.fillStyle = glassGradient;
+    ctx.fill();
+    roundedRectPath(ctx, -15, y + 34, 30, 34, 6);
+    ctx.fillStyle = "rgba(23, 54, 76, 0.88)";
+    ctx.fill();
+    ctx.fillStyle = "rgba(229, 246, 255, 0.82)";
+    for (const offset of [-18, -6, 6, 18]) {
+      roundedRectPath(ctx, -18, offset, 36, 6, 3);
+      ctx.fill();
+    }
+  } else {
+    roundedRectPath(ctx, -12, y + 18, 24, 20, 7);
+    ctx.fillStyle = glassGradient;
+    ctx.fill();
+    roundedRectPath(ctx, -11, y + 42, 22, 17, 6);
+    ctx.fillStyle = "rgba(11, 42, 58, 0.88)";
+    ctx.fill();
+    roundedRectPath(ctx, -10, y + 6, 20, 9, 4);
+    ctx.fillStyle = "rgba(214, 251, 255, 0.72)";
+    ctx.fill();
+  }
+
+  ctx.fillStyle = "#07111b";
+  const wheelY = isBus ? 29 : 22;
+  const wheelH = isBus ? 18 : 14;
+  const wheelW = isBus ? 7 : 6;
+  for (const yy of [-wheelY, wheelY]) {
+    roundedRectPath(ctx, x - 4, yy - wheelH / 2, wheelW, wheelH, 3);
+    ctx.fill();
+    roundedRectPath(ctx, x + bodyWidth - 3, yy - wheelH / 2, wheelW, wheelH, 3);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = "#fff4a8";
+  roundedRectPath(ctx, -12, y - 1, 8, 5, 2);
+  ctx.fill();
+  roundedRectPath(ctx, 4, y - 1, 8, 5, 2);
+  ctx.fill();
+  ctx.fillStyle = "#ff4268";
+  roundedRectPath(ctx, -12, y + bodyHeight - 4, 8, 5, 2);
+  ctx.fill();
+  roundedRectPath(ctx, 4, y + bodyHeight - 4, 8, 5, 2);
+  ctx.fill();
+
+  ctx.restore();
+  return canvas;
+}
+
+function drawSignalSprite(state: SignalState) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 96;
+  canvas.height = 96;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(48, 48);
+  ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetX = 5;
+  ctx.shadowOffsetY = 7;
+
+  ctx.fillStyle = "#4b5563";
+  roundedRectPath(ctx, -3, -30, 6, 50, 3);
+  ctx.fill();
+  roundedRectPath(ctx, -3, -30, 30, 5, 3);
+  ctx.fill();
+
+  const headGradient = ctx.createLinearGradient(4, -43, 30, 30);
+  headGradient.addColorStop(0, "#4b5563");
+  headGradient.addColorStop(0.35, "#111827");
+  headGradient.addColorStop(1, "#020617");
+  roundedRectPath(ctx, 16, -43, 22, 56, 7);
+  ctx.fillStyle = headGradient;
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(248, 250, 252, 0.58)";
+  ctx.stroke();
+
+  const lens = (y: number, color: string, active: boolean) => {
+    ctx.beginPath();
+    ctx.arc(27, y, active ? 7 : 5.8, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.shadowColor = active ? color : "transparent";
+    ctx.shadowBlur = active ? 16 : 0;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.38)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  };
+
+  lens(-29, state === "red" ? "#ff4268" : "#263141", state === "red");
+  lens(-15, state === "yellow" ? "#ffd166" : "#263141", state === "yellow");
+  lens(-1, state === "green" ? "#33d17a" : "#263141", state === "green");
+
+  ctx.restore();
+  return canvas;
+}
+
+function ensureMapSprites(map: MapLibreMap) {
+  const sprites: Array<[string, HTMLCanvasElement]> = [
+    ["vehicle-car-3d", drawVehicleSprite("car")],
+    ["vehicle-bus-3d", drawVehicleSprite("bus")],
+    ["signal-red-3d", drawSignalSprite("red")],
+    ["signal-yellow-3d", drawSignalSprite("yellow")],
+    ["signal-green-3d", drawSignalSprite("green")],
+  ];
+
+  for (const [id, canvas] of sprites) {
+    if (!map.hasImage(id)) {
+      const context = canvas.getContext("2d");
+      if (context) {
+        map.addImage(id, context.getImageData(0, 0, canvas.width, canvas.height), { pixelRatio: 2 });
+      }
+    }
+  }
+}
+
+function orientedRectangle(
+  center: { lng: number; lat: number },
+  headingDeg: number,
+  lengthMeters: number,
+  widthMeters: number,
+  forwardOffsetMeters = 0,
+  rightOffsetMeters = 0,
+): Array<[number, number]> {
+  const headingRad = (headingDeg * Math.PI) / 180;
+  const forwardX = Math.sin(headingRad);
+  const forwardY = Math.cos(headingRad);
+  const rightX = Math.cos(headingRad);
+  const rightY = -Math.sin(headingRad);
+  const latScale = 111_320;
+  const lngScale = Math.cos((center.lat * Math.PI) / 180) * latScale;
+  const halfLength = lengthMeters / 2;
+  const halfWidth = widthMeters / 2;
+  const originX = forwardX * forwardOffsetMeters + rightX * rightOffsetMeters;
+  const originY = forwardY * forwardOffsetMeters + rightY * rightOffsetMeters;
+
+  const corner = (forwardMeters: number, rightMeters: number): [number, number] => {
+    const eastMeters = originX + forwardX * forwardMeters + rightX * rightMeters;
+    const northMeters = originY + forwardY * forwardMeters + rightY * rightMeters;
+
+    return [center.lng + eastMeters / lngScale, center.lat + northMeters / latScale];
+  };
+
+  const corners = [
+    corner(halfLength, -halfWidth),
+    corner(halfLength, halfWidth),
+    corner(-halfLength, halfWidth),
+    corner(-halfLength, -halfWidth),
+  ];
+
+  return [...corners, corners[0]];
+}
+
+function extrudedRectFeature(
+  id: string,
+  center: { lng: number; lat: number },
+  headingDeg: number,
+  lengthMeters: number,
+  widthMeters: number,
+  forwardOffsetMeters: number,
+  rightOffsetMeters: number,
+  properties: Record<string, string | number | boolean | null>,
+) {
+  return {
+    type: "Feature" as const,
+    properties: {
+      id,
+      ...properties,
+    },
+    geometry: {
+      type: "Polygon" as const,
+      coordinates: [
+        orientedRectangle(center, headingDeg, lengthMeters, widthMeters, forwardOffsetMeters, rightOffsetMeters),
+      ],
+    },
+  };
+}
+
+function vehiclePart(
+  actor: ActorFrame,
+  part: string,
+  lengthMeters: number,
+  widthMeters: number,
+  forwardOffsetMeters: number,
+  rightOffsetMeters: number,
+  color: string,
+  height: number,
+  base: number,
+) {
+  return extrudedRectFeature(
+    `${actor.id}:${part}`,
+    actor.position,
+    actor.headingDeg,
+    lengthMeters,
+    widthMeters,
+    forwardOffsetMeters,
+    rightOffsetMeters,
+    {
+      actorId: actor.id,
+      type: actor.type,
+      part,
+      waiting: actor.waiting,
+      color,
+      height,
+      base,
+    },
+  );
+}
+
+function actorBodyGeoJson(frame: SimulationFrame): PolygonCollection {
+  return {
+    type: "FeatureCollection",
+    features: frame.actors
+      .filter((actor) => actor.type !== "pedestrian")
+      .flatMap((actor) => {
+        const isBus = actor.type === "bus";
+        const alertColor = actor.waiting
+          ? "#ff5c7a"
+          : actor.congestion > 0.4
+            ? "#fb923c"
+            : isBus
+              ? "#fbbf24"
+              : "#4cc9f0";
+        const bodyColor = isBus ? "#f4b740" : alertColor;
+        const sideColor = actor.waiting ? "#ff8aa0" : isBus ? "#ffd166" : "#2f9fd1";
+        const glassColor = isBus ? "#dbeafe" : "#b8f3ff";
+        const darkGlass = isBus ? "#24445c" : "#16415a";
+        const wheelColor = "#07111b";
+        const headlightColor = "#fff7b8";
+        const tailColor = "#ff4268";
+
+        if (isBus) {
+          return [
+            vehiclePart(actor, "shadow", 18.4, 5.3, -0.45, 0, "#06111d", 0.18, 0),
+            vehiclePart(actor, "lower-body", 16.4, 4.35, 0, 0, bodyColor, 2.3, 0.12),
+            vehiclePart(actor, "front-mask", 1.4, 4.15, 7.45, 0, "#ffe6a3", 2.75, 0.12),
+            vehiclePart(actor, "rear-mask", 1.1, 4.15, -7.55, 0, sideColor, 2.65, 0.12),
+            vehiclePart(actor, "roof", 12.6, 2.65, -0.45, 0, "#fff0b5", 3.35, 2.28),
+            vehiclePart(actor, "front-window", 1.1, 2.85, 6.55, 0, glassColor, 3.7, 2.35),
+            vehiclePart(actor, "left-windows", 9.8, 0.42, 0.1, -1.74, darkGlass, 3.55, 2.45),
+            vehiclePart(actor, "right-windows", 9.8, 0.42, 0.1, 1.74, darkGlass, 3.55, 2.45),
+            vehiclePart(actor, "left-front-wheel", 1.35, 0.58, 5.35, -2.18, wheelColor, 1.05, 0.05),
+            vehiclePart(actor, "right-front-wheel", 1.35, 0.58, 5.35, 2.18, wheelColor, 1.05, 0.05),
+            vehiclePart(actor, "left-rear-wheel", 1.35, 0.58, -5.35, -2.18, wheelColor, 1.05, 0.05),
+            vehiclePart(actor, "right-rear-wheel", 1.35, 0.58, -5.35, 2.18, wheelColor, 1.05, 0.05),
+            vehiclePart(actor, "headlight-left", 0.28, 0.48, 8.26, -1.05, headlightColor, 2.8, 2.35),
+            vehiclePart(actor, "headlight-right", 0.28, 0.48, 8.26, 1.05, headlightColor, 2.8, 2.35),
+            vehiclePart(actor, "tail-left", 0.25, 0.42, -8.16, -1.08, tailColor, 2.45, 1.7),
+            vehiclePart(actor, "tail-right", 0.25, 0.42, -8.16, 1.08, tailColor, 2.45, 1.7),
+          ];
+        }
+
+        return [
+          vehiclePart(actor, "shadow", 8.4, 3.9, -0.25, 0, "#06111d", 0.16, 0),
+          vehiclePart(actor, "chassis", 6.7, 2.95, 0, 0, bodyColor, 1.75, 0.1),
+          vehiclePart(actor, "hood", 1.65, 2.48, 2.22, 0, sideColor, 2.08, 1.58),
+          vehiclePart(actor, "trunk", 1.3, 2.38, -2.48, 0, "#237fa8", 1.95, 1.48),
+          vehiclePart(actor, "cabin", 2.65, 1.82, -0.12, 0, glassColor, 2.82, 1.72),
+          vehiclePart(actor, "windshield", 0.75, 1.56, 1.08, 0, "#e8fdff", 2.95, 2.22),
+          vehiclePart(actor, "rear-window", 0.58, 1.42, -1.35, 0, darkGlass, 2.86, 2.1),
+          vehiclePart(actor, "left-wheel-front", 0.92, 0.44, 1.85, -1.58, wheelColor, 0.86, 0.05),
+          vehiclePart(actor, "right-wheel-front", 0.92, 0.44, 1.85, 1.58, wheelColor, 0.86, 0.05),
+          vehiclePart(actor, "left-wheel-rear", 0.92, 0.44, -2.08, -1.58, wheelColor, 0.86, 0.05),
+          vehiclePart(actor, "right-wheel-rear", 0.92, 0.44, -2.08, 1.58, wheelColor, 0.86, 0.05),
+          vehiclePart(actor, "headlight-left", 0.22, 0.36, 3.48, -0.78, headlightColor, 2.05, 1.68),
+          vehiclePart(actor, "headlight-right", 0.22, 0.36, 3.48, 0.78, headlightColor, 2.05, 1.68),
+          vehiclePart(actor, "tail-left", 0.2, 0.34, -3.45, -0.76, tailColor, 1.8, 1.35),
+          vehiclePart(actor, "tail-right", 0.2, 0.34, -3.45, 0.76, tailColor, 1.8, 1.35),
+        ];
       }),
   };
 }
@@ -554,6 +891,82 @@ function signalFramesGeoJson(signals: SignalFrame[]): FeatureCollection<Point> {
   };
 }
 
+function signalBodyGeoJson(signals: SignalFrame[]): PolygonCollection {
+  return {
+    type: "FeatureCollection",
+    features: signals.flatMap((signal) => {
+      const heading = signal.primaryHeadingDeg ?? 0;
+      const lensColor = (state: SignalState) =>
+        signal.state === state
+          ? state === "green"
+            ? "#33d17a"
+            : state === "yellow"
+              ? "#ffd166"
+              : "#ff4268"
+          : "#1f2937";
+
+      return [
+        extrudedRectFeature(`${signal.id}:base`, signal.position, heading, 1.8, 1.8, 0, 0, {
+          signalId: signal.id,
+          part: "base",
+          state: signal.state,
+          color: "#101923",
+          height: 0.55,
+          base: 0,
+        }),
+        extrudedRectFeature(`${signal.id}:pole`, signal.position, heading, 0.65, 0.65, 0, 0, {
+          signalId: signal.id,
+          part: "pole",
+          state: signal.state,
+          color: "#52616d",
+          height: 7.4,
+          base: 0.2,
+        }),
+        extrudedRectFeature(`${signal.id}:arm`, signal.position, heading, 4.6, 0.48, 1.95, 0, {
+          signalId: signal.id,
+          part: "arm",
+          state: signal.state,
+          color: "#334155",
+          height: 7.4,
+          base: 6.9,
+        }),
+        extrudedRectFeature(`${signal.id}:backplate`, signal.position, heading, 1.22, 3.25, 4.1, 0, {
+          signalId: signal.id,
+          part: "backplate",
+          state: signal.state,
+          color: "#111827",
+          height: 8.85,
+          base: 6.95,
+        }),
+        extrudedRectFeature(`${signal.id}:red-lens`, signal.position, heading, 0.72, 0.72, 4.18, -0.9, {
+          signalId: signal.id,
+          part: "red-lens",
+          state: signal.state,
+          color: lensColor("red"),
+          height: signal.state === "red" ? 9.25 : 9.05,
+          base: 8.82,
+        }),
+        extrudedRectFeature(`${signal.id}:yellow-lens`, signal.position, heading, 0.72, 0.72, 4.18, 0, {
+          signalId: signal.id,
+          part: "yellow-lens",
+          state: signal.state,
+          color: lensColor("yellow"),
+          height: signal.state === "yellow" ? 9.25 : 9.05,
+          base: 8.82,
+        }),
+        extrudedRectFeature(`${signal.id}:green-lens`, signal.position, heading, 0.72, 0.72, 4.18, 0.9, {
+          signalId: signal.id,
+          part: "green-lens",
+          state: signal.state,
+          color: lensColor("green"),
+          height: signal.state === "green" ? 9.25 : 9.05,
+          base: 8.82,
+        }),
+      ];
+    }),
+  };
+}
+
 function signalGeoJson(frame: SimulationFrame): FeatureCollection<Point> {
   return signalFramesGeoJson(frame.signals);
 }
@@ -762,7 +1175,9 @@ function attachDynamicMapLayers(
 ) {
   if (map.getSource("actors")) return;
 
+  ensureMapSprites(map);
   map.addSource("actors", { type: "geojson", data: actorGeoJson(frame) });
+  map.addSource("actor-bodies", { type: "geojson", data: actorBodyGeoJson(frame) });
   map.addSource("actor-headings", { type: "geojson", data: actorHeadingGeoJson(frame) });
   map.addSource("scenario-routes", { type: "geojson", data: routeGeoJson(scenario) });
   map.addSource("signal-phases", { type: "geojson", data: scenarioSignalPhaseGeoJson(scenario, frame.timeSeconds) });
@@ -807,11 +1222,37 @@ function attachDynamicMapLayers(
     },
   });
   map.addLayer({
+    id: "actor-3d-shadows",
+    type: "fill-extrusion",
+    source: "actor-bodies",
+    filter: ["==", ["get", "part"], "shadow"],
+    paint: {
+      "fill-extrusion-color": ["get", "color"],
+      "fill-extrusion-height": ["get", "height"],
+      "fill-extrusion-base": ["get", "base"],
+      "fill-extrusion-opacity": 0.28,
+      "fill-extrusion-vertical-gradient": true,
+    },
+  });
+  map.addLayer({
+    id: "actor-3d-bodies",
+    type: "fill-extrusion",
+    source: "actor-bodies",
+    filter: ["!=", ["get", "part"], "shadow"],
+    paint: {
+      "fill-extrusion-color": ["get", "color"],
+      "fill-extrusion-height": ["get", "height"],
+      "fill-extrusion-base": ["get", "base"],
+      "fill-extrusion-opacity": 0.96,
+      "fill-extrusion-vertical-gradient": true,
+    },
+  });
+  map.addLayer({
     id: "actors",
     type: "circle",
     source: "actors",
     paint: {
-      "circle-radius": ["match", ["get", "type"], "bus", 11, "pedestrian", 5, 7],
+      "circle-radius": ["match", ["get", "type"], "bus", 7, "pedestrian", 5, 4],
       "circle-color": [
         "case",
         ["==", ["get", "waiting"], true],
@@ -821,8 +1262,23 @@ function attachDynamicMapLayers(
         ["match", ["get", "type"], "bus", "#fbbf24", "pedestrian", "#f472b6", "#7dd3fc"],
       ],
       "circle-stroke-color": "#031018",
-      "circle-stroke-width": 2,
-      "circle-blur": 0.1,
+      "circle-stroke-width": ["match", ["get", "type"], "pedestrian", 2, 0],
+      "circle-opacity": ["match", ["get", "type"], "pedestrian", 1, 0.22],
+      "circle-blur": ["match", ["get", "type"], "pedestrian", 0.1, 0.45],
+    },
+  });
+  map.addLayer({
+    id: "actor-3d-sprites",
+    type: "symbol",
+    source: "actors",
+    filter: ["!=", ["get", "type"], "pedestrian"],
+    layout: {
+      "icon-image": ["match", ["get", "type"], "bus", "vehicle-bus-3d", "vehicle-car-3d"],
+      "icon-size": ["match", ["get", "type"], "bus", 0.56, 0.46],
+      "icon-rotate": ["get", "headingDeg"],
+      "icon-rotation-alignment": "map",
+      "icon-allow-overlap": true,
+      "icon-ignore-placement": true,
     },
   });
   map.addLayer({
@@ -1047,6 +1503,7 @@ function attachDynamicMapLayers(
     });
   }
   map.addSource("signals", { type: "geojson", data: scenarioSignalGeoJson(scenario, frame.timeSeconds) });
+  map.addSource("signal-bodies", { type: "geojson", data: signalBodyGeoJson(signalAtTime(scenario, frame.timeSeconds)) });
   map.addLayer({
     id: "signals-halo",
     type: "circle",
@@ -1059,14 +1516,40 @@ function attachDynamicMapLayers(
     },
   });
   map.addLayer({
+    id: "signals-3d",
+    type: "fill-extrusion",
+    source: "signal-bodies",
+    paint: {
+      "fill-extrusion-color": ["get", "color"],
+      "fill-extrusion-height": ["get", "height"],
+      "fill-extrusion-base": ["get", "base"],
+      "fill-extrusion-opacity": 0.96,
+      "fill-extrusion-vertical-gradient": true,
+    },
+  });
+  map.addLayer({
     id: "signals",
     type: "circle",
     source: "signals",
     paint: {
-      "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 6, 15, 11],
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 3, 15, 6],
       "circle-color": ["match", ["get", "state"], "green", "#86efac", "yellow", "#fbbf24", "#fb7185"],
       "circle-stroke-color": "#ffffff",
-      "circle-stroke-width": 2,
+      "circle-stroke-width": 1.4,
+      "circle-opacity": 0.72,
+    },
+  });
+  map.addLayer({
+    id: "signal-3d-sprites",
+    type: "symbol",
+    source: "signals",
+    layout: {
+      "icon-image": ["match", ["get", "state"], "green", "signal-green-3d", "yellow", "signal-yellow-3d", "signal-red-3d"],
+      "icon-size": ["interpolate", ["linear"], ["zoom"], 10, 0.38, 15, 0.76],
+      "icon-rotate": ["get", "primaryHeadingDeg"],
+      "icon-rotation-alignment": "map",
+      "icon-allow-overlap": true,
+      "icon-ignore-placement": true,
     },
   });
   map.addLayer({
@@ -1531,9 +2014,13 @@ export function LiveMap({
         }
 
         (map.getSource("actors") as GeoJSONSource | undefined)?.setData(actorGeoJson(frameRef.current));
+        (map.getSource("actor-bodies") as GeoJSONSource | undefined)?.setData(actorBodyGeoJson(frameRef.current));
         (map.getSource("actor-headings") as GeoJSONSource | undefined)?.setData(actorHeadingGeoJson(frameRef.current));
         (map.getSource("signals") as GeoJSONSource | undefined)?.setData(
           scenarioSignalGeoJson(scenarioRef.current, frameRef.current.timeSeconds),
+        );
+        (map.getSource("signal-bodies") as GeoJSONSource | undefined)?.setData(
+          signalBodyGeoJson(signalAtTime(scenarioRef.current, frameRef.current.timeSeconds)),
         );
         (map.getSource("signal-phases") as GeoJSONSource | undefined)?.setData(
           scenarioSignalPhaseGeoJson(scenarioRef.current, frameRef.current.timeSeconds),
@@ -1678,9 +2165,13 @@ export function LiveMap({
 
   useEffect(() => {
     (mapRef.current?.getSource("actors") as GeoJSONSource | undefined)?.setData(actorGeoJson(frame));
+    (mapRef.current?.getSource("actor-bodies") as GeoJSONSource | undefined)?.setData(actorBodyGeoJson(frame));
     (mapRef.current?.getSource("actor-headings") as GeoJSONSource | undefined)?.setData(actorHeadingGeoJson(frame));
     (mapRef.current?.getSource("signals") as GeoJSONSource | undefined)?.setData(
       scenarioSignalGeoJson(scenario, frame.timeSeconds),
+    );
+    (mapRef.current?.getSource("signal-bodies") as GeoJSONSource | undefined)?.setData(
+      signalBodyGeoJson(signalAtTime(scenario, frame.timeSeconds)),
     );
     (mapRef.current?.getSource("signal-phases") as GeoJSONSource | undefined)?.setData(
       scenarioSignalPhaseGeoJson(scenario, frame.timeSeconds),

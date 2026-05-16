@@ -251,7 +251,7 @@ export function createTimisoaraStptAdapter(): TrafficProviderAdapter {
         vehicles: StptLiveVehicle[];
       }>("/data/sources/stpt-live/latest-vehicles.json");
 
-      const probeSegments = getRecentProbeSegments(undefined, 300);
+      const probeSegments = await getRecentProbeSegments(undefined, 300);
       const useRealProbes = probeSegments.length >= 3;
 
       const segments = latest.vehicles.slice(0, 25).map((vehicle, index) => {

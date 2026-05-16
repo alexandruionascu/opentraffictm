@@ -35,6 +35,7 @@ function modulo(value: number, divisor: number) {
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { queryAllProbeSegments } from "../stpt-probe";
+import type { SignalProgram } from "../data";
 
 interface SignalsJson {
   programs: Array<{
@@ -586,7 +587,7 @@ export async function buildArrivalModel(probes: ProbeObservation[]): Promise<Arr
 }
 
 export async function main() {
-  const { queryAllProbeSegments } = await import("./stpt-probe");
+  const { queryAllProbeSegments } = await import("../stpt-probe");
 
   console.log("Loading probe segments...");
   const probes = await queryAllProbeSegments();

@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const s = require\\('./data/traffic-lights/signals.json'\\); console.log\\(JSON.stringify\\({count: s.programs.length, sample: s.programs[0]}, null, 2\\)\\)\")",
+      "Bash(node *)",
+      "Bash(pip3 list *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c \"import fitz; print\\('ok'\\)\")",
+      "Bash(python3 -c \"import pdfplumber; print\\('ok'\\)\")",
+      "Bash(python3 *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(npx tsx *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(npx *)",
+      "Bash(git lfs *)",
+      "WebFetch(domain:github.com)",
+      "Bash(awk -F',' 'NR>1 {print $1}' /Users/alexandruionascu/Workspace/opentraffictm/data/traffic-flow/csv/tomtom-flow-2026-05-14T09-54-13-984Z.csv)",
+      "Bash(awk *)",
+      "WebSearch",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(pip show *)",
+      "Bash(pip install *)",
+      "Bash(git reset *)",
+      "Bash(git pull *)",
+      "Bash(gh api *)",
+      "Bash(git fetch *)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/alexandruionascu/opentraffictm/main/scripts/uxsim-adapter.py\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/alexandruionascu/opentraffictm/main/README.md\")",
+      "Bash(sqlite3 *)",
+      "Bash(git check-ignore *)",
+      "Bash(git ls-tree *)",
+      "Bash(brew install *)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(git filter-branch *)",
+      "Bash(git remote *)",
+      "Bash(git stash *)",
+      "Bash(npm rebuild *)"
+    ]
+  }
+}

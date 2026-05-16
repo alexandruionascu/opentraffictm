@@ -75,7 +75,7 @@ export interface TomTomProfilerOutput {
   };
 }
 
-const REGIME_THRESHOLDS = { free: 0.85, light: 0.65, heavy: 0.40 };
+const REGIME_THRESHOLDS = { free: 0.85, light: 0.65, heavy: 0.40, blocked: 0.25 };
 
 function classifyRegime(speedRatio: number): CongestionRegime {
   if (speedRatio >= REGIME_THRESHOLDS.free) return "free";

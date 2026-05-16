@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","id":"transit-route-M50","geometry":{"type":"LineString","coordinates":[[21.25141,45.751579],[21.23315,45.755459]]},"properties":{"id":"transit-route-M50","label":"Route M50","source":"STPT historical probes","kind":"transit-corridor","route":"M50","sampleCount":6823,"avgSpeedKph":43,"avgDelaySeconds":8,"densityRank":1}}]}

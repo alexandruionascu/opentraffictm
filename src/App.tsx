@@ -28,6 +28,9 @@ import type {
   TrafficLightProbeExportManifest,
 } from "./contracts";
 import { TrafficLightConfidenceMap, type TrafficHistoricalPlace, type TrafficProbeTrack } from "./map/TrafficLightConfidenceMap";
+import { FullscreenMapPage } from "./map/FullscreenMapPage";
+import { MapAtlasIndex } from "./map/MapAtlasIndex";
+import { findAtlasView } from "./map/mapAtlas";
 
 const LiveMap = lazy(() => import("./map/LiveMap").then((module) => ({ default: module.LiveMap })));
 
@@ -42,6 +45,7 @@ const eBusExamples = [
 const navItems = [
   { path: "/", label: "Home" },
   { path: "/map", label: "Live Map" },
+  { path: "/maps", label: "Map Atlas" },
   { path: "/datasets", label: "Data" },
   { path: "/sources", label: "Sources" },
   { path: "/validation", label: "Validation" },
@@ -79,7 +83,7 @@ function Shell({
   path: string;
   navigate: (nextPath: string) => void;
 }) {
-  const isMap = path === "/map" || path === "/traffic-lights";
+  const isMap = path === "/map" || path === "/traffic-lights" || path.startsWith("/maps/");
 
   return (
     <div className={isMap ? "app app-map" : "app"}>
@@ -90,7 +94,7 @@ function Shell({
         <nav>
           {navItems.map((item) => (
             <button
-              className={path === item.path ? "active" : ""}
+              className={path === item.path || (item.path !== "/" && path.startsWith(`${item.path}/`)) ? "active" : ""}
               key={item.path}
               onClick={() => navigate(item.path)}
               type="button"
@@ -107,6 +111,8 @@ function Shell({
 
 export function App() {
   const { path, navigate } = useRoute();
+  const atlasView = findAtlasView(path);
+  const knownStaticPaths = ["/map", "/maps", "/datasets", "/sources", "/validation", "/traffic-lights", "/tomtom", "/sheet", "/scenarios", "/leaderboards", "/papers"];
 
   return (
     <Shell path={path} navigate={navigate}>
@@ -114,6 +120,14 @@ export function App() {
         <Suspense fallback={<MapLoading />}>
           <LiveMap scenarios={scenarios} />
         </Suspense>
+      ) : null}
+      {path === "/maps" ? <MapAtlasIndex navigate={navigate} /> : null}
+      {path === "/maps/scenarios/playback" ? (
+        <Suspense fallback={<MapLoading />}>
+          <LiveMap scenarios={scenarios} />
+        </Suspense>
+      ) : atlasView ? (
+        <FullscreenMapPage view={atlasView} navigate={navigate} />
       ) : null}
       {path === "/datasets" ? <DatasetsPage /> : null}
       {path === "/sources" ? <SourcesPage /> : null}
@@ -124,7 +138,7 @@ export function App() {
       {path === "/scenarios" ? <ScenariosPage /> : null}
       {path === "/leaderboards" ? <LeaderboardsPage /> : null}
       {path === "/papers" ? <PapersPage /> : null}
-      {!["/map", "/datasets", "/sources", "/validation", "/traffic-lights", "/tomtom", "/sheet", "/scenarios", "/leaderboards", "/papers"].includes(path) ? (
+      {!knownStaticPaths.includes(path) && !path.startsWith("/maps/") ? (
         <HomePage />
       ) : null}
     </Shell>

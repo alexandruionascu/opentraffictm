@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","id":"transit-route-13","geometry":{"type":"LineString","coordinates":[[21.22459,45.757919],[21.23209,45.755661]]},"properties":{"id":"transit-route-13","label":"Route 13","source":"STPT historical probes","kind":"transit-corridor","route":"13","sampleCount":10601,"avgSpeedKph":17.3,"avgDelaySeconds":19,"densityRank":2}}]}
